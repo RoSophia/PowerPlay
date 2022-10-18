@@ -1,33 +1,27 @@
 package org.firstinspires.ftc.teamcode.husk;
 
-import android.graphics.Color;
-
-import androidx.annotation.ColorInt;
-
 import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
-import com.qualcomm.robotcore.hardware.I2cWaitControl;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
+
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import kotlin.collections.EmptyList;
-
 class AlgoByteId {
-    public String ALGORITHM_OBJECT_TRACKING = "0100";
-    public String ALGORITHM_FACE_RECOGNITION = "0000";
-    public String ALGORITHM_OBJECT_RECOGNITION = "0200";
-    public String ALGORITHM_LINE_TRACKING = "0300";
-    public String ALGORITHM_COLOR_RECOGNITION = "0400";
-    public String ALGORITHM_TAG_RECOGNITION = "0500";
-    public String ALGORITHM_OBJECT_CLASSIFICATION = "0600";
-    public String ALGORITHM_QR_CODE_RECOGNTITION = "0700";
-    public String ALGORITHM_BARCODE_RECOGNTITION = "0800";
+    public byte ALGORITHM_OBJECT_TRACKING = 0x01;
+    public byte ALGORITHM_FACE_RECOGNITION = 0x00;
+    public byte ALGORITHM_OBJECT_RECOGNITION = 0x02;
+    public byte ALGORITHM_LINE_TRACKING = 0x03;
+    public byte ALGORITHM_COLOR_RECOGNITION = 0x04;
+    public byte ALGORITHM_TAG_RECOGNITION = 0x05;
+    public byte ALGORITHM_OBJECT_CLASSIFICATION = 0x06;
+    public byte ALGORITHM_QR_CODE_RECOGNTITION = 0x07;
+    public byte ALGORITHM_BARCODE_RECOGNTITION = 0x08;
 }
 
 class EElement {
@@ -54,21 +48,48 @@ class EElement {
     }
 }
 
-class HuskyLensLib {
-    int address;
+@I2cDeviceType()
+@DeviceProperties(name = "Husky", description = "Husky cam", xmlTag = "HUSKY_CAM")
+class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+    //int address;
     boolean checkOnceAgain;
     Vector<Byte> lastCmdSent;
 
-    public HuskyLensLib(String comPort, int addr) {
-        address = addr;
+    @Override
+    public Manufacturer getManufacturer() {
+        return Manufacturer.Other;
+    }
+
+    @Override
+    protected synchronized boolean doInitialize() {
+        return true;
+    }
+
+    @Override
+    public String getDeviceName() {
+        return "Huskylens";
+    }
+
+    private final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x23);
+
+    public HuskyLensLib(I2cDeviceSynch deviceClient) {
+        super(deviceClient, true);
+        this.deviceClient.setI2cAddress(ADDRESS_I2C_DEFAULT);
+        super.registerArmingStateCallback(false);
+        //address = addr;
         checkOnceAgain = true;
         lastCmdSent = new Vector<>();
+
+        deviceClient.engage();
     }
 
     public void writeToHuskyLens(Vector<Byte> cmd) {
         lastCmdSent = cmd;
-        /// TODO: AAA
-        huskylensSer.write_i2c_block_data(address, 12, cmd);
+        byte[] barr = new byte[cmd.size()];
+        for (int i = 0; i < cmd.size(); ++i) {
+            barr[i] = cmd.get(i);
+        }
+        this.deviceClient.write(12, barr);
     }
 
     static class SplitCommand {
@@ -97,22 +118,24 @@ class HuskyLensLib {
     public SplitCommand getCommandSplit() {
         Vector<Byte> byteString = new Vector<>();
         for (int i = 0; i < 5; ++i) {
-            byteString.add(huskylensSer.read_byte(address));
+            byteString.add(this.deviceClient.read8());
         }
         for (int i = 0; i < byteString.elementAt(3) + 1; ++i) {
-            byteString.add(huskylensSer.read_byte(address));
+            byteString.add(this.deviceClient.read8());
         }
 
         return splitCommandToParts(byteString);
     }
 
-    public Vector<EElement> processReturnData(boolean numIdLearnFlag, boolean frameFlag) {
-        Vector<Byte> byteString = new Vector<>();
+    public int nidLearned; // Number of ID learned
+    public int fNumber;    // Frame number
+
+    public Vector<EElement> processReturnData() {
         try {
             SplitCommand spc = getCommandSplit();
             if (spc.command == 0x2E) {
                 checkOnceAgain = true;
-                return "Knock Recieved";
+                return new Vector<>();
             } else {
                 Vector<List<Byte>> returnData = new Vector<>();
                 int numberOfBlocksOrArrow = spc.data.get(0) + spc.data.get(1) << 8;
@@ -132,7 +155,7 @@ class HuskyLensLib {
                     for (int q = 0; q < i.size(); q += 4) {
                         int low = i.get(0);
                         int high = i.get(1);
-                        int val = 0;
+                        int val;
                         if (high > 0) {
                             val = low + 255 + high;
                         } else {
@@ -146,12 +169,8 @@ class HuskyLensLib {
 
                 checkOnceAgain = true;
                 Vector<EElement> ret = convert_to_class_object(finalData, isBlock);
-                /*if (numIdLearnFlag) { /// TODO: Fix
-                    ret.add(numberOfIDLearned);
-                }
-                if (frameFlag) {
-                    ret.add(frameNumber);
-                }*/
+                nidLearned = numberOfIDLearned;
+                fNumber = frameNumber;
                 return ret;
             }
         } catch (Exception E) {
@@ -159,16 +178,17 @@ class HuskyLensLib {
                 // huskylensSer.timeout = 5; TODO: I DO NOT GET IT??
                 checkOnceAgain = false;
                 // huskylensSer.timeout = .5;
-                return processReturnData(false, false);
+                return processReturnData();
             }
             /// PRINT("Read response error, please try again");
+            /*
             huskylensSer.flushInput();
             huskylensSer.flushOutput();
             huskylensSer.flush();
+             */
             return new Vector<>();
         }
     }
-
 
     public Vector<EElement> convert_to_class_object(Vector<List<Integer>> data, boolean isBlock) {
         Vector<EElement> tmp = new Vector<>();
@@ -181,254 +201,234 @@ class HuskyLensLib {
         return tmp;
     }
 
-    Byte[] commandHeaderAndAddress = {0x55, (byte)0xAA, 0x11};
+    Byte[] commandHeaderAndAddress = {0x55, (byte) 0xAA, 0x11};
 
     public int knock() {
         Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
         Byte[] kms = {0x00, 0x2c, 0x3c};
         cmd.addAll(Arrays.asList(kms));
         writeToHuskyLens(cmd);
-        Vector<EElement> x = processReturnData(false, false);
+        Vector<EElement> x = processReturnData();
         return x.size();
     }
 
-    def learn(self, x):
-    data ="{:04x}".
-
-    format(x)
-
-    part1=data[2:]
-    part2=data[0:2]
-            #
-    reverse to
-    correct endiness
-    data=part1+
-    part2
-            dataLen = "{:02x}".format(len(data)//2)
-            cmd = commandHeaderAndAddress + dataLen + "36" + data
-            cmd += self.calculateChecksum(cmd)
-            cmd = self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-        return self.processReturnData()
-
-    def forget(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"003747")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def setCustomName(self, name, idV):
-    nameDataSize ="{:02x}".
-
-    format(len(name)+1)
-    name =name.encode("utf-8").
-
-    hex()+"00"
-    localId ="{:02x}".
-
-    format(idV)
-
-    data =localId+nameDataSize+
-    name
-            dataLen = "{:02x}".format(len(data)//2)
-            cmd = commandHeaderAndAddress + dataLen + "2f" + data
-            cmd += self.calculateChecksum(cmd)
-            cmd = self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-        return self.processReturnData()
-
-    def customText(self, nameV, xV, yV):
-    name=nameV.encode("utf-8").
-
-    hex()
-
-    nameDataSize ="{:02x}".
-
-    format(len(name)//2)
-        if(xV>255):
-    x="ff"+"{:02x}".
-
-    format(xV%255)
-        else:
-    x="00"+"{:02x}".
-
-    format(xV)
-
-    y="{:02x}".
-
-    format(yV)
-
-    data =nameDataSize+x+y+
-    name
-            dataLen = "{:02x}".format(len(data)//2)
-
-            cmd = commandHeaderAndAddress + dataLen + "34" + data
-            cmd += self.calculateChecksum(cmd)
-            cmd = self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-        return self.processReturnData()
-
-    def clearText(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"003545")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def requestAll(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002030")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def saveModelToSDCard(self, idVal):
-    idVal ="{:04x}".
-
-    format(idVal)
-
-    idVal =idVal[2:]+idVal[0:2]
-    cmd =commandHeaderAndAddress+"0232"+idVal
-    cmd +=self.calculateChecksum(cmd)
-    cmd =self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def loadModelFromSDCard(self, idVal):
-    idVal ="{:04x}".
-
-    format(idVal)
-
-    idVal =idVal[2:]+idVal[0:2]
-    cmd =commandHeaderAndAddress+"0233"+idVal
-    cmd +=self.calculateChecksum(cmd)
-    cmd =self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def savePictureToSDCard(self):
-    self.huskylensSer.timeout=5
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"003040")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def saveScreenshotToSDCard(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"003949")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-
-    def blocks(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002131")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def arrows(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002232")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def learned(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002333")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def learnedBlocks(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002434")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def learnedArrows(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002535")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def getObjectByID(self, idVal):
-    idVal ="{:04x}".
-
-    format(idVal)
-
-    idVal =idVal[2:]+idVal[0:2]
-    cmd =commandHeaderAndAddress+"0226"+idVal
-    cmd +=self.calculateChecksum(cmd)
-    cmd =self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def getBlocksByID(self, idVal):
-    idVal ="{:04x}".
-
-    format(idVal)
-
-    idVal =idVal[2:]+idVal[0:2]
-    cmd =commandHeaderAndAddress+"0227"+idVal
-    cmd +=self.calculateChecksum(cmd)
-    cmd =self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def getArrowsByID(self, idVal):
-    idVal ="{:04x}".
-
-    format(idVal)
-
-    idVal =idVal[2:]+idVal[0:2]
-    cmd =commandHeaderAndAddress+"0228"+idVal
-    cmd +=self.calculateChecksum(cmd)
-    cmd =self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()[0]
-
-    def algorthim(self, alg):
-            if
-    alg in
-    algorthimsByteID:
-    cmd =commandHeaderAndAddress+"022d"+algorthimsByteID[alg]
-    cmd +=self.calculateChecksum(cmd)
-    cmd =self.cmdToBytes(cmd)
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData()
-            else:
-
-    print("INCORRECT ALGORITHIM NAME")
-
-    def count(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002030")
-            self.writeToHuskyLens(cmd)
-            return
-
-    len(self.processReturnData())
-
-    def learnedObjCount(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002030")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData(numIdLearnFlag=True)[-1]
-
-    def frameNumber(self):
-    cmd =self.cmdToBytes(commandHeaderAndAddress+"002030")
-            self.writeToHuskyLens(cmd)
-            return self.processReturnData(frameFlag=True)[-1]
-
-    @I2cDeviceType()
-    @DeviceProperties(name = "QWIIC LED Stick", description = "Sparkfun QWIIC LED Stick", xmlTag = "QWIIC_LED_STICK")
-    public class Husky extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
-
-        @Override
-        public Manufacturer getManufacturer() {
-            return Manufacturer.Other;
+    byte calculateChecksum(Vector<Byte> hexStr) {
+        int total = 0;
+        for (int i = 0; i < hexStr.size(); ++i) {
+            total += hexStr.elementAt(i);
         }
-
-        @Override
-        protected synchronized boolean doInitialize() {
-            return true;
-        }
-
-        @Override
-        public String getDeviceName() {
-            return "Huskylens";
-        }
-
-        private final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x23);
-
-        public Husky(I2cDeviceSynchSimple deviceClient) {
-            super(deviceClient, true);
-
-            this.deviceClient.setI2cAddress(ADDRESS_I2C_DEFAULT);
-            super.registerArmingStateCallback(false);
-        }
-
+        return (byte) (total & 0xFF);
     }
+
+    public int learn(int x) {
+        Byte[] data = {(byte) (x & 0xFF), (byte) ((x & 0xFF00) >> 2)};
+        Byte[] dataLen = {0x02};
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(data));
+        cmd.addAll(Arrays.asList(commandHeaderAndAddress));
+        cmd.addAll(Arrays.asList(dataLen));
+        cmd.add((byte) 0x36);
+        cmd.addAll(Arrays.asList(data));
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return knock();//processReturnData();
+    }
+
+    public int forget() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        Byte[] st = {(byte) 0x00, (byte) 0x37, (byte) 0x47};
+        cmd.addAll(Arrays.asList(st));
+        writeToHuskyLens(cmd);
+        return knock();//self.processReturnData();
+    }
+
+    private Vector<Byte> atov(byte[] bs) {
+        Vector<Byte> b = new Vector<>();
+        for (byte bi : bs) {
+            b.add(bi);
+        }
+        return b;
+    }
+
+    public int setCustomName(String name, int idV) {
+        byte nameDataSize = (byte) (name.length() + 1);
+        byte[] bs = name.getBytes(StandardCharsets.UTF_8);
+        Vector<Byte> b = atov(bs);
+        b.add((byte) 0x00);
+        byte localId = (byte) idV;
+        Vector<Byte> data = new Vector<>();
+        data.add(localId);
+        data.add(nameDataSize);
+        data.addAll(b);
+        byte dataLen = (byte) data.size();
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        cmd.add(dataLen);
+        cmd.add((byte) 0x2f);
+        cmd.addAll(data);
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return knock();
+    }
+
+    public int customText(String name, int xV, int yV) {
+        byte nameDataSize = (byte) name.length();
+        Vector<Byte> x = new Vector<>();
+        if (xV > 255) {
+            x.add((byte) 0xFF);
+            x.add((byte) (xV & 0xFF));
+        } else {
+            x.add((byte) 0x00);
+            x.add((byte) xV);
+        }
+
+        Vector<Byte> b = atov(name.getBytes(StandardCharsets.UTF_8));
+
+        Vector<Byte> data = new Vector<>();
+        data.add(nameDataSize);
+        data.addAll(x);
+        data.add((byte) yV);
+        data.addAll(b);
+        byte dataLen = (byte) data.size();
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        cmd.add(dataLen);
+        cmd.add((byte) 0x34);
+        cmd.addAll(data);
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return knock();
+    }
+
+    public int clearText() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x35, (byte) 0x45};
+        Vector<Byte> b = atov(bs);
+        cmd.addAll(b);
+        writeToHuskyLens(cmd);
+        return knock();
+    }
+
+    public Vector<EElement> requestAll() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x20, (byte) 0x30};
+        Vector<Byte> b = atov(bs);
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    /*
+
+        def saveModelToSDCard(self,idVal):
+            idVal = "{:04x}".format(idVal)
+            idVal = idVal[2:]+idVal[0:2]
+            cmd = commandHeaderAndAddress+"0232"+idVal
+            cmd += self.calculateChecksum(cmd)
+            cmd = self.cmdToBytes(cmd)
+            self.writeToHuskyLens(cmd)
+            return self.processReturnData()
+
+        def loadModelFromSDCard(self,idVal):
+            idVal = "{:04x}".format(idVal)
+            idVal = idVal[2:]+idVal[0:2]
+            cmd = commandHeaderAndAddress+"0233"+idVal
+            cmd += self.calculateChecksum(cmd)
+            cmd = self.cmdToBytes(cmd)
+            self.writeToHuskyLens(cmd)
+            return self.processReturnData()
+
+        def savePictureToSDCard(self):
+            self.huskylensSer.timeout=5
+            cmd = self.cmdToBytes(commandHeaderAndAddress+"003040")
+            self.writeToHuskyLens(cmd)
+            return self.processReturnData()
+
+        def saveScreenshotToSDCard(self):
+            cmd = self.cmdToBytes(commandHeaderAndAddress+"003949")
+            self.writeToHuskyLens(cmd)
+            return self.processReturnData()
+
+     */
+
+    public Vector<EElement> blocks() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x21, (byte) 0x31};
+        Vector<Byte> b = atov(bs);
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> arrows() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x22, (byte) 0x32};
+        Vector<Byte> b = atov(bs);
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> learned() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x23, (byte) 0x33};
+        Vector<Byte> b = atov(bs);
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> learnedBlocks() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x24, (byte) 0x34};
+        Vector<Byte> b = atov(bs);
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> learnedArrows() {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        byte[] bs = {(byte) 0x00, (byte) 0x25, (byte) 0x35};
+        Vector<Byte> b = atov(bs);
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> getObjectByID(int idVal) {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        cmd.add((byte) 0x02);
+        cmd.add((byte) 0x26);
+        cmd.add((byte) (idVal & 0xFF));
+        cmd.add((byte) ((idVal & 0xFF00) >> 2));
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> getBlocksByID(int idVal) {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        cmd.add((byte) 0x02);
+        cmd.add((byte) 0x27);
+        cmd.add((byte) (idVal & 0xFF));
+        cmd.add((byte) ((idVal & 0xFF00) >> 2));
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public Vector<EElement> getArrowsByID(int idVal) {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        cmd.add((byte) 0x02);
+        cmd.add((byte) 0x28);
+        cmd.add((byte) (idVal & 0xFF));
+        cmd.add((byte) ((idVal & 0xFF00) >> 2));
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return processReturnData();
+    }
+
+    public int algorthim(byte alg) {
+        Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
+        cmd.add((byte) 0x02);
+        cmd.add((byte) 0x2d);
+        cmd.add(alg);
+        cmd.add((byte) 0x00);
+        cmd.add(calculateChecksum(cmd));
+        writeToHuskyLens(cmd);
+        return knock();
+    }
+
+}
