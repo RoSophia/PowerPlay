@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.husk;
+package org.firstinspires.ftc.teamcode.HuskyLensLib;
 
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
@@ -24,7 +24,7 @@ class AlgoByteId {
     public byte ALGORITHM_BARCODE_RECOGNTITION = 0x08;
 }
 
-class EElement {
+public class EElement {
     public int x0;
     public int y0;
     public int x1;
@@ -50,7 +50,7 @@ class EElement {
 
 @I2cDeviceType()
 @DeviceProperties(name = "Husky", description = "Husky cam", xmlTag = "HUSKY_CAM")
-class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     //int address;
     boolean checkOnceAgain;
     Vector<Byte> lastCmdSent;
