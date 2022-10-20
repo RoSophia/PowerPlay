@@ -82,7 +82,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
             final double rfPower = (speed * Math.cos(angle) - turn);
             final double lbPower = speed * Math.cos(angle) + turn;
             final double rbPower = (speed * Math.sin(angle) - turn);
-00
+
             if (ridicareSlide.getCurrentPosition() >= -4120 && ridicareSlide.getCurrentPosition() <= 0)
                 ridicareSlide.setPower(0.8 * gamepad2.left_stick_y);
             else ridicareSlide.setPower(0);
