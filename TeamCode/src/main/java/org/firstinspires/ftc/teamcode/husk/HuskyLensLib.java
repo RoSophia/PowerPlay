@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
+import org.firstinspires.ftc.teamcode.husk.EElement;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -24,33 +25,9 @@ class AlgoByteId {
     public byte ALGORITHM_BARCODE_RECOGNTITION = 0x08;
 }
 
-public class EElement {
-    public int x0;
-    public int y0;
-    public int x1;
-    public int y1;
-    public int ID;
-    public int learned;
-
-    enum EType {ARROW, BLOCK}
-
-    ;
-    public EType type;
-
-    public EElement(int xt, int yt, int xh, int yh, int id, boolean ct) {
-        x0 = xt;
-        y0 = yt;
-        x1 = xh;
-        y1 = yh;
-        ID = id;
-        learned = ID > 0 ? 1 : 0;
-        type = ct ? EType.BLOCK : EType.ARROW;
-    }
-}
-
 @I2cDeviceType()
 @DeviceProperties(name = "Husky", description = "Husky cam", xmlTag = "HUSKY_CAM")
-public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I have become a husk of myself
     //int address;
     boolean checkOnceAgain;
     Vector<Byte> lastCmdSent;
@@ -70,7 +47,15 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         return "Huskylens";
     }
 
-    private final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x23);
+    private final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x32);
+
+    public Vector<Byte> MaSinucid() {
+        Vector<Byte> b = new Vector<>();
+        for (int i = 0; i < 255; ++i) {
+            b.add(this.deviceClient.read(i, 1)[0]);
+        }
+        return b;
+    }
 
     public HuskyLensLib(I2cDeviceSynch deviceClient) {
         super(deviceClient, true);
@@ -80,7 +65,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> {
         checkOnceAgain = true;
         lastCmdSent = new Vector<>();
 
-        deviceClient.engage();
+        this.deviceClient.engage();
     }
 
     public void writeToHuskyLens(Vector<Byte> cmd) {

@@ -4,9 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import org.firstinspires.ftc.teamcode.HuskyLensLib.EElement;
 
 import org.firstinspires.ftc.teamcode.HuskyLensLib.HuskyLensLib;
+import org.firstinspires.ftc.teamcode.husk.EElement;
 
 import java.util.Vector;
 
@@ -39,7 +39,19 @@ public class CaineleHuskyCareEsteAlMeu extends LinearOpMode {
 
         waitForStart();
 
+        Vector<Byte> b = husk.MaSinucid();
+        for (int i = 0; i < 255; ++i) {
+            telemetry.addData(String.valueOf(i), b.get(i));
+        }
+        telemetry.update();
+
+        /*
+        int a = 0;
         while (opModeIsActive()) {
+            telemetry.addData("a", a);
+            telemetry.addData("KMS", husk.MaSinucid());
+            sleep(1000);
+            a++;
             double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double turn = -gamepad1.right_stick_x;
@@ -66,6 +78,6 @@ public class CaineleHuskyCareEsteAlMeu extends LinearOpMode {
             rightFront.setPower(rfPower);
             leftBack.setPower(lbPower);
             rightBack.setPower(rbPower);
-        }
+        }*/
     }
 }
