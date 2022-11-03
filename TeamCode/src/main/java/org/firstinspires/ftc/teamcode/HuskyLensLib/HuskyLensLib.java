@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.HuskyLensLib;
+package org.firstinspires.ftc.teamcode.husk;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.I2cAddr;
