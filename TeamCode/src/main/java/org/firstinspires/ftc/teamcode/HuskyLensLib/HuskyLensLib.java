@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.husk;
+/*package org.firstinspires.ftc.teamcode.husk;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.I2cAddr;
@@ -216,7 +216,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
             huskylensSer.flushInput();
             huskylensSer.flushOutput();
             huskylensSer.flush();
-             */
+
             return new Vector<>();
         }
     }
@@ -377,7 +377,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
             self.writeToHuskyLens(cmd)
             return self.processReturnData()
 
-     */
+
 
     public Vector<EElement> blocks() {
         Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
@@ -469,3 +469,4 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
     }
 
 }
+*/
