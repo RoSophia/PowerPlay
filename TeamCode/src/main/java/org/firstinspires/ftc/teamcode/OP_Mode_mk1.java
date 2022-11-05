@@ -158,7 +158,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
             }
             //lastButtonY = gamepad2.y;
             if (gamepad2.x) {
-                s1pos = 0f;
+                s1pos = 0.4f;
                 //s2pos = 0.4f;
             }
             //lastButtonX = gamepad2.x;

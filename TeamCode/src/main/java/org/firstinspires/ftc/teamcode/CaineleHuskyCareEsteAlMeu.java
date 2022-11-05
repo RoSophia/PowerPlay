@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+/*
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-//import org.firstinspires.ftc.teamcode.HuskyLensLib.HuskyLensLib;
+import org.firstinspires.ftc.teamcode.HuskyLensLib.HuskyLensLib;
 import org.firstinspires.ftc.teamcode.husk.EElement;
 
 import java.util.Vector;
@@ -19,14 +20,14 @@ public class CaineleHuskyCareEsteAlMeu extends LinearOpMode {
     public DcMotor rightBack;
     public DcMotor rightFront;
 
-  ////  HuskyLensLib husk;
+    HuskyLensLib husk;
 
     public void runOpMode() {
         leftBack = hardwareMap.get(DcMotor.class, "LB");
         leftFront = hardwareMap.get(DcMotor.class, "LF");
         rightBack = hardwareMap.get(DcMotor.class, "RB");
         rightFront = hardwareMap.get(DcMotor.class, "RF");
-       // husk = hardwareMap.get(HuskyLensLib.class, "Husky");
+        husk = hardwareMap.get(HuskyLensLib.class, "Husky");
 
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -39,11 +40,11 @@ public class CaineleHuskyCareEsteAlMeu extends LinearOpMode {
 
         waitForStart();
 
-       // Vector<Byte> b = husk.MaSinucid();
-      //  for (int i = 0; i < 255; ++i) {
-       ///     telemetry.addData(String.valueOf(i), b.get(i));
-      ///  }
-       // telemetry.update();
+        Vector<Byte> b = husk.MaSinucid();
+        for (int i = 0; i < 255; ++i) {
+            telemetry.addData(String.valueOf(i), b.get(i));
+        }
+        telemetry.update();
 
         /*
         int a = 0;
@@ -78,6 +79,7 @@ public class CaineleHuskyCareEsteAlMeu extends LinearOpMode {
             rightFront.setPower(rfPower);
             leftBack.setPower(lbPower);
             rightBack.setPower(rbPower);
-        }*/
+        }
     }
 }
+*/

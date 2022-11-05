@@ -1,36 +1,27 @@
-package org.firstinspires.ftc.teamcode.husk;
+/*package org.firstinspires.ftc.teamcode.husk;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
-import org.firstinspires.ftc.teamcode.husk.EElement;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-class AlgoByteId {
-    public byte ALGORITHM_OBJECT_TRACKING = 0x01;
-    public byte ALGORITHM_FACE_RECOGNITION = 0x00;
-    public byte ALGORITHM_OBJECT_RECOGNITION = 0x02;
-    public byte ALGORITHM_LINE_TRACKING = 0x03;
-    public byte ALGORITHM_COLOR_RECOGNITION = 0x04;
-    public byte ALGORITHM_TAG_RECOGNITION = 0x05;
-    public byte ALGORITHM_OBJECT_CLASSIFICATION = 0x06;
-    public byte ALGORITHM_QR_CODE_RECOGNTITION = 0x07;
-    public byte ALGORITHM_BARCODE_RECOGNTITION = 0x08;
-}
-
+/// THIS SHIT IS NOT USEFUL, KILL MYSELF
 @I2cDeviceType()
 @DeviceProperties(name = "Husky", description = "Husky cam", xmlTag = "HUSKY_CAM")
+@Disabled
 public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I have become a husk of myself
-    //int address;
     boolean checkOnceAgain;
     Vector<Byte> lastCmdSent;
+    Telemetry telemetry;
 
     @Override
     public Manufacturer getManufacturer() {
@@ -57,6 +48,10 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         return b;
     }
 
+    public void AddTelemetry(Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
+
     public HuskyLensLib(I2cDeviceSynch deviceClient) {
         super(deviceClient, true);
         this.deviceClient.setI2cAddress(ADDRESS_I2C_DEFAULT);
@@ -69,10 +64,13 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
     }
 
     public void writeToHuskyLens(Vector<Byte> cmd) {
+        cmd.add((byte) 0x00);
+        telemetry.addData("Write len", cmd.size());
         lastCmdSent = cmd;
         byte[] barr = new byte[cmd.size()];
         for (int i = 0; i < cmd.size(); ++i) {
             barr[i] = cmd.get(i);
+            telemetry.addData("i", (int)barr[i]);
         }
         this.deviceClient.write(12, barr);
     }
@@ -86,6 +84,15 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         int checkSum;
     }
 
+    void printSplitCommand(SplitCommand spcl) {
+        telemetry.addLine("   \\-Split");
+        telemetry.addData("    -Haed", spcl.headers);
+        telemetry.addData("    -Addr", spcl.address);
+        telemetry.addData("    -datl", spcl.data_length);
+        telemetry.addData("    -comm", spcl.command);
+        telemetry.addData("    -data", spcl.data);
+    }
+
     public SplitCommand splitCommandToParts(Vector<Byte> str) {
         SplitCommand sc = new SplitCommand();
         sc.headers = str.subList(0, 2);
@@ -97,17 +104,27 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         }
         sc.checkSum = str.elementAt(5 + sc.data_length);
 
+        printSplitCommand(sc);
         return sc;
     }
 
     public SplitCommand getCommandSplit() {
+        telemetry.addLine(" \\-GetCommandSplit: Start");
+        telemetry.addLine("U");
+        //telemetry.update();
         Vector<Byte> byteString = new Vector<>();
         for (int i = 0; i < 5; ++i) {
             byteString.add(this.deviceClient.read8());
         }
+        telemetry.addData("  -GetCommandSplit: bstr", byteString);
+        telemetry.addLine("I");
+        //telemetry.update();
         for (int i = 0; i < byteString.elementAt(3) + 1; ++i) {
             byteString.add(this.deviceClient.read8());
         }
+        telemetry.addData("  -GetCommandSplit: bst2", byteString);
+        telemetry.addLine("P");
+        //telemetry.update();
 
         return splitCommandToParts(byteString);
     }
@@ -116,27 +133,51 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
     public int fNumber;    // Frame number
 
     public Vector<EElement> processReturnData() {
+        telemetry.addLine("ProcessReturnData: Start");
+        telemetry.addLine("1");
+        //telemetry.update();
+
         try {
+            telemetry.addLine("C");
+            //telemetry.update();
             SplitCommand spc = getCommandSplit();
+            telemetry.addLine("2");
+            //telemetry.update();
             if (spc.command == 0x2E) {
                 checkOnceAgain = true;
+                telemetry.addLine("ProcessReturnData: Comand iz 0x2E. Knoc knoc");
+                telemetry.addLine("3");
+                //telemetry.update();
                 return new Vector<>();
             } else {
+                telemetry.addLine("4");
+                //telemetry.update();
                 Vector<List<Byte>> returnData = new Vector<>();
                 int numberOfBlocksOrArrow = spc.data.get(0) + spc.data.get(1) << 8;
                 int numberOfIDLearned = spc.data.get(2) + spc.data.get(3) << 8;
                 int frameNumber = spc.data.get(4) + spc.data.get(5) << 8;
+                telemetry.addData("ProcessReturnData: nrboa", numberOfBlocksOrArrow);
+                telemetry.addData("ProcessReturnData: nridl", numberOfIDLearned);
+                telemetry.addData("ProcessReturnData: nrfrn", frameNumber);
+                telemetry.addLine("5");
+                //telemetry.update();
                 boolean isBlock = true;
                 for (int i = 0; i < numberOfBlocksOrArrow; ++i) {
                     SplitCommand tspc = getCommandSplit();
                     isBlock = tspc.command == 0x2A; // ??????????????????????????
                     returnData.add(tspc.data);
                 }
+                telemetry.addLine("6");
+                //telemetry.update();
 
-                Vector<List<Integer>> finalData = new Vector<>();
+                telemetry.addLine("ProcessReturnData: preinit");
+                Vector<Vector<Integer>> finalData = new Vector<>();
                 Vector<Integer> tmp = new Vector<>();
+                telemetry.addLine("ProcessReturnData: postinit");
                 for (List<Byte> i : returnData) {
+                    telemetry.addLine("ProcessReturnData: clear");
                     tmp.clear();
+                    telemetry.addData("ProcessReturnData: i", i);
                     for (int q = 0; q < i.size(); q += 4) {
                         int low = i.get(0);
                         int high = i.get(1);
@@ -150,8 +191,11 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
                     }
 
                     finalData.add(tmp);
+                    telemetry.addData("ProcessReturnData: fd", finalData);
                 }
 
+                telemetry.addLine("7");
+                //telemetry.update();
                 checkOnceAgain = true;
                 Vector<EElement> ret = convert_to_class_object(finalData, isBlock);
                 nidLearned = numberOfIDLearned;
@@ -159,6 +203,8 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
                 return ret;
             }
         } catch (Exception E) {
+            telemetry.addData("ProcessReturnData: Excieption", E.getMessage());
+            telemetry.addData("", Arrays.toString(E.getStackTrace()));
             if (checkOnceAgain) {
                 // huskylensSer.timeout = 5; TODO: I DO NOT GET IT??
                 checkOnceAgain = false;
@@ -170,14 +216,14 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
             huskylensSer.flushInput();
             huskylensSer.flushOutput();
             huskylensSer.flush();
-             */
+
             return new Vector<>();
         }
     }
 
-    public Vector<EElement> convert_to_class_object(Vector<List<Integer>> data, boolean isBlock) {
+    public Vector<EElement> convert_to_class_object(Vector<Vector<Integer>> data, boolean isBlock) {
         Vector<EElement> tmp = new Vector<>();
-        for (List<Integer> i : data) {
+        for (Vector<Integer> i : data) {
             EElement obj;
             obj = new EElement(i.get(0), i.get(1), i.get(2), i.get(3), i.get(4), isBlock);
             tmp.add(obj);
@@ -186,7 +232,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         return tmp;
     }
 
-    Byte[] commandHeaderAndAddress = {0x55, (byte) 0xAA, 0x11};
+    Byte[] commandHeaderAndAddress = {(byte)0x55, (byte) 0xAA, (byte)0x11};
 
     public int knock() {
         Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
@@ -295,6 +341,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
         byte[] bs = {(byte) 0x00, (byte) 0x20, (byte) 0x30};
         Vector<Byte> b = atov(bs);
+        cmd.addAll(b);
         writeToHuskyLens(cmd);
         return processReturnData();
     }
@@ -330,12 +377,13 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
             self.writeToHuskyLens(cmd)
             return self.processReturnData()
 
-     */
+
 
     public Vector<EElement> blocks() {
         Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
         byte[] bs = {(byte) 0x00, (byte) 0x21, (byte) 0x31};
         Vector<Byte> b = atov(bs);
+        cmd.addAll(b);
         writeToHuskyLens(cmd);
         return processReturnData();
     }
@@ -345,6 +393,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         byte[] bs = {(byte) 0x00, (byte) 0x22, (byte) 0x32};
         Vector<Byte> b = atov(bs);
         writeToHuskyLens(cmd);
+        cmd.addAll(b);
         return processReturnData();
     }
 
@@ -353,6 +402,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         byte[] bs = {(byte) 0x00, (byte) 0x23, (byte) 0x33};
         Vector<Byte> b = atov(bs);
         writeToHuskyLens(cmd);
+        cmd.addAll(b);
         return processReturnData();
     }
 
@@ -361,6 +411,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         byte[] bs = {(byte) 0x00, (byte) 0x24, (byte) 0x34};
         Vector<Byte> b = atov(bs);
         writeToHuskyLens(cmd);
+        cmd.addAll(b);
         return processReturnData();
     }
 
@@ -369,6 +420,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         byte[] bs = {(byte) 0x00, (byte) 0x25, (byte) 0x35};
         Vector<Byte> b = atov(bs);
         writeToHuskyLens(cmd);
+        cmd.addAll(b);
         return processReturnData();
     }
 
@@ -405,7 +457,7 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
         return processReturnData();
     }
 
-    public int algorthim(byte alg) {
+    public int algorithm(byte alg) {
         Vector<Byte> cmd = new Vector<>(Arrays.asList(commandHeaderAndAddress));
         cmd.add((byte) 0x02);
         cmd.add((byte) 0x2d);
@@ -417,3 +469,4 @@ public class HuskyLensLib extends I2cDeviceSynchDevice<I2cDeviceSynch> { // I ha
     }
 
 }
+*/
