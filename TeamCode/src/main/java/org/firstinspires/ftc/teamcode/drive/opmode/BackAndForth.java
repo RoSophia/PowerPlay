@@ -30,7 +30,7 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 @Autonomous(group = "drive")
 public class BackAndForth extends LinearOpMode {
 
-    public static double DISTANCE = 50;
+    public static double DISTANCE = 25;
 
     @Override
     public void runOpMode() throws InterruptedException {

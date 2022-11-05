@@ -317,11 +317,15 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
+        telemetry.addLine("EXTH");
+        telemetry.update();
         return imu.getAngularOrientation().firstAngle;
     }
 
     @Override
     public Double getExternalHeadingVelocity() {
+        telemetry.addLine("EXTH");
+        telemetry.update();
         return (double) imu.getAngularVelocity().zRotationRate;
     }
 
