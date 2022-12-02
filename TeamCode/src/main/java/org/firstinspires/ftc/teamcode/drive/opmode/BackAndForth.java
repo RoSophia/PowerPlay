@@ -35,22 +35,25 @@ public class BackAndForth extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        drive.setTele(telemetry);
 
-        Trajectory trajectoryForward = drive.trajectoryBuilder(new Pose2d())
-                .forward(DISTANCE)
+
+        Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())
+                .strafeLeft(DISTANCE)
+                .build();
+
+        /*Trajectory trajectoryforward = drive.trajectorybuilder(new pose2d())
+                .forward(distance)
                 .build();
 
         Trajectory trajectoryBackward = drive.trajectoryBuilder(trajectoryForward.end())
                 .back(DISTANCE)
-                .build();
+                .build();*/
 
         waitForStart();
 
-        while (opModeIsActive() && !isStopRequested()) {
-            drive.followTrajectory(trajectoryForward);
-            drive.followTrajectory(trajectoryBackward);
-            drive.update();
-        }
+        if (isStopRequested()) return;
+
+        drive.followTrajectory(trajectory);
+        drive.update();
     }
 }
