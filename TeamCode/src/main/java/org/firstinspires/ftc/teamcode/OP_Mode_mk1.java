@@ -121,6 +121,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "RB");
         rightFront = hardwareMap.get(DcMotor.class, "RF");
         ridicareSlide = hardwareMap.get(DcMotor.class, "RS");
+
         s1 = hardwareMap.get(Servo.class, "S1");
         //s2 = hardwareMap.get(Servo.class, "S2");
         sspate = hardwareMap.get(Servo.class, "RPS");
@@ -149,6 +150,12 @@ public class OP_Mode_mk1 extends LinearOpMode {
         //reverse those suckers
         rightBack.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
+
+        Servo SPa = hardwareMap.get(Servo.class, "SPa");
+        Servo SPe = hardwareMap.get(Servo.class, "SPe");
+
+        SPa.setPosition(0.0);
+        SPe.setPosition(0.0);
 
         s1pos = 0.85f;
         //s2pos = 0.4f;
