@@ -11,9 +11,11 @@ import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import java.util.Objects;
 
@@ -42,7 +44,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 @Config
 @Autonomous(group = "drive")
 public class ManualFeedforwardTuner extends LinearOpMode {
-    public static double DISTANCE = 72; // in
+    public static double DISTANCE = 250; // in
 
     private FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -88,6 +90,8 @@ public class ManualFeedforwardTuner extends LinearOpMode {
         MotionProfile activeProfile = generateProfile(true);
         double profileStart = clock.seconds();
 
+        Encoder pa = new Encoder(hardwareMap.get(DcMotorEx.class, "EPa"));
+        Encoder pe = new Encoder(hardwareMap.get(DcMotorEx.class, "EPe"));
 
         while (!isStopRequested()) {
             telemetry.addData("mode", mode);
@@ -120,6 +124,13 @@ public class ManualFeedforwardTuner extends LinearOpMode {
                     // update telemetry
                     telemetry.addData("targetVelocity", motionState.getV());
                     telemetry.addData("measuredVelocity", currentVelo);
+                    /*telemetry.addData("PaP", pa.getCurrentPosition());
+                    telemetry.addData("PaV", pa.getRawVelocity());
+                    telemetry.addData("PaCV", pa.getCorrectedVelocity());
+                    telemetry.addData("PaD", pa.getDirection());
+                    telemetry.addData("pH", drive.getPoseEstimate().getHeading());*/
+                    telemetry.addData("pX", drive.getPoseEstimate().getX());
+                    telemetry.addData("pY", drive.getPoseEstimate().getY());
                     telemetry.addData("error", motionState.getV() - currentVelo);
                     break;
                 case DRIVER_MODE:
