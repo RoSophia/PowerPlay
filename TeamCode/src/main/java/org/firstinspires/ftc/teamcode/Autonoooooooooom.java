@@ -33,7 +33,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
     private final FtcDashboard dashboard;
 
-    OpenCvCamera phoneCam;
+    OpenCvCamera webcam;
     PwrDeterminationPipeline pipeline;
 
     SampleMecanumDrive drive;
@@ -70,14 +70,14 @@ public class Autonoooooooooom extends LinearOpMode {
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         pipeline = new PwrDeterminationPipeline();
-        phoneCam.setPipeline(pipeline);
+        webcam.setPipeline(pipeline);
         //phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.MAXIMIZE_EFFICIENCY);
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
             }
 
             @Override
@@ -112,11 +112,12 @@ public class Autonoooooooooom extends LinearOpMode {
 
         waitForStart();
 
+
         TelemetryPacket packet;
 
         //drive.followTrajectoryAsync(traj);
 
-        dashboard.startCameraStream(phoneCam, 15);
+        dashboard.startCameraStream(webcam, 15);
 
         while (!isStopRequested()) {
             if (MODE == 1) {

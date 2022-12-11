@@ -35,7 +35,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
  * and then snapshot that value for later use when the START
  * command is issued. The pipeline is re-used from SkystoneDeterminationExample
  */
-@Autonomous (name = "Auto69")
+@Autonomous (name = "AutoCamera")
 public class AutonomousInitDetectionExample extends LinearOpMode
 {
     OpenCvWebcam webcam;
