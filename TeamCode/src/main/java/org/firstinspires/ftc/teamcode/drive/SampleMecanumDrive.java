@@ -60,7 +60,7 @@ import static java.lang.Thread.sleep;
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(16, 0.5, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(1, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -96,7 +96,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(2.0)), 0.8);
+                new Pose2d(0.2, 0.2, Math.toRadians(2.0)), 0.9);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
