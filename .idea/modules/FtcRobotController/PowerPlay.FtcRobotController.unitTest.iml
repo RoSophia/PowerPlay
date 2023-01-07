@@ -70,5 +70,4 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.firstinspires.ftc:gameAssets-PowerPlay:1.0.0@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.acmerobotics.dashboard:dashboard:0.4.5@aar" level="project" />
   </component>
-  <component name="TestModuleProperties" production-module="PowerPlay.FtcRobotController.main" />
 </module>
