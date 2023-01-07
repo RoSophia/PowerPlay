@@ -2,15 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PowerPlay.iml" filepath="$PROJECT_DIR$/.idea/modules/PowerPlay.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.main.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/PowerPlay.FtcRobotController.unitTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.main.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/PowerPlay.TeamCode.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ro_sofia.iml" filepath="$PROJECT_DIR$/.idea/modules/ro_sofia.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.main.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/FtcRobotController/ro_sofia.FtcRobotController.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.main.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/TeamCode/ro_sofia.TeamCode.unitTest.iml" />
     </modules>
   </component>
 </project>

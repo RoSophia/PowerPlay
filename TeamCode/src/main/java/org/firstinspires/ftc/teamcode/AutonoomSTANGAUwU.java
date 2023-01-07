@@ -94,7 +94,7 @@ public class AutonoomSTANGAUwU extends LinearOpMode {
 
         //VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        TelemetryPacket packet;
+        TelemetryPacket packet;//
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
