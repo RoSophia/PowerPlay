@@ -67,7 +67,7 @@ public class AutonoomSTANGAUwU extends LinearOpMode {
     public int MIU_POS = 1010;
     public int MID_POS = 760;
 
-    public static int NORMAL = 0;//
+    public static int NORMAL = 0;////
 
     public static int F = 65;
 
