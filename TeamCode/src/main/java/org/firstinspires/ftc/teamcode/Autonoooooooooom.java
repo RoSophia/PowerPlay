@@ -318,7 +318,6 @@ public class Autonoooooooooom extends LinearOpMode {
                                 })
 
                                /* .lineToLinearHeading(new Pose2d(F * 2 - 7, F - 7, 0))
-
                                 .waitSeconds(0.3)
                                 .lineToLinearHeading(new Pose2d(15, F - 7, 0))
                                 .lineToLinearHeading(new Pose2d(15, 0, 0))*/
