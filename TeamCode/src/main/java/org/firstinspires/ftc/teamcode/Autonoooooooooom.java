@@ -71,7 +71,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
     public static int F = 65;
 
-    double S1CL = 0.40;
+    double S1CL = 0.33;
     double S1OP = 0.75;
 
     public static double HEAD1 = Math.toRadians(311);
@@ -79,8 +79,8 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double PY1 = 43;
     public static double HEAD2 = Math.toRadians(270);
     public static double PX2 = 132;
-    public static double PY2 = -51;
-    public static double HEAD3 = Math.toRadians(386);
+    public static double PY2 = -53;
+    public static double HEAD3 = Math.toRadians(388.5);
     public static double PX3 = 144.5;
     public static double PY3 = 8;
 

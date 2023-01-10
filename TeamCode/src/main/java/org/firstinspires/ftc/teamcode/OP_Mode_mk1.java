@@ -107,7 +107,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
     public static int MID_POS = 760;
 
     public static double SDESCHIS = 0.75;
-    public static double SINCHIS = 0.495;
+    public static double SINCHIS = 0.35;
     //PIDController controller;
     //double p = 0, i = 0, d = 0;
     //double pep = 0;
