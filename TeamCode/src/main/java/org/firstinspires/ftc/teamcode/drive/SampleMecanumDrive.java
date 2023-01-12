@@ -96,7 +96,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.2, 0.2, Math.toRadians(2.0)), 0.9);
+                new Pose2d(0.2, 0.2, Math.toRadians(0.1)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -263,7 +263,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
         PIDFCoefficients compensatedCoefficients = new PIDFCoefficients(
                 coefficients.p, coefficients.i, coefficients.d,
-                coefficients.f * 12 / batteryVoltageSensor.getVoltage()
+                coefficients.f * 14 / batteryVoltageSensor.getVoltage()
         );
 
         for (DcMotorEx motor : motors) {

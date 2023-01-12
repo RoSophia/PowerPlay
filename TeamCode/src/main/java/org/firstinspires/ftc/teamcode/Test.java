@@ -41,46 +41,6 @@ public class Test extends LinearOpMode {
         dashboard.setTelemetryTransmissionInterval(25);
     }
 
-    int ERROR = 0;
-
-    void sError(int err) {
-        ERROR = err;
-    }
-
-    final double TAGSIZE = 4.5 / 100;
-    /*final double FX = 578.272;
-    final double FY = 578.272;*/
-    final double FX = 878.272;
-    final double FY = 878.272;
-    final double CX = 320;
-    final double CY = 240;
-    public static int LL = 0;
-
-    final double PI2 = Math.PI / 2;
-    final double PI = Math.PI;
-
-    static final double FEET_PER_METER = 3.28084;
-
-    int LAST_ID = 0;
-
-    public int TOP_POS = 1303;
-    public int MIU_POS = 1010;
-    public int MID_POS = 760;
-
-    public static int NORMAL = 0;
-
-    public static int F = 65;
-
-    double S1CL = 0.40;
-    double S1OP = 0.75;
-
-    public static double HEAD1 = Math.toRadians(311);
-    public static double PX1 = 142;
-    public static double PY1 = 43;
-
-    public static boolean AAAAAAAAAAAAAA = false;
-    boolean OPENED = false;
-
     @Override
     public void runOpMode() throws InterruptedException {
         Servo s1 = hardwareMap.get(Servo.class, "S1");
@@ -88,7 +48,6 @@ public class Test extends LinearOpMode {
         ridicareSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ridicareSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         ridicareSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        s1.setPosition(S1CL);
         drive = new SampleMecanumDrive(hardwareMap);
 
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -110,11 +69,10 @@ public class Test extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
             //drive.followTrajectorySequenceAsync(traj);
             drive.update();
-            telemetry.addData("px",drive.getPoseEstimate().getX());
-            telemetry.addData("py",drive.getPoseEstimate().getY());
-            telemetry.addData("ph",drive.getPoseEstimate().getHeading());
+            telemetry.addData("px", drive.getPoseEstimate().getX());
+            telemetry.addData("py", drive.getPoseEstimate().getY());
+            telemetry.addData("ph", Math.toDegrees(drive.getPoseEstimate().getHeading()));
             telemetry.update();
-
         }
     }
 }
