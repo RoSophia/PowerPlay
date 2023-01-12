@@ -66,7 +66,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
     int LAST_ID = 0;
 
-    public int TOP_POS = 1233;
+    public int TOP_POS = 1220;
     public int MIU_POS = 1010;
     public int MID_POS = 760;
 
@@ -76,21 +76,22 @@ public class Autonoooooooooom extends LinearOpMode {
     double S1OP = 0.75;
 
     public static double HEAD1 = Math.toRadians(58.56);
-    public static double PX1 = 159;
-    public static double PY1 = -4;
+    public static double PX1 = 160;
+    public static double PY1 = -3.4;
     public static double HEAD2 = Math.toRadians(270);
     public static double PX2 = 136;
     public static double PY2 = -51;
     public static double HEAD3 = Math.toRadians(50.592);
     public static double PX3 = 154.93;
     public static double PY3 = -0.82;
+    public static double HEADC = Math.toRadians(-1);
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean RECURRING_SINGULARITY = true;
     boolean OPENED = false;
 
-    public static double MVEL = 150;
-    public static double MAL  = 150;
+    public static double MVEL = 165;
+    public static double MAL  = 165;
 
     VoltageSensor batteryVoltageSensor;
 
@@ -209,15 +210,14 @@ public class Autonoooooooooom extends LinearOpMode {
                         ridicareSlide.setPower(0.4);
                         ridicareSlide.setTargetPosition(100);
                     })
-                    .lineToLinearHeading(new Pose2d(F * 2 - 10, -12, 0), vc, ac)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        ridicareSlide.setPower(0.7);
+                    .lineToLinearHeading(new Pose2d(F * 2 - 10, -10, 0), vc, ac)
+                    .UNSTABLE_addTemporalMarkerOffset(0.18, () -> {
+                        ridicareSlide.setPower(1);
                         ridicareSlide.setTargetPosition(TOP_POS);
                         s1.setPosition(S1CL);
                     })
                     .lineToLinearHeading(new Pose2d(PX1, PY1, HEAD1))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> ridicareSlide.setTargetPosition(TOP_POS - 150))
-                    .waitSeconds(0.1)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1OP)) ///////////////////////////// PRELOAD 1
                     .lineToLinearHeading(new Pose2d(F * 2 - 10, 0, Math.toRadians(-30)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -225,34 +225,52 @@ public class Autonoooooooooom extends LinearOpMode {
                         ridicareSlide.setTargetPosition(360);
                     })
                     .lineToLinearHeading(new Pose2d(PX2, PY2, HEAD2)) //////////////////////////////////////////// GET CONE 1
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1CL))
-                    .UNSTABLE_addTemporalMarkerOffset(0.07, () -> {
-                        ridicareSlide.setPower(0.9);
+                    .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(S1CL))
+                    .waitSeconds(0.12)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        ridicareSlide.setPower(1);
                         ridicareSlide.setTargetPosition(TOP_POS / 2);
                     })
                     .lineToLinearHeading(new Pose2d(F * 2, 0, 0))
                     .UNSTABLE_addTemporalMarkerOffset(0.0, () -> ridicareSlide.setTargetPosition(TOP_POS))
                     .lineToLinearHeading(new Pose2d(PX3, PY3, HEAD3))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> ridicareSlide.setTargetPosition(TOP_POS - 150))
-                    .waitSeconds(0.1)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1OP)) ///////////////////////////// CONE 1
                     .lineToLinearHeading(new Pose2d(F * 2 - 10, 0, Math.toRadians(-30)))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ridicareSlide.setPower(0.4);
-                        ridicareSlide.setTargetPosition(330);
+                        ridicareSlide.setTargetPosition(310);
                     })
                     .lineToLinearHeading(new Pose2d(PX2, PY2, HEAD2)) //////////////////////////////////////////// GET CONE 2
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1CL))
-                    .UNSTABLE_addTemporalMarkerOffset(0.07, () -> {
-                        ridicareSlide.setPower(0.9);
+                    .UNSTABLE_addTemporalMarkerOffset(-0.07, () -> s1.setPosition(S1CL))
+                    .waitSeconds(0.1)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        ridicareSlide.setPower(1);
                         ridicareSlide.setTargetPosition(TOP_POS / 2);
                     })
                     .lineToLinearHeading(new Pose2d(F * 2, 0, 0))
                     .UNSTABLE_addTemporalMarkerOffset(0.0, () -> ridicareSlide.setTargetPosition(TOP_POS))
-                    .lineToLinearHeading(new Pose2d(PX3, PY3, HEAD3))
+                    .lineToLinearHeading(new Pose2d(PX3, PY3, HEAD3 + HEADC))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> ridicareSlide.setTargetPosition(TOP_POS - 150))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1OP)) ///////////////////////////// CONE 2
+                    .lineToLinearHeading(new Pose2d(F * 2 - 10, 0, Math.toRadians(-30)))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        ridicareSlide.setPower(0.4);
+                        ridicareSlide.setTargetPosition(260);
+                    })
+                    .lineToLinearHeading(new Pose2d(PX2, PY2, HEAD2)) //////////////////////////////////////////// GET CONE 3
+                    .UNSTABLE_addTemporalMarkerOffset(-0.07, () -> s1.setPosition(S1CL))
+                    .waitSeconds(0.1)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        ridicareSlide.setPower(1);
+                        ridicareSlide.setTargetPosition(TOP_POS / 2);
+                    })
+                    .lineToLinearHeading(new Pose2d(F * 2, 0, 0))
+                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> ridicareSlide.setTargetPosition(TOP_POS))
+                    .lineToLinearHeading(new Pose2d(PX3, PY3, HEAD3 + HEADC * 2))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> ridicareSlide.setTargetPosition(TOP_POS - 150))
                     .waitSeconds(0.1)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1OP)) ///////////////////////////// CONE 2
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1OP)) ///////////////////////////// CONE 3
 
 
 
