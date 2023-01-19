@@ -241,6 +241,18 @@ public class TrajectorySequenceBuilder {
         return addPath(() -> currentTrajectoryBuilder.splineTo(endPosition, endHeading, velConstraint, accelConstraint));
     }
 
+    public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition,
+                                                     Vector2d p1,
+                                                     Vector2d p2,
+                                                     TrajectoryVelocityConstraint velConstraint,
+                                                     TrajectoryAccelerationConstraint accelConstraint
+    ) {
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint));
+    }
+    public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2) {
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint));
+    }
+
     public TrajectorySequenceBuilder splineToConstantHeading(Vector2d endPosition, double endHeading) {
         return addPath(() -> currentTrajectoryBuilder.splineToConstantHeading(endPosition, endHeading, currentVelConstraint, currentAccelConstraint));
     }

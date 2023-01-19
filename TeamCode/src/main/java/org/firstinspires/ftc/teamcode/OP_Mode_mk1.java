@@ -62,7 +62,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
     boolean lastButtonX = false;
     int targetReading, rid = 0;
 
-    public static boolean USE_TELEMETRY = true;
+    public static boolean USE_TELEMETRY = false;
 
     int lpos = 0;
 
@@ -89,6 +89,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
     boolean L2D = false;
     boolean G2X = false;
     boolean R2RB = false;
+    boolean R2LB = false;
     boolean R2LT = false;
     boolean RB = false;
     boolean switched = false;
@@ -107,7 +108,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
     public static int MID_POS = 760;
 
     public static double SDESCHIS = 0.75;
-    public static double SINCHIS = 0.35;
+    public static double SINCHIS = 0.40;
     //PIDController controller;
     //double p = 0, i = 0, d = 0;
     //double pep = 0;
@@ -118,7 +119,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
 
         //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        L2A = L2B = L2U = L2D = G2X = R2RB = R2LT = RB = switched = OV3RDR1V3 = false;
+        L2A = L2B = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = switched = OV3RDR1V3 = false;
 
         leftBack = hardwareMap.get(DcMotorEx.class, "LB");
         leftFront = hardwareMap.get(DcMotorEx.class, "LF");
@@ -192,12 +193,15 @@ public class OP_Mode_mk1 extends LinearOpMode {
             }
             L2D = gamepad2.dpad_down;
 
-            if (!R2RB && gamepad2.right_bumper) {
+            if (!R2RB && gamepad2.right_bumper &&
+                !R2LB && gamepad2.left_bumper
+            ) {
                 OV3RDR1V3 = !OV3RDR1V3;
                 telemetry.addLine("Nothing here, keep looking");
                 telemetry.update();
             }
             R2RB = gamepad2.right_bumper;
+            R2LB = gamepad2.left_bumper;
 
             if (!R2LT && gamepad2.left_trigger > 0.01) {
                 USE_TELEMETRY = !USE_TELEMETRY;
