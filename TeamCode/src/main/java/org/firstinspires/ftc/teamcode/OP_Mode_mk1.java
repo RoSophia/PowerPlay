@@ -31,15 +31,94 @@ package org.firstinspires.ftc.teamcode;
  * Cu de toate fara ceapa boss
  */
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+@Config
+class ThreadInfo {
+    public static int target = 0;
+    public static boolean shouldClose = false;
+    public static boolean use = true;
+    public static int fr;
+}
+
+@Config
+class ArmcPIDF implements Runnable {
+    DcMotorEx ridicareSlide;
+
+    public ArmcPIDF(DcMotorEx ridicareSlide) {
+        this.ridicareSlide = ridicareSlide;
+        ridicareSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ridicareSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public static double ppd = 0.000;
+    public static double ppu = 0.00001;
+    public static double pd = 0.001;
+    public static double pu = 0.008;
+    public static double d  = 0;
+    public static double i  = 0;
+    public static double Kf = 0.0005;
+
+    double error = 0;
+    double derivate = 0;
+    double lastError = 0;
+    double integralSum = 0;
+
+    public void run() {
+        //ElapsedTime timer  = new ElapsedTime();
+        ElapsedTime timer2 = new ElapsedTime();
+        double outp = 0;
+        int tc = 0;
+        //timer.reset();
+        timer2.reset();
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        while (!ThreadInfo.shouldClose) {
+            TelemetryPacket pack = new TelemetryPacket();
+            pack.put("Target", ThreadInfo.target);
+            pack.put("Current", ridicareSlide.getCurrentPosition());
+            pack.put("Power", outp);
+            dashboard.sendTelemetryPacket(pack);
+
+            ++tc;
+            if (timer2.seconds() >= 1.0) {
+                ThreadInfo.fr = tc;
+                tc = 0;
+                timer2.reset();
+            }
+            if (ThreadInfo.use) {
+                error = ThreadInfo.target - ridicareSlide.getCurrentPosition();
+                /*derivate = (error - lastError) / timer.seconds();
+                integralSum = integralSum + (error * timer.seconds());*/
+                if (error < -220) {
+                    outp = (ppd * error * error) + (pd * error) + (d * derivate) + (i * integralSum) + Kf;
+                } else {
+                    outp = (ppu * error * error) + (pu * error) + (d * derivate) + (i * integralSum) + Kf;
+                }
+                ridicareSlide.setPower(outp);
+
+                lastError = error;
+                //timer.reset();
+            } else {
+                error = derivate = lastError = integralSum = 0;
+            }
+            /*try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
+        }
+    }
+}
 
 @Config
 @TeleOp
@@ -53,34 +132,12 @@ public class OP_Mode_mk1 extends LinearOpMode {
     public DcMotorEx ridicareSlide;
     public Servo s1;
     public Servo s2;
-    public static double S1P = 0.24, S2P = 0.4; // Fucking you static
-    //S2 0.4START 0.
-    // 2 FINISH S1 0.24 START 0.5 FINISH
-    public static double s1pos;
-    int poz = 0, stick;
-    boolean lastButtonY = false;
-    boolean lastButtonX = false;
-    int targetReading, rid = 0;
+    int poz = 0;
 
     public static boolean USE_TELEMETRY = false;
 
     int lpos = 0;
 
-    void ridicare(int target) {
-        targetReading = target;
-        ridicareSlide.setTargetPosition(targetReading);
-        ridicareSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        ridicareSlide.setPower(1f);
-        if (gamepad2.y) {
-            s1pos = 0.0f;
-            //s2pos = 0.2f;
-        }
-        //lastButtonY = gamepad2.y;
-        if (gamepad2.x) {
-            s1pos = 1f;
-            //s2pos = 0.4f;
-        }
-    }
     //
 
     boolean L2A = false;
@@ -101,18 +158,15 @@ public class OP_Mode_mk1 extends LinearOpMode {
 
     public static int BRAK = 1;
 
-    public static int dif = 150;
+    public static int dif = 170;
 
     public static int TOP_POS = 1303;
     public static int MIU_POS = 1010;
     public static int MID_POS = 760;
 
-    public static double SDESCHIS = 0.75;
-    public static double SINCHIS = 0.40;
-    //PIDController controller;
-    //double p = 0, i = 0, d = 0;
-    //double pep = 0;
-    //double pap = 0;
+    public static double SDESCHIS = 0.58;
+    public static double SINCHIS = 0.362;
+    public static double s1pos = SDESCHIS;
 
     public void runOpMode() {
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -126,6 +180,9 @@ public class OP_Mode_mk1 extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "RB");
         rightFront = hardwareMap.get(DcMotorEx.class, "RF");
         ridicareSlide = hardwareMap.get(DcMotorEx.class, "RS");
+
+        Runnable armRun = new ArmcPIDF(ridicareSlide);
+        Thread armThread = new Thread(armRun);
 
         s1 = hardwareMap.get(Servo.class, "S1");
         //s2 = hardwareMap.get(Servo.class, "S2");
@@ -158,10 +215,19 @@ public class OP_Mode_mk1 extends LinearOpMode {
         SPa.setPosition(0.0);
         SPe.setPosition(0.0);
 
-        s1pos = 0.75f;
-        ridicareSlide.setTargetPosition(0);
+        s1pos = SDESCHIS;
 
         waitForStart();
+
+        ThreadInfo.shouldClose = false;
+        armThread.start();
+        ThreadInfo.use = true;
+
+        /*TelemetryPacket pack;
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        while (opModeIsActive()) {
+            ThreadInfo.use = true;
+        }*/
 
         while (opModeIsActive()) {
             double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
@@ -174,27 +240,31 @@ public class OP_Mode_mk1 extends LinearOpMode {
             final double rbPower = (speed * Math.sin(angle) - turn);
 
             if (!L2A && gamepad2.a) {
-                ridicareSlide.setTargetPosition(TOP_POS);
+                ThreadInfo.target = TOP_POS;
+                //ridicareSlide.setTargetPosition(TOP_POS);
             }
             L2A = gamepad2.a;
 
             if (!L2B && gamepad2.b) {
-                ridicareSlide.setTargetPosition(0);
+                ThreadInfo.target = 0;
+                //ridicareSlide.setTargetPosition(0);
             }
             L2B = gamepad2.b;
 
             if (!L2U && gamepad2.dpad_up) {
-                ridicareSlide.setTargetPosition(MIU_POS);
+                ThreadInfo.target = MIU_POS;
+                //ridicareSlide.setTargetPosition(MIU_POS);
             }
             L2U = gamepad2.dpad_up;
 
             if (!L2D && gamepad2.dpad_down) {
-                ridicareSlide.setTargetPosition(MID_POS);
+                ThreadInfo.target = MID_POS;
+                //ridicareSlide.setTargetPosition(MID_POS);
             }
             L2D = gamepad2.dpad_down;
 
             if (!R2RB && gamepad2.right_bumper &&
-                !R2LB && gamepad2.left_bumper
+                    !R2LB && gamepad2.left_bumper
             ) {
                 OV3RDR1V3 = !OV3RDR1V3;
                 telemetry.addLine("Nothing here, keep looking");
@@ -222,6 +292,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     telemetry.addLine("ALL 0V3");
                 }
                 if (Math.abs(gamepad2.right_stick_y) > 0.01) {
+                    ThreadInfo.use = false;
                     if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_USING_ENCODER) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -231,43 +302,49 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     }
                     ridicareSlide.setPower(POW_COEF * gamepad2.right_stick_y);
                 } else {
-                    if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
+                    ThreadInfo.use = true;
+                    /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                    }
+                    }*/
                     if (USE_TELEMETRY) {
                         telemetry.addLine("0V3RDR1V3 AUT");
                     }
 
-                    ridicareSlide.setTargetPosition(0);
-                    ridicareSlide.setPower(POW_COEF / 2);
+                    ThreadInfo.target = 0;
+                    /*ridicareSlide.setTargetPosition(0);
+                    ridicareSlide.setPower(POW_COEF / 2);*/
                 }
             } else {
                 if (Math.abs(gamepad2.right_stick_y) > 0.01) {
+                    ThreadInfo.use = false;
                     if (USE_TELEMETRY) {
                         telemetry.addLine("ALL MAN");
                     }
-                    if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_USING_ENCODER) {
+                    /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_USING_ENCODER) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                    }
+                    }*/
                     lpos = ridicareSlide.getCurrentPosition();
                     if (lpos < 0) {
                         if (USE_TELEMETRY) {
                             telemetry.addLine("MAN UND");
                         }
-                        ridicareSlide.setPower(AUT_POW);
-                        ridicareSlide.setTargetPosition(10);
+                        ThreadInfo.target = 10;
+                        //ridicareSlide.setPower(AUT_POW);
+                        //ridicareSlide.setTargetPosition(10);
                     } else if (lpos < 150 && gamepad2.right_stick_y > 0) {
                         if (USE_TELEMETRY) {
                             telemetry.addLine("MAN CLOSE UND");
                         }
                         ridicareSlide.setPower(0);
-                        ridicareSlide.setTargetPosition(lpos);
+                        ThreadInfo.target = lpos;
+                        //ridicareSlide.setTargetPosition(lpos);
                     } else if (lpos > TOP_POS - 40 && gamepad2.right_stick_y < 0) {
                         if (USE_TELEMETRY) {
                             telemetry.addLine("MAN CLOSE UPW");
                         }
                         ridicareSlide.setPower(0);
-                        ridicareSlide.setTargetPosition(lpos);
+                        ThreadInfo.target = lpos;
+                        //ridicareSlide.setTargetPosition(lpos);
                     } else if (lpos < TOP_POS) {
                         if (gamepad2.right_stick_y > 0) {
                             if (USE_TELEMETRY) {
@@ -280,31 +357,35 @@ public class OP_Mode_mk1 extends LinearOpMode {
                             }
                             ridicareSlide.setPower(POW_COEF * gamepad2.right_stick_y);
                         }
-                        ridicareSlide.setTargetPosition(lpos);
+                        ThreadInfo.target = lpos;
+                        //ridicareSlide.setTargetPosition(lpos);
                     } else {
                         if (USE_TELEMETRY) {
                             telemetry.addLine("MAN UPW");
                         }
                         ridicareSlide.setPower(AUT_POW);
-                        ridicareSlide.setTargetPosition(TOP_POS);
+                        ThreadInfo.target = TOP_POS;
+                        //ridicareSlide.setTargetPosition(TOP_POS);
                     }
                 } else {
-                    if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
+                    ThreadInfo.use = true;
+                    /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                    }
+                    }*/
                     if (USE_TELEMETRY) {
                         telemetry.addLine("ALL AUT");
                     }
-                    if (ridicareSlide.getTargetPosition() < ridicareSlide.getCurrentPosition()) {
+                    //if (ridicareSlide.getTargetPosition() < ridicareSlide.getCurrentPosition()) {
+                    if (ThreadInfo.target < ridicareSlide.getCurrentPosition()) {
                         if (USE_TELEMETRY) {
                             telemetry.addLine("COB AUT");
                         }
-                        ridicareSlide.setPower(COB_COEF);
+                        //ridicareSlide.setPower(COB_COEF);
                     } else {
                         if (USE_TELEMETRY) {
                             telemetry.addLine("RID AUT");
                         }
-                        ridicareSlide.setPower(AUT_POW);
+                        //ridicareSlide.setPower(AUT_POW);
                     }
                 }
             }
@@ -313,27 +394,28 @@ public class OP_Mode_mk1 extends LinearOpMode {
             }
 
             if (!RB && gamepad2.left_bumper) {
-                ridicareSlide.setTargetPosition(ridicareSlide.getCurrentPosition() - dif);
-                ridicareSlide.setPower(1.0);
+                //ridicareSlide.setPower(1.0);
+                ThreadInfo.target = ThreadInfo.target - dif;
+                //ridicareSlide.setTargetPosition(ridicareSlide.getCurrentPosition() - dif);
             }
             if (RB && !gamepad2.left_bumper) {
-                ridicareSlide.setTargetPosition(ridicareSlide.getCurrentPosition() + dif);
-                ridicareSlide.setPower(1.0);
+                //ridicareSlide.setPower(1.0);
+                ThreadInfo.target = ThreadInfo.target + dif;
+                //ridicareSlide.setTargetPosition(ridicareSlide.getCurrentPosition() + dif);
             }
             RB = gamepad2.left_bumper;
-            // ridicare(poz);
-
 
             if (USE_TELEMETRY) {
                 if (OV3RDR1V3) {
                     telemetry.addLine("U HAV3 3NT3R3D 0V3RDR1V3 M0D3");
                 }
                 telemetry.addData("Ridicare", ridicareSlide.getCurrentPosition());
-                telemetry.addData("Target", ridicareSlide.getTargetPosition());
+                telemetry.addData("Target", ThreadInfo.target);//ridicareSlide.getTargetPosition());
                 telemetry.addData("Cpow", ridicareSlide.getPower());
                 telemetry.addData("left_stick_y", poz);
                 telemetry.addData("r_stick_y", gamepad2.right_stick_y);
                 telemetry.addData("pad", gamepad1.right_trigger);
+                telemetry.addData("Fps", ThreadInfo.fr);
                 telemetry.update();
             } else if (OV3RDR1V3) {
                 telemetry.addLine("U HAV3 3NT3R3D 0V3RDR1V3 M0D3");
@@ -369,6 +451,13 @@ public class OP_Mode_mk1 extends LinearOpMode {
             //pep = SPe.getPosition();
             //pap = SPa.getPosition();
             //}
+        }
+
+        try {
+            ThreadInfo.shouldClose = true;
+            armThread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
