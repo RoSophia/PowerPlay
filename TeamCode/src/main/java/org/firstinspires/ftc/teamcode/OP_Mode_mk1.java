@@ -31,6 +31,12 @@ package org.firstinspires.ftc.teamcode;
  * Cu de toate fara ceapa boss
  */
 
+import static org.firstinspires.ftc.teamcode.RobotConstants.MID_POS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.MIU_POS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -62,9 +68,9 @@ class ArmcPIDF implements Runnable {
     }
 
     public static double ppd = 0.000;
-    public static double ppu = 0.00001;
-    public static double pd = 0.001;
-    public static double pu = 0.008;
+    public static double ppu = 0.000011;
+    public static double pd = 0.0008;
+    public static double pu = 0.009;
     public static double d  = 0;
     public static double i  = 0;
     public static double Kf = 0.0005;
@@ -160,12 +166,6 @@ public class OP_Mode_mk1 extends LinearOpMode {
 
     public static int dif = 170;
 
-    public static int TOP_POS = 1303;
-    public static int MIU_POS = 1010;
-    public static int MID_POS = 760;
-
-    public static double SDESCHIS = 0.58;
-    public static double SINCHIS = 0.362;
     public static double s1pos = SDESCHIS;
 
     public void runOpMode() {
@@ -222,6 +222,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
         ThreadInfo.shouldClose = false;
         armThread.start();
         ThreadInfo.use = true;
+        ThreadInfo.target = 0;
 
         /*TelemetryPacket pack;
         FtcDashboard dashboard = FtcDashboard.getInstance();
