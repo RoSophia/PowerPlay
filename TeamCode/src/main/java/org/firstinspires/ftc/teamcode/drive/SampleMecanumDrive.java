@@ -59,9 +59,9 @@ import static java.lang.Thread.sleep;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(12, 0.04, 0);
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(13, 0.0, 0);
     public static PIDCoefficients LATERAL_PID = new PIDCoefficients(15, 0.0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -100,8 +100,6 @@ public class SampleMecanumDrive extends MecanumDrive {
                 new Pose2d(0.2, 0.2, Math.toRadians(0.1)), 0.3);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
-
-        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -152,8 +150,8 @@ public class SampleMecanumDrive extends MecanumDrive {
             setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         }
 
-        // setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
             setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
@@ -266,7 +264,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
         PIDFCoefficients compensatedCoefficients = new PIDFCoefficients(
                 coefficients.p, coefficients.i, coefficients.d,
-                coefficients.f * 14 / batteryVoltageSensor.getVoltage()
+                coefficients.f * 12.5 / batteryVoltageSensor.getVoltage()
         );
 
         for (DcMotorEx motor : motors) {
@@ -315,9 +313,9 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
+        leftFront .setPower(v );
+        leftRear  .setPower(v1);
+        rightRear .setPower(v2);
         rightFront.setPower(v3);
     }
 

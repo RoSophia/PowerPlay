@@ -81,33 +81,33 @@ public class Autonoooooooooom extends LinearOpMode {
     public static int F = 65;
 
     public static double HEAD1 = 0.84;//Math.toRadians(48);
-    public static double PX1 = 153.2;
+    public static double PX1 = 152;
     public static double PY1 = 8;
     public static double HEAD2 = Math.toRadians(270);
-    public static double PX2 = 134;
-    public static double PY2 = -47.3;
-    public static double HEAD3 = Math.toRadians(46);
-    public static double PX3 = 156;
-    public static double PY3 = 3;
-    public static double HEADC = Math.toRadians(-1.3);
+    public static double PX2 = 136;
+    public static double PY2 = -47;
+    public static double HEAD3 = Math.toRadians(45);
+    public static double PX3 = 157;
+    public static double PY3 = 4;
+    public static double HEADC = Math.toRadians(-1.1);
     public static double PXC = 1.8;
-    public static double PYC = 1.6;
+    public static double PYC = 1.4;
 
-    public static double P1X = 40;
+    public static double P1X = 25;
     public static double P1Y = Math.PI;
-    public static double P2X = 10;
-    public static double P2Y = Math.PI / 1.9;
+    public static double P2X = 43.5;
+    public static double P2Y = Math.PI / 2;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
     public static boolean RECURRING_SINGULARITY = true;
 
-    public static double MVEL = 165;
-    public static double MAL = 165;
+    public static double MVEL = 120;
+    public static double MAL = 120;
 
     public static double OPD = 0.3;
     public static double UPD = 0.7;
-    public static double WTD = 1.2;
+    public static double WTD = 1.1;
     public static double WD = 0.4;
 
     public static double R1X = 14;
@@ -118,10 +118,12 @@ public class Autonoooooooooom extends LinearOpMode {
     VoltageSensor batteryVoltageSensor;
 
     Vector<Double> v = new Vector<>();
+    Vector<Pose2d> e = new Vector<>();
     double it;
 
     void ltime() {
         v.add(getRuntime() - it);
+        e.add(drive.getLastError());
     }
 
     void follow_traj(TrajectorySequence traj) {
@@ -148,6 +150,7 @@ public class Autonoooooooooom extends LinearOpMode {
                 if (segment instanceof TrajectorySegment) {
                     fieldOverlay.setStrokeWidth(1);
                     fieldOverlay.setStroke(COLOR_INACTIVE_TRAJECTORY);
+
 
                     DashboardUtil.drawSampledPath(fieldOverlay, ((TrajectorySegment) segment).getTrajectory().getPath());
                 } else if (segment instanceof TurnSegment) {
@@ -228,7 +231,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ridicareSlide.setPower(0.4);
                         ridicareSlide.setTargetPosition(310);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC, PY2, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 2
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 2.2, PY2 - PYC * 0.5, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 2
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
                     .waitSeconds(0.12)
@@ -241,7 +244,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 1.25, PY3 + PYC, HEAD3 + HEADC), P2, P1)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC, PY3 + PYC, HEAD3 + HEADC), P2, P1)
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS - 200;
@@ -251,9 +254,9 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         ThreadInfo.target = 260;
                         ridicareSlide.setPower(0.4);
-                        ridicareSlide.setTargetPosition(260);
+                        ridicareSlide.setTargetPosition(245);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 2, PY2, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 3
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 3, PY2 - PYC, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 3
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
                     .waitSeconds(0.12)
@@ -266,7 +269,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 2.5, PY3 + PYC * 2, HEAD3 + HEADC * 2.4), P2, P1)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 2, PY3 + PYC * 2, HEAD3 + HEADC * 2), P2, P1)
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS - 200;
@@ -276,9 +279,9 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
                         ThreadInfo.target = 210;
                         ridicareSlide.setPower(0.4);
-                        ridicareSlide.setTargetPosition(210);
+                        ridicareSlide.setTargetPosition(205);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 3.75, PY2, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 4
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 5, PY2 - PYC * 1.5, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 4
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
                     .waitSeconds(0.12)
@@ -291,19 +294,20 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 3.1, PY3 + PYC * 3, HEAD3 + HEADC * 4.5), P2, P1)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 3, PY3 + PYC * 3, HEAD3 + HEADC * 3.4), new Vector2d(P2.getX() * 1.3, P2.getY() * 0.91), P1)
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS - 200;
                         ridicareSlide.setTargetPosition(TOP_POS - 200);
                     })
-                    .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 4
-                    .waitSeconds(0.4)
+                    .UNSTABLE_addTemporalMarkerOffset(OPD / 2, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 4
+                    .waitSeconds(0.1)
                     .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
                         ThreadInfo.target = 70;
                         ridicareSlide.setPower(0.2);
                         ridicareSlide.setTargetPosition(70);
                     })
+                    .addTemporalMarker(this::ltime)
                     .build();
         }
     }
@@ -384,6 +388,12 @@ public class Autonoooooooooom extends LinearOpMode {
             sleep(100);
         }*/
 
+        TrajectorySequence traj = null;
+
+        if (BBBBBBBBBBBBBB) {
+            traj = mktraj(ridicareSlide, s1);
+        }
+
         waitForStart();
 
         /*ThreadInfo.shouldClose = false;
@@ -403,8 +413,6 @@ public class Autonoooooooooom extends LinearOpMode {
         TelemetryPacket pack = new TelemetryPacket();
         pack.put("bat", batteryVoltageSensor.getVoltage());
         dashboard.sendTelemetryPacket(pack);
-
-        TrajectorySequence traj = null;
 
         if (!BBBBBBBBBBBBBB) {
             telemetry.addLine("Start");
@@ -468,7 +476,7 @@ public class Autonoooooooooom extends LinearOpMode {
                 packet.put("LID", LAST_ID);
                 dashboard.sendTelemetryPacket(packet);
 
-                traj = mktraj(ridicareSlide, s1);
+                // traj = mktraj(ridicareSlide, s1);
 
                 it = getRuntime();
                 follow_traj(traj);
@@ -513,7 +521,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
                 if (RECURRING_SINGULARITY) {
                     traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                            .lineToLinearHeading(new Pose2d(5, 0, 0))
+                            .lineToLinearHeading(new Pose2d(20, 0, 0))
                             .build();
                     follow_traj(traj);
                 } else {
@@ -528,5 +536,16 @@ public class Autonoooooooooom extends LinearOpMode {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
+
+        for (int i = 0; i < v.size(); ++i) {
+            pack = new TelemetryPacket();
+            pack.put("id", i);
+            pack.put("t", v.get(i));
+            pack.put("xe", e.get(i).getX());
+            pack.put("ye", e.get(i).getY());
+            pack.put("he", e.get(i).getHeading());
+            dashboard.sendTelemetryPacket(pack);
+        }
+
     }
 }
