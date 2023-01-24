@@ -61,7 +61,7 @@ import static java.lang.Thread.sleep;
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients AXIAL_PID = new PIDCoefficients(13, 0.0, 0);
     public static PIDCoefficients LATERAL_PID = new PIDCoefficients(15, 0.0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5.5, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 

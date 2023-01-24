@@ -14,6 +14,7 @@ class ThreadInfo {
     public static boolean shouldClose = false;
     public static boolean use = true;
     public static int fr;
+    public static boolean useTele = false;
 }
 
 @Config
@@ -40,11 +41,9 @@ class ArmcPIDF implements Runnable {
     double integralSum = 0;
 
     public void run() {
-        //ElapsedTime timer  = new ElapsedTime();
         ElapsedTime timer2 = new ElapsedTime();
         double outp = 0;
         int tc = 0;
-        //timer.reset();
         timer2.reset();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         while (!ThreadInfo.shouldClose) {
@@ -54,11 +53,16 @@ class ArmcPIDF implements Runnable {
             pack.put("Power", outp);
             dashboard.sendTelemetryPacket(pack);*/
 
-            ++tc;
-            if (timer2.seconds() >= 1.0) {
-                ThreadInfo.fr = tc;
-                tc = 0;
-                timer2.reset();
+            if (ThreadInfo.useTele) {
+                ++tc;
+                if (timer2.seconds() >= 1.0) {
+                    ThreadInfo.fr = tc;
+                    TelemetryPacket pack = new TelemetryPacket();
+                    pack.put("fr", tc / timer2.seconds());
+                    dashboard.sendTelemetryPacket(pack);
+                    tc = 0;
+                    timer2.reset();
+                }
             }
             if (ThreadInfo.use) {
                 error = ThreadInfo.target - ridicareSlide.getCurrentPosition();
@@ -76,11 +80,11 @@ class ArmcPIDF implements Runnable {
             } else {
                 error = derivate = lastError = integralSum = 0;
             }
-            /*try {
+            try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
     }
 }
