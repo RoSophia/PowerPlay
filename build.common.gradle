@@ -49,7 +49,6 @@ android {
         }
     }
 
-
     defaultConfig {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'
@@ -128,12 +127,13 @@ android {
     sourceSets.main {
         jni.srcDirs = []
         jniLibs.srcDir rootProject.file('libs')
+        jniLibs.srcDirs = ['libs']
     }
     ndkVersion '21.3.6528147'
 }
 
-repositories {
+/*repositories {
     flatDir {
         dirs rootProject.file('libs')
     }
-}
+}*/

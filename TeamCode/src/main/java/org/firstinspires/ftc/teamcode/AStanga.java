@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+/*
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
@@ -26,6 +27,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -44,11 +46,10 @@ import java.time.chrono.ThaiBuddhistEra;
 import java.util.ArrayList;
 import java.util.Vector;
 
-@SuppressWarnings("CommentedOutCode")
 @Config
 @Autonomous(group = "drive")
 @SuppressLint("DefaultLocale")
-public class Autonoooooooooom extends LinearOpMode {
+public class AStanga extends LinearOpMode {
 
     private final FtcDashboard dashboard;
 
@@ -57,7 +58,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
     SampleMecanumDrive drive;
 
-    public Autonoooooooooom() {
+    public AStanga() {
         dashboard = FtcDashboard.getInstance();
         dashboard.setTelemetryTransmissionInterval(25);
     }
@@ -80,23 +81,23 @@ public class Autonoooooooooom extends LinearOpMode {
 
     public static int F = 65;
 
-    public static double HEAD1 = 0.79;//Math.toRadians(45);
-    public static double PX1 = 142;
-    public static double PY1 = 20;
-    public static double HEAD2 = Math.toRadians(270);
+    public static double HEAD1 = -0.79;//Math.toRadians(45);
+    public static double PX1 = 148;
+    public static double PY1 = -8;
+    public static double HEAD2 = -Math.toRadians(270);
     public static double PX2 = 140;
-    public static double PY2 = -44.5;
-    public static double HEAD3 = Math.toRadians(45);
+    public static double PY2 = 44.5;
+    public static double HEAD3 = -Math.toRadians(45);
     public static double PX3 = 157;
-    public static double PY3 = 7;
-    public static double HEADC = -0.025;
+    public static double PY3 = -7;
+    public static double HEADC = 0.025;
     public static double PXC = 1.8;
-    public static double PYC = 1.3;
+    public static double PYC = -1.4;
 
     public static double P1X = 35;
-    public static double P1Y = Math.PI;
+    public static double P1Y = -Math.PI;
     public static double P2X = 30;
-    public static double P2Y = 2;
+    public static double P2Y = -2;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
@@ -104,7 +105,6 @@ public class Autonoooooooooom extends LinearOpMode {
 
     public static double MVEL = 120;
     public static double MAL = 120;
-    public static double MDL = 40;
 
     public static double OPD = 0.3;
     public static double UPD = 0.7;
@@ -112,9 +112,9 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double WD = 0.2;
 
     public static double R1X = 14;
-    public static double R1Y = 0.1;
+    public static double R1Y = -0.1;
     public static double R2X = 25;
-    public static double R2Y = 4.5;
+    public static double R2Y = -4.5;
 
     VoltageSensor batteryVoltageSensor;
 
@@ -127,7 +127,7 @@ public class Autonoooooooooom extends LinearOpMode {
         e.add(drive.getLastError());
     }
 
-    void follow_traj(TrajectorySequence traj) {
+    void follow_traj(TrajectorySequence traj, int p) {
         drive.followTrajectorySequenceAsync(traj);
         drive.update();
         while (drive.isBusy() && !isStopRequested() && traj != null) {
@@ -135,7 +135,7 @@ public class Autonoooooooooom extends LinearOpMode {
             telemetry.addData("Traj", "Going from (%f, %f, %f) to (%f, %f, %f) for %f", traj.start().getX(), traj.start().getY(), traj.start().getHeading(),
                     traj.end().getX(), traj.end().getY(), traj.end().getHeading(),
                     traj.duration());
-            telemetry.addData("Normal", NORMAL);*/
+            telemetry.addData("Normal", NORMAL);
             drive.update();
         }
     }
@@ -170,14 +170,10 @@ public class Autonoooooooooom extends LinearOpMode {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     TrajectorySequence mktraj(DcMotor ridicareSlide, Servo s1) {
         if (false) {
-            TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
-            TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
             return drive.trajectorySequenceBuilder(new Pose2d())
-                    .lineToConstantHeading(new Vector2d(F * 2, 0), vc, ac)
-                    //.lineToConstantHeading(new Vector2d(F * 2, 0))
+                    .lineToConstantHeading(new Vector2d(F * 2, 0))
                     .build();
         } else {
             Vector2d P1 = new Vector2d(P1X, P1Y);
@@ -312,7 +308,7 @@ public class Autonoooooooooom extends LinearOpMode {
                     })
                     .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 4
                     .waitSeconds(0.1)
-                    .addTemporalMarker(this::ltime)*/
+                    .addTemporalMarker(this::ltime)
                     .build();
         }
     }
@@ -343,7 +339,7 @@ public class Autonoooooooooom extends LinearOpMode {
         s1.setPosition(SINCHIS);
 
         /*Runnable armRun = new ArmcPIDF(ridicareSlide);
-        Thread armThread = new Thread(armRun);*/
+        Thread armThread = new Thread(armRun);
 
         drive = new SampleMecanumDrive(hardwareMap);
 
@@ -405,7 +401,7 @@ public class Autonoooooooooom extends LinearOpMode {
         /*ThreadInfo.shouldClose = false;
         armThread.start();
         ThreadInfo.use = true;
-        ThreadInfo.target = 40;*/
+        ThreadInfo.target = 40;
 
 
         ridicareSlide.setPower(0.5);
@@ -489,59 +485,57 @@ public class Autonoooooooooom extends LinearOpMode {
 
                 TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
                 TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
-                if (!isStopRequested()) {
-                    switch (LAST_ID) {
-                        default:
-                            telemetry.addLine("DEFAULT");
-                        case 7:
-                            telemetry.addLine("6");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, 0, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .lineToLinearHeading(new Pose2d(F * 2, 0, 0))
-                                    .addTemporalMarker(this::ltime)
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
-                                        ThreadInfo.target = 70;
-                                        ridicareSlide.setPower(0.5);
-                                        ridicareSlide.setTargetPosition(70);
-                                    })
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                        case 6:
-                            telemetry.addLine("7");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .lineToLinearHeading(new Pose2d(F * 2, F, 0))
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> {
-                                        ThreadInfo.target = 70;
-                                        ridicareSlide.setPower(0.5);
-                                        ridicareSlide.setTargetPosition(70);
-                                    })
-                                    .addTemporalMarker(this::ltime)
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                        case 8:
-                            telemetry.addLine("8");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, -F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .lineToLinearHeading(new Pose2d(F * 2, -F, 0))
-                                    .addTemporalMarker(this::ltime)
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> {
-                                        ThreadInfo.target = 70;
-                                        ridicareSlide.setPower(0.5);
-                                        ridicareSlide.setTargetPosition(70);
-                                    })
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                    }
-                    telemetry.update();
-                    follow_traj(traj);
+                switch (LAST_ID) {
+                    default:
+                        telemetry.addLine("DEFAULT");
+                    case 7:
+                        telemetry.addLine("6");
+                        traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                //.funnyRaikuCurve(new Pose2d(F * 2.15, 0, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
+                                .lineToLinearHeading(new Pose2d(F * 2.15, 0, 0))
+                                .addTemporalMarker(this::ltime)
+                                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
+                                    ThreadInfo.target = 70;
+                                    ridicareSlide.setPower(0.5);
+                                    ridicareSlide.setTargetPosition(70);
+                                })
+                                .waitSeconds(1)
+                                .build();
+                        break;
+                    case 6:
+                        telemetry.addLine("7");
+                        traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                //.funnyRaikuCurve(new Pose2d(F * 2.15, F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
+                                .lineToLinearHeading(new Pose2d(F * 2.15, F, 0))
+                                .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> {
+                                    ThreadInfo.target = 70;
+                                    ridicareSlide.setPower(0.5);
+                                    ridicareSlide.setTargetPosition(70);
+                                })
+                                .addTemporalMarker(this::ltime)
+                                .waitSeconds(1)
+                                .build();
+                        break;
+                    case 8:
+                        telemetry.addLine("8");
+                        traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                //.funnyRaikuCurve(new Pose2d(F * 2.15, -F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
+                                .lineToLinearHeading(new Pose2d(F * 2.15, -F, 0))
+                                .addTemporalMarker(this::ltime)
+                                .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> {
+                                    ThreadInfo.target = 70;
+                                    ridicareSlide.setPower(0.5);
+                                    ridicareSlide.setTargetPosition(70);
+                                })
+                                .waitSeconds(1)
+                                .build();
+                        break;
                 }
+                telemetry.update();
+                follow_traj(traj);
             }
 
-            if (RECURRING_SINGULARITY && !isStopRequested()) {
+            if (RECURRING_SINGULARITY) {
                 traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                         .lineToLinearHeading(new Pose2d(20, 0, 0))
                         .build();
@@ -554,7 +548,7 @@ public class Autonoooooooooom extends LinearOpMode {
             armThread.join();
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
 
         for (int i = 0; i < v.size(); ++i) {
             pack = new TelemetryPacket();
@@ -568,3 +562,4 @@ public class Autonoooooooooom extends LinearOpMode {
 
     }
 }
+*/

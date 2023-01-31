@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 import java.util.Objects;
 
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_DECEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
@@ -41,7 +43,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  * user to reset the position of the bot in the event that it drifts off the path.
  * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
  */
-@Config
+//@Config
+@Disabled
 @Autonomous(group = "drive")
 public class ManualFeedforwardTuner extends LinearOpMode {
     public static double DISTANCE = 250; // in
@@ -60,7 +63,7 @@ public class ManualFeedforwardTuner extends LinearOpMode {
     private static MotionProfile generateProfile(boolean movingForward) {
         MotionState start = new MotionState(movingForward ? 0 : DISTANCE, 0, 0, 0);
         MotionState goal = new MotionState(movingForward ? DISTANCE : 0, 0, 0, 0);
-        return MotionProfileGenerator.generateSimpleMotionProfile(start, goal, MAX_VEL, MAX_ACCEL);
+        return MotionProfileGenerator.generateSimpleMotionProfile(start, goal, MAX_VEL, MAX_ACCEL, MAX_DECEL);
     }
 
     @Override

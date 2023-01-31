@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
+
 import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -48,38 +50,29 @@ public class AutonoomSTANGAUwU extends LinearOpMode {
     }
 
     final double TAGSIZE = 4.5 / 100;
-    /*final double FX = 578.272;
-    final double FY = 578.272;*/
     final double FX = 878.272;
     final double FY = 878.272;
     final double CX = 320;
     final double CY = 240;
-    public static int LL = 0;
-
-    final double PI2 = Math.PI / 2;
-    final double PI = Math.PI;
-
-    static final double FEET_PER_METER = 3.28084;
-
     int LAST_ID = 0;
-
-    public int TOP_POS = 1303;
-    public int MIU_POS = 1010;
-    public int MID_POS = 760;
-
-    public static int NORMAL = 0;////
 
     public static int F = 65;
 
-    double S1CL = 0.25;
-    double S1OP = 0.75;
-
-    public static double HEAD1 = Math.toRadians(320);
-    public static double PX1 = 142;
-    public static double PY1 = 41;
-
-    public static boolean AAAAAAAAAAAAAA = false ;
+    public static boolean AAAAAAAAAAAAAA = false;
     public static boolean OPENED;
+
+    void follow_traj(TrajectorySequence traj) {
+        drive.followTrajectorySequenceAsync(traj);
+        drive.update();
+        while (drive.isBusy() && !isStopRequested() && traj != null) {
+            /*telemetry.speak("Buna ziua!");
+            telemetry.addData("Traj", "Going from (%f, %f, %f) to (%f, %f, %f) for %f", traj.start().getX(), traj.start().getY(), traj.start().getHeading(),
+                    traj.end().getX(), traj.end().getY(), traj.end().getHeading(),
+                    traj.duration());
+            telemetry.addData("Normal", NORMAL);*/
+            drive.update();
+        }
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -88,7 +81,7 @@ public class AutonoomSTANGAUwU extends LinearOpMode {
         ridicareSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ridicareSlide.setDirection(DcMotorSimple.Direction.REVERSE);
         ridicareSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        s1.setPosition(S1CL);
+        s1.setPosition(SINCHIS);
 
         drive = new SampleMecanumDrive(hardwareMap);
 
@@ -107,6 +100,7 @@ public class AutonoomSTANGAUwU extends LinearOpMode {
                 dashboard.startCameraStream(webcam, 15);
                 OPENED = true;
             }
+
             @Override
             public void onError(int errorCode) {
                 sError(errorCode);
@@ -141,142 +135,33 @@ public class AutonoomSTANGAUwU extends LinearOpMode {
         webcam.closeCameraDeviceAsync(() -> {
         });
 
-        TrajectorySequence ct;
-        if (AAAAAAAAAAAAAA) {
-            while (!isStopRequested()) {
-                if (!drive.isBusy()) {
-                    ct = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                            .lineToLinearHeading(new Pose2d(0, -F, 0))
-                            .lineToLinearHeading(new Pose2d(0, F, 0))
-                            .build();
-                    drive.followTrajectorySequenceAsync(ct);
-                }
-                drive.update();
-            }
+        packet = new TelemetryPacket();
+        packet.put("LID", LAST_ID);
+        dashboard.sendTelemetryPacket(packet);
 
-
-            /*while (!isStopRequested()) {
-                drive.updatePoseEstimate();
-                packet = new TelemetryPacket();
-                packet.put("px", drive.getPoseEstimate().getX());
-                packet.put("py", drive.getPoseEstimate().getY());
-                packet.put("ph", drive.getPoseEstimate().getHeading());
-                dashboard.sendTelemetryPacket(packet);
-            }*/
-        } else {
-            packet = new TelemetryPacket();
-            packet.put("LID", LAST_ID);
-            dashboard.sendTelemetryPacket(packet);
-
-            TrajectorySequence traj = null;
-            if (NORMAL == 0) {
-                if (LL != 0) {
-                    LAST_ID += LL + 5;
-                }
-                switch (LAST_ID) {
-                    case 6:
-                        traj = drive.trajectorySequenceBuilder(new Pose2d())
-                                .lineToLinearHeading(new Pose2d(0, F, 0))
-                                .lineToLinearHeading(new Pose2d(F * 2 - 7, F, 0))
-                                .build();
-                        break;
-                    case 7:
-                        traj = drive.trajectorySequenceBuilder(new Pose2d())
-                                .lineToLinearHeading(new Pose2d(0, F, 0))
-                                .lineToLinearHeading(new Pose2d(F * 2 - 7, F, 0))
-                                .lineToLinearHeading(new Pose2d(F * 2, 0, 0))
-                                .build();
-                        break;
-                    case 8:
-                        traj = drive.trajectorySequenceBuilder(new Pose2d())
-                                .lineToLinearHeading(new Pose2d(0, -F, 0))
-                                .lineToLinearHeading(new Pose2d(F * 2 - 7, -F, 0))
-                                .build();
-                        break;
-                    default:
-                        traj = drive.trajectorySequenceBuilder(new Pose2d())
-                                .lineToLinearHeading(new Pose2d(0, F, 0))
-                                .build();
-                }
-            } else {
+        TrajectorySequence traj = null;
+        switch (LAST_ID) {
+            case 6:
                 traj = drive.trajectorySequenceBuilder(new Pose2d())
-                        .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                            ridicareSlide.setPower(0.4);
-                            ridicareSlide.setTargetPosition(100);
-                        })
-                        .lineToLinearHeading(new Pose2d(8, F - 7, 0))
-                        .lineToLinearHeading(new Pose2d(F * 2 - 7, F - 7, 0))
-                        .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                            ridicareSlide.setPower(0.7);
-                            ridicareSlide.setTargetPosition(TOP_POS);
-                            s1.setPosition(S1CL);
-                        })
-                        .lineToLinearHeading(new Pose2d(PX1, PY1, HEAD1))
-                        .UNSTABLE_addTemporalMarkerOffset(0.1, () -> ridicareSlide.setTargetPosition(TOP_POS - 150))
-                        .waitSeconds(0.5)
-                        .UNSTABLE_addTemporalMarkerOffset(0.1, () -> s1.setPosition(S1OP))
-                        .waitSeconds(0.4)
-                        .lineToLinearHeading(new Pose2d(F * 2 - 7, F - 7, 0))
-                        .UNSTABLE_addTemporalMarkerOffset(1.0, () -> {
-                            ridicareSlide.setPower(0.3);
-                            ridicareSlide.setTargetPosition(100);
-                        })
-                        .waitSeconds(0.3)
-                        .lineToLinearHeading(new Pose2d(15, F - 7, 0))
-                        .lineToLinearHeading(new Pose2d(15, 0, 0))
+                        .lineToLinearHeading(new Pose2d(0, F, 0))
+                        .lineToLinearHeading(new Pose2d(F * 2 - 7, F, 0))
                         .build();
-                    /*
-                    .splineToLinearHeading(new Pose2d(PX2, PY2, HEAD2), HEAD2)
-                    .waitSeconds(2)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1CL))
-                    .UNSTABLE_addTemporalMarkerOffset(1, () -> ridicareSlide.setTargetPosition(TOP_POS))
-                    .splineToLinearHeading(new Pose2d(PX1, PY1, HEAD1), HEAD1)
-                    .waitSeconds(2)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> s1.setPosition(S1OP))
-                    .UNSTABLE_addTemporalMarkerOffset(0.7, () -> ridicareSlide.setTargetPosition(0))
-                    .build();*/
-            }
-
-            drive.followTrajectorySequenceAsync(traj);
-            drive.update();
-            while (drive.isBusy() && !isStopRequested()) {
-                telemetry.addData("Currently following traj", traj);
-                telemetry.addData("Normal", NORMAL);
-                drive.update();
-            }
-        /*if (NORMAL != 0) {
-            if (isStopRequested()) {
-                return;
-            }
-            Pose2d cp = drive.getPoseEstimate();
-            switch (LAST_ID) {
-                case 6:
-                    traj = drive.trajectorySequenceBuilder(cp)
-                            .splineToLinearHeading(new Pose2d(F * 2 - 7, F, 0), 0)
-                            .build();
-                    break;
-                case 7:
-                    traj = drive.trajectorySequenceBuilder(cp)
-                            .splineToLinearHeading(new Pose2d(F * 2, 0, 0), 0)
-                            .build();
-                    break;
-                case 8:
-                    traj = drive.trajectorySequenceBuilder(cp)
-                            .splineToLinearHeading(new Pose2d(F * 2 - 7, -F, 0), 0)
-                            .build();
-                    break;
-                default:
-                    traj = drive.trajectorySequenceBuilder(cp)
-                            .waitSeconds(1)
-                            .build();
-            }
-            drive.followTrajectorySequenceAsync(traj);
-            drive.update();
-            while (drive.isBusy() && !isStopRequested()) {
-                telemetry.addData("Currently following second traj", traj);
-                drive.update();
-            }
-        }*/
+                break;
+            default:
+            case 7:
+                traj = drive.trajectorySequenceBuilder(new Pose2d())
+                        //.lineToLinearHeading(new Pose2d(0, F, 0))
+                        .lineToLinearHeading(new Pose2d(F * 2 - 7, F, 0))
+                        .lineToLinearHeading(new Pose2d(F * 2, 0, 0))
+                        .build();
+                break;
+            case 8:
+                traj = drive.trajectorySequenceBuilder(new Pose2d())
+                        .lineToLinearHeading(new Pose2d(0, -F, 0))
+                        .lineToLinearHeading(new Pose2d(F * 2 - 7, -F, 0))
+                        .build();
+                break;
         }
+        follow_traj(traj);
     }
 }

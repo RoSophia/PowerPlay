@@ -184,13 +184,13 @@ public class TrajectorySequenceRunner {
             poseHistory.removeFirst();
         }
 
-        packet.put("x", poseEstimate.getX());
+        /*packet.put("x", poseEstimate.getX());
         packet.put("y", poseEstimate.getY());
         packet.put("heading (deg)", Math.toDegrees(poseEstimate.getHeading()));
 
         packet.put("xError", getLastPoseError().getX());
         packet.put("yError", getLastPoseError().getY());
-        packet.put("headingError (deg)", Math.toDegrees(getLastPoseError().getHeading()));
+        packet.put("headingError (deg)", Math.toDegrees(getLastPoseError().getHeading()));*/
 
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
 

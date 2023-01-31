@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings({"unused", "UnusedReturnValue", "FieldCanBeLocal"})
 public class TrajectorySequenceBuilder {
     private final double resolution = 0.25;
 
@@ -241,6 +242,10 @@ public class TrajectorySequenceBuilder {
         return addPath(() -> currentTrajectoryBuilder.splineTo(endPosition, endHeading, velConstraint, accelConstraint));
     }
 
+    public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2) {
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint));
+    }
+
     public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition,
                                                      Vector2d p1,
                                                      Vector2d p2,
@@ -248,9 +253,6 @@ public class TrajectorySequenceBuilder {
                                                      TrajectoryAccelerationConstraint accelConstraint
     ) {
         return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint));
-    }
-    public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2) {
-        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint));
     }
 
     public TrajectorySequenceBuilder splineToConstantHeading(Vector2d endPosition, double endHeading) {
@@ -344,7 +346,6 @@ public class TrajectorySequenceBuilder {
             TrajectoryAccelerationConstraint accelConstraint
     ) {
         this.currentVelConstraint = velConstraint;
-        this.currentAccelConstraint = accelConstraint;
 
         return this;
     }
@@ -453,6 +454,7 @@ public class TrajectorySequenceBuilder {
                 new MotionState(lastPose.getHeading(), 0.0, 0.0, 0.0),
                 new MotionState(lastPose.getHeading() + angle, 0.0, 0.0, 0.0),
                 maxAngVel,
+                maxAngAccel,
                 maxAngAccel
         );
 
@@ -714,6 +716,7 @@ public class TrajectorySequenceBuilder {
                 closestPoint = comparingPoint;
         }
 
+        assert closestPoint != null;
         return displacementToTime(sequenceSegments, closestPoint.thisPathDisplacement);
     }
 

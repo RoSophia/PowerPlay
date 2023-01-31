@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.MovingStatistics;
 
@@ -23,6 +26,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * accurate track width estimate is important or else the angular constraints will be thrown off.
  */
 @Config
+//@Disabled
 @Autonomous(group = "drive")
 public class TrackWidthTuner extends LinearOpMode {
     public static double ANGLE = 180; // deg
@@ -50,8 +54,11 @@ public class TrackWidthTuner extends LinearOpMode {
         telemetry.update();
 
         MovingStatistics trackWidthStats = new MovingStatistics(NUM_TRIALS);
+        TelemetryPacket p = new TelemetryPacket();
+        FtcDashboard dash = FtcDashboard.getInstance();
         for (int i = 0; i < NUM_TRIALS; i++) {
             drive.setPoseEstimate(new Pose2d());
+
 
             // it is important to handle heading wraparounds
             double headingAccumulator = 0;
@@ -65,6 +72,13 @@ public class TrackWidthTuner extends LinearOpMode {
                 lastHeading = heading;
 
                 drive.update();
+                p = new TelemetryPacket();
+                p.put("cx", drive.getPoseEstimate().getX());
+                p.put("cy", drive.getPoseEstimate().getY());
+                p.put("ch", drive.getPoseEstimate().getHeading());
+                p.put("pa", ((TwoTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions().get(0));
+                p.put("pe", ((TwoTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions().get(1));
+                dash.sendTelemetryPacket(p);
             }
 
             double trackWidth = DriveConstants.TRACK_WIDTH * Math.toRadians(ANGLE) / headingAccumulator;

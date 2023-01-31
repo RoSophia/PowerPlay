@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -10,7 +11,8 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Config
+//@Config
+@Disabled
 public class PwrDeterminationPipeline extends OpenCvPipeline {
     public enum PwrPosition {
         LEFT,

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -28,12 +27,14 @@ class ArmcPIDF implements Runnable {
     }
 
     public static double ppd = 0.000;
-    public static double ppu = 0.000011;
+    public static double ppu = 0.000005;
     public static double pd = 0.0008;
-    public static double pu = 0.009;
-    public static double d  = 0;
-    public static double i  = 0;
+    public static double pu = 0.01;
+    public static double d = 0;
+    public static double i = 0;
     public static double Kf = 0.0005;
+
+    public static double LPC = 2.5;
 
     double error = 0;
     double derivate = 0;
@@ -47,18 +48,15 @@ class ArmcPIDF implements Runnable {
         timer2.reset();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         while (!ThreadInfo.shouldClose) {
-            /*TelemetryPacket pack = new TelemetryPacket();
-            pack.put("Target", ThreadInfo.target);
-            pack.put("Current", ridicareSlide.getCurrentPosition());
-            pack.put("Power", outp);
-            dashboard.sendTelemetryPacket(pack);*/
-
             if (ThreadInfo.useTele) {
                 ++tc;
                 if (timer2.seconds() >= 1.0) {
                     ThreadInfo.fr = tc;
                     TelemetryPacket pack = new TelemetryPacket();
                     pack.put("fr", tc / timer2.seconds());
+                    pack.put("Target", ThreadInfo.target);
+                    pack.put("Current", ridicareSlide.getCurrentPosition());
+                    pack.put("Power", outp);
                     dashboard.sendTelemetryPacket(pack);
                     tc = 0;
                     timer2.reset();
@@ -72,6 +70,9 @@ class ArmcPIDF implements Runnable {
                     outp = (ppd * error * error) + (pd * error) + (d * derivate) + (i * integralSum) + Kf;
                 } else {
                     outp = (ppu * error * error) + (pu * error) + (d * derivate) + (i * integralSum) + Kf;
+                }
+                if (ThreadInfo.target < 150 && ridicareSlide.getCurrentPosition() < 150) {
+                    outp /= LPC;
                 }
                 ridicareSlide.setPower(outp);
 

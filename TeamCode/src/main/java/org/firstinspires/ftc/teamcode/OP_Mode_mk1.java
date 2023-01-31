@@ -68,6 +68,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
     //
 
     boolean L2A = false;
+    boolean L2RB = false;
     boolean L2B = false;
     boolean L2U = false;
     boolean L2D = false;
@@ -87,13 +88,9 @@ public class OP_Mode_mk1 extends LinearOpMode {
 
     public static int dif = 170;
 
-    public static double s1pos = SDESCHIS;
     public static boolean LOV = false;
     public static double UPP = 100;
-
-    void update_armc() {
-
-    }
+    public static double UPPP = 100;
 
     public void runOpMode() {
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -143,7 +140,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
         SPa.setPosition(0.0);
         SPe.setPosition(0.0);
 
-        s1pos = SDESCHIS;
+        s1.setPosition(SDESCHIS);
 
         waitForStart();
 
@@ -161,7 +158,6 @@ public class OP_Mode_mk1 extends LinearOpMode {
         timer.reset();
         int fps = 0;
         while (opModeIsActive()) {
-            update_armc();
             if (ThreadInfo.useTele) {
                 ++fps;
                 if (timer.seconds() >= 1.0) {
@@ -176,32 +172,39 @@ public class OP_Mode_mk1 extends LinearOpMode {
             double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double turn = -gamepad1.right_stick_x;
+            final double ms = speed * Math.sin(angle);
+            final double mc = speed * Math.cos(angle);
             //maths (nu stiu eu deastea ca fac cu antohe)
-            final double lfPower = speed * Math.sin(angle) + turn;
-            final double rfPower = (speed * Math.cos(angle) - turn);
-            final double lbPower = speed * Math.cos(angle) + turn;
-            final double rbPower = (speed * Math.sin(angle) - turn);
+            final double lfPower = ms + turn;
+            final double rfPower = mc - turn;
+            final double lbPower = mc + turn;
+            final double rbPower = ms - turn;
 
             if (!L2A && gamepad2.a) {
-                ThreadInfo.target = TOP_POS + (int)(gamepad2.left_trigger * UPP);
+                ThreadInfo.target = TOP_POS + (int) (gamepad2.left_trigger * UPP);
                 //ridicareSlide.setTargetPosition(TOP_POS);
             }
             L2A = gamepad2.a;
 
+            if (!L2RB && gamepad2.right_bumper) {
+                UPP += UPPP;
+            }
+            L2RB = gamepad2.right_bumper;
+
             if (!L2B && gamepad2.b) {
-                ThreadInfo.target = 0;
+                ThreadInfo.target = 15;
                 //ridicareSlide.setTargetPosition(0);
             }
             L2B = gamepad2.b;
 
             if (!L2U && gamepad2.dpad_up) {
-                ThreadInfo.target = MIU_POS + (int)(gamepad2.left_trigger * UPP);
+                ThreadInfo.target = MIU_POS + (int) (gamepad2.left_trigger * UPP);
                 //ridicareSlide.setTargetPosition(MIU_POS);
             }
             L2U = gamepad2.dpad_up;
 
             if (!L2D && gamepad2.dpad_down) {
-                ThreadInfo.target = MID_POS + (int)(gamepad2.left_trigger * UPP);
+                ThreadInfo.target = MID_POS + (int) (gamepad2.left_trigger * UPP);
                 //ridicareSlide.setTargetPosition(MID_POS);
             }
             L2D = gamepad2.dpad_down;
@@ -369,22 +372,14 @@ public class OP_Mode_mk1 extends LinearOpMode {
 
             if (!G2X && gamepad2.x) {
                 if (switched) {
-                    s1pos = SDESCHIS;
+                    s1.setPosition(SDESCHIS);
                 } else {
-                    s1pos = SINCHIS;
+                    s1.setPosition(SINCHIS);
                 }
                 switched = !switched;
             }
             G2X = gamepad2.x;
-            s1.setPosition(s1pos);
 
-
-
-            /*if (Math.abs(gamepad1.left_stick_x) +
-                Math.abs(gamepad1.left_stick_y) +
-                Math.abs(gamepad1.right_stick_x) +
-                Math.abs(gamepad1.right_stick_y) > 0.0001) {
-            } else {*/
             //dam blana in motoare
             double pcoef = 12.0 / batteryVoltageSensor.getVoltage();
             double spcoef = 1 - 0.6 * gamepad1.right_trigger;
@@ -393,9 +388,6 @@ public class OP_Mode_mk1 extends LinearOpMode {
             rightFront.setPower(rfPower * fcoef);
             leftBack.setPower(lbPower * fcoef);
             rightBack.setPower(rbPower * fcoef);
-            //pep = SPe.getPosition();
-            //pap = SPa.getPosition();
-            //}
         }
 
         try {
