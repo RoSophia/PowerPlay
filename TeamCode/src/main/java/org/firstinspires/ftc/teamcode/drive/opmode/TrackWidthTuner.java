@@ -5,7 +5,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -76,8 +75,8 @@ public class TrackWidthTuner extends LinearOpMode {
                 p.put("cx", drive.getPoseEstimate().getX());
                 p.put("cy", drive.getPoseEstimate().getY());
                 p.put("ch", drive.getPoseEstimate().getHeading());
-                p.put("pa", ((TwoTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions().get(0));
-                p.put("pe", ((TwoTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions().get(1));
+                // p.put("pa", ((TwoTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions().get(0));
+                // p.put("pe", ((TwoTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions().get(1));
                 dash.sendTelemetryPacket(p);
             }
 

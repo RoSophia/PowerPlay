@@ -33,6 +33,9 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.MID_POS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.MIU_POS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.S1PO;
+import static org.firstinspires.ftc.teamcode.RobotConstants.S2PO;
+import static org.firstinspires.ftc.teamcode.RobotConstants.S3PO;
 import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
@@ -134,11 +137,13 @@ public class OP_Mode_mk1 extends LinearOpMode {
         rightBack.setDirection(DcMotorEx.Direction.REVERSE);
         rightFront.setDirection(DcMotorEx.Direction.REVERSE);
 
-        Servo SPa = hardwareMap.get(Servo.class, "SPa");
-        Servo SPe = hardwareMap.get(Servo.class, "SPe");
+        Servo S1 = hardwareMap.get(Servo.class, "SPe");
+        Servo S2 = hardwareMap.get(Servo.class, "SPa1");
+        Servo S3 = hardwareMap.get(Servo.class, "SPa2");
 
-        SPa.setPosition(0.0);
-        SPe.setPosition(0.0);
+        S1.setPosition(S1PO);
+        S2.setPosition(S2PO);
+        S3.setPosition(S3PO);
 
         s1.setPosition(SDESCHIS);
 
@@ -169,9 +174,9 @@ public class OP_Mode_mk1 extends LinearOpMode {
                 }
             }
 
-            double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
-            double turn = -gamepad1.right_stick_x;
+            final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
+            final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            final double turn = -gamepad1.right_stick_x;
             final double ms = speed * Math.sin(angle);
             final double mc = speed * Math.cos(angle);
             //maths (nu stiu eu deastea ca fac cu antohe)
@@ -381,9 +386,9 @@ public class OP_Mode_mk1 extends LinearOpMode {
             G2X = gamepad2.x;
 
             //dam blana in motoare
-            double pcoef = 12.0 / batteryVoltageSensor.getVoltage();
-            double spcoef = 1 - 0.6 * gamepad1.right_trigger;
-            double fcoef = pcoef * spcoef;
+            final double pcoef = 12.0 / batteryVoltageSensor.getVoltage();
+            final double spcoef = 1 - 0.6 * gamepad1.right_trigger;
+            final double fcoef = pcoef * spcoef;
             leftFront.setPower(lfPower * fcoef);
             rightFront.setPower(rfPower * fcoef);
             leftBack.setPower(lbPower * fcoef);

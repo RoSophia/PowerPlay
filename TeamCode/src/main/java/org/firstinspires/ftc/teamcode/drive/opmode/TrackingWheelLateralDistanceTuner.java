@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.util.Angle;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -62,11 +63,20 @@ import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
  * slightly but your heading will still be fine. This does not affect your overall tracking
  * precision. The heading should still line up.
  */
-//@Config
-@Disabled
+@Config
+//@Disabled
 @TeleOp(group = "drive")
 public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
     public static int NUM_TURNS = 10;
+
+    public static boolean EXT = false;
+
+    double fixRetardation(double r) {
+        if (r < 0) {
+            return Math.PI * 2 + r;
+        }
+        return r;
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -84,6 +94,11 @@ public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
         telemetry.addLine("");
         telemetry.addLine("Press Y/△ to stop the routine.");
         telemetry.update();
+
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
 
         waitForStart();
 
@@ -103,7 +118,12 @@ public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
 
             drive.update();
 
-            double heading = drive.getPoseEstimate().getHeading();
+            double heading;
+            if (EXT) {
+                heading = fixRetardation(imu.getAngularOrientation().firstAngle);
+            }  else {
+                heading = drive.getPoseEstimate().getHeading();
+            }
             double deltaHeading = heading - lastHeading;
 
             headingAccumulator += Angle.normDelta(deltaHeading);

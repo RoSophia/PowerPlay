@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.Traject
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -80,23 +81,23 @@ public class Autonoooooooooom extends LinearOpMode {
 
     public static int F = 65;
 
-    public static double HEAD1 = 0.79;//Math.toRadians(45);
-    public static double PX1 = 142;
-    public static double PY1 = 20;
-    public static double HEAD2 = Math.toRadians(270);
-    public static double PX2 = 140;
-    public static double PY2 = -44.5;
-    public static double HEAD3 = Math.toRadians(45);
-    public static double PX3 = 157;
-    public static double PY3 = 7;
-    public static double HEADC = -0.025;
-    public static double PXC = 1.8;
-    public static double PYC = 1.3;
+    public static double HEAD1 = Math.toRadians(48.7);
+    public static double PX1 = 150;
+    public static double PY1 = 12.3;
+    public static double HEAD2 = Math.toRadians(267.57);
+    public static double PX2 = 128;
+    public static double PY2 = -63.56;
+    public static double HEAD3 = HEAD1;//Math.toRadians(45);
+    public static double PX3 = PX1;
+    public static double PY3 = PY1;
+    public static double HEADC = 0;//-0.025;
+    public static double PXC = 0;//1.8;
+    public static double PYC = 1.5;//1.3;
 
-    public static double P1X = 35;
+    public static double P1X = 15;
     public static double P1Y = Math.PI;
     public static double P2X = 30;
-    public static double P2Y = 2;
+    public static double P2Y = Math.PI / 2;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
@@ -111,8 +112,8 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double WTD = 1.1;
     public static double WD = 0.2;
 
-    public static double R1X = 14;
-    public static double R1Y = 0.1;
+    public static double R1X = 15;
+    public static double R1Y = Math.PI;
     public static double R2X = 25;
     public static double R2Y = 4.5;
 
@@ -186,6 +187,7 @@ public class Autonoooooooooom extends LinearOpMode {
             Vector2d R2 = new Vector2d(R2X, R2Y);
             TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
             TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
+            TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
             return drive.trajectorySequenceBuilder(new Pose2d())
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = 100;
@@ -198,7 +200,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ridicareSlide.setTargetPosition(TOP_POS);
                         s1.setPosition(SINCHIS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX1, PY1, HEAD1), R1, R2, vc, ac)
+                    .funnyRaikuCurve(new Pose2d(PX1, PY1, HEAD1), R1, R2, vc, ac, dc)
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
                         ThreadInfo.target = TOP_POS - 300;
@@ -211,7 +213,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ridicareSlide.setPower(0.5);
                         ridicareSlide.setTargetPosition(350);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2, PY2, HEAD2), new Vector2d(P1.getX() * 1.3, P1.getY() * 0.8), P2) //////////////////////////////////////////// GET CONE 1
+                    .funnyRaikuCurve(new Pose2d(PX2, PY2, HEAD2), P1, P2) //////////////////////////////////////////// GET CONE 1
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
                     .waitSeconds(0.12)

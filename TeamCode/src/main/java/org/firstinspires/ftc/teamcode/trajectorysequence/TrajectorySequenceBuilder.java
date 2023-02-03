@@ -34,9 +34,11 @@ public class TrajectorySequenceBuilder {
 
     private final TrajectoryVelocityConstraint baseVelConstraint;
     private final TrajectoryAccelerationConstraint baseAccelConstraint;
+    private final TrajectoryAccelerationConstraint baseDecelConstraint;
 
     private TrajectoryVelocityConstraint currentVelConstraint;
     private TrajectoryAccelerationConstraint currentAccelConstraint;
+    private TrajectoryAccelerationConstraint currentDecelConstraint;
 
     private final double baseTurnConstraintMaxAngVel;
     private final double baseTurnConstraintMaxAngAccel;
@@ -70,14 +72,17 @@ public class TrajectorySequenceBuilder {
             Double startTangent,
             TrajectoryVelocityConstraint baseVelConstraint,
             TrajectoryAccelerationConstraint baseAccelConstraint,
+            TrajectoryAccelerationConstraint baseDecelConstraint,
             double baseTurnConstraintMaxAngVel,
             double baseTurnConstraintMaxAngAccel
     ) {
         this.baseVelConstraint = baseVelConstraint;
         this.baseAccelConstraint = baseAccelConstraint;
+        this.baseDecelConstraint = baseDecelConstraint;
 
         this.currentVelConstraint = baseVelConstraint;
         this.currentAccelConstraint = baseAccelConstraint;
+        this.currentDecelConstraint = baseDecelConstraint;
 
         this.baseTurnConstraintMaxAngVel = baseTurnConstraintMaxAngVel;
         this.baseTurnConstraintMaxAngAccel = baseTurnConstraintMaxAngAccel;
@@ -111,12 +116,13 @@ public class TrajectorySequenceBuilder {
             Pose2d startPose,
             TrajectoryVelocityConstraint baseVelConstraint,
             TrajectoryAccelerationConstraint baseAccelConstraint,
+            TrajectoryAccelerationConstraint baseDecelConstraint,
             double baseTurnConstraintMaxAngVel,
             double baseTurnConstraintMaxAngAccel
     ) {
         this(
                 startPose, null,
-                baseVelConstraint, baseAccelConstraint,
+                baseVelConstraint, baseAccelConstraint, baseDecelConstraint,
                 baseTurnConstraintMaxAngVel, baseTurnConstraintMaxAngAccel
         );
     }
@@ -243,16 +249,17 @@ public class TrajectorySequenceBuilder {
     }
 
     public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2) {
-        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint));
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint, currentDecelConstraint));
     }
 
     public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition,
                                                      Vector2d p1,
                                                      Vector2d p2,
                                                      TrajectoryVelocityConstraint velConstraint,
-                                                     TrajectoryAccelerationConstraint accelConstraint
+                                                     TrajectoryAccelerationConstraint accelConstraint,
+                                                     TrajectoryAccelerationConstraint decelConstraint
     ) {
-        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint));
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint, decelConstraint));
     }
 
     public TrajectorySequenceBuilder splineToConstantHeading(Vector2d endPosition, double endHeading) {
@@ -343,9 +350,12 @@ public class TrajectorySequenceBuilder {
 
     public TrajectorySequenceBuilder setConstraints(
             TrajectoryVelocityConstraint velConstraint,
-            TrajectoryAccelerationConstraint accelConstraint
+            TrajectoryAccelerationConstraint accelConstraint,
+            TrajectoryAccelerationConstraint decelConstraint
     ) {
         this.currentVelConstraint = velConstraint;
+        this.currentAccelConstraint = accelConstraint;
+        this.currentDecelConstraint = decelConstraint;
 
         return this;
     }
@@ -353,6 +363,7 @@ public class TrajectorySequenceBuilder {
     public TrajectorySequenceBuilder resetConstraints() {
         this.currentVelConstraint = this.baseVelConstraint;
         this.currentAccelConstraint = this.baseAccelConstraint;
+        this.currentDecelConstraint = this.baseDecelConstraint;
 
         return this;
     }
@@ -377,6 +388,18 @@ public class TrajectorySequenceBuilder {
 
     public TrajectorySequenceBuilder resetAccelConstraint() {
         this.currentAccelConstraint = this.baseAccelConstraint;
+
+        return this;
+    }
+
+    public TrajectorySequenceBuilder setDecelConstraint(TrajectoryAccelerationConstraint decelConstraint) {
+        this.currentDecelConstraint = decelConstraint;
+
+        return this;
+    }
+
+    public TrajectorySequenceBuilder resetDecelConstraint() {
+        this.currentDecelConstraint = this.baseDecelConstraint;
 
         return this;
     }
@@ -503,7 +526,7 @@ public class TrajectorySequenceBuilder {
 
         double tangent = setAbsoluteTangent ? absoluteTangent : Angle.norm(lastPose.getHeading() + tangentOffset);
 
-        currentTrajectoryBuilder = new TrajectoryBuilder(lastPose, tangent, currentVelConstraint, currentAccelConstraint, resolution);
+        currentTrajectoryBuilder = new TrajectoryBuilder(lastPose, tangent, currentVelConstraint, currentAccelConstraint, currentDecelConstraint, resolution);
     }
 
     public TrajectorySequence build() {

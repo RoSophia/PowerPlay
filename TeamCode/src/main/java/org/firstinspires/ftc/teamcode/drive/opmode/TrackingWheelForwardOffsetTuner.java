@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.util.Angle;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -34,13 +35,21 @@ import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
  * for the forward offset. You can run this procedure as many times as necessary until a
  * satisfactory result is produced.
  */
-//@Config
-@Disabled
+@Config
+//@Disabled
 @Autonomous(group="drive")
 public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
     public static double ANGLE = 180; // deg
     public static int NUM_TRIALS = 5;
     public static int DELAY = 1000; // ms
+    public static boolean EXT = true;
+
+    double fixRetardation(double r) {
+        if (r < 0) {
+            return Math.PI * 2 + r;
+        }
+        return r;
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -58,6 +67,11 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
         telemetry.addLine("Make sure your robot has enough clearance to turn smoothly");
         telemetry.update();
 
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
+
         waitForStart();
 
         if (isStopRequested()) return;
@@ -67,6 +81,7 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
         telemetry.update();
 
         MovingStatistics forwardOffsetStats = new MovingStatistics(NUM_TRIALS);
+        double thead = 0;
         for (int i = 0; i < NUM_TRIALS; i++) {
             drive.setPoseEstimate(new Pose2d());
 
@@ -77,7 +92,13 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
             drive.turnAsync(Math.toRadians(ANGLE));
 
             while (!isStopRequested() && drive.isBusy()) {
-                double heading = drive.getPoseEstimate().getHeading();
+                double heading;
+                if (EXT) {
+                    heading = fixRetardation(imu.getAngularOrientation().firstAngle);
+                }  else {
+                    heading = drive.getPoseEstimate().getHeading();
+                }
+
                 headingAccumulator += Angle.norm(heading - lastHeading);
                 lastHeading = heading;
 
@@ -87,12 +108,14 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
             double forwardOffset = StandardTrackingWheelLocalizer.FORWARD_OFFSET +
                     drive.getPoseEstimate().getY() / headingAccumulator;
             forwardOffsetStats.add(forwardOffset);
+            thead += headingAccumulator;
 
             sleep(DELAY);
         }
 
         telemetry.clearAll();
         telemetry.addLine("Tuning complete");
+        telemetry.addData("Total heading", thead);
         telemetry.addLine(Misc.formatInvariant("Effective forward offset = %.2f (SE = %.3f)",
                 forwardOffsetStats.getMean(),
                 forwardOffsetStats.getStandardDeviation() / Math.sqrt(NUM_TRIALS)));
