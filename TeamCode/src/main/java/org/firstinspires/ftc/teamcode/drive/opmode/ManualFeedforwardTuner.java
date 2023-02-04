@@ -43,8 +43,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  * user to reset the position of the bot in the event that it drifts off the path.
  * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
  */
-//@Config
-@Disabled
+@Config
+//@Disabled
 @Autonomous(group = "drive")
 public class ManualFeedforwardTuner extends LinearOpMode {
     public static double DISTANCE = 250; // in
@@ -92,9 +92,6 @@ public class ManualFeedforwardTuner extends LinearOpMode {
         boolean movingForwards = true;
         MotionProfile activeProfile = generateProfile(true);
         double profileStart = clock.seconds();
-
-        Encoder pa = new Encoder(hardwareMap.get(DcMotorEx.class, "EPa"));
-        Encoder pe = new Encoder(hardwareMap.get(DcMotorEx.class, "EPe"));
 
         while (!isStopRequested()) {
             telemetry.addData("mode", mode);

@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.S1PC;
+import static org.firstinspires.ftc.teamcode.RobotConstants.S1PO;
 import static org.firstinspires.ftc.teamcode.RobotConstants.S2PC;
 import static org.firstinspires.ftc.teamcode.RobotConstants.S3PC;
+import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
 
 import android.annotation.SuppressLint;
 
@@ -119,6 +121,8 @@ public class Test extends LinearOpMode {
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.temperatureUnit = BNO055IMU.TempUnit.CELSIUS;
         imu.initialize(parameters);
 
         TelemetryPacket packet;
@@ -129,6 +133,7 @@ public class Test extends LinearOpMode {
 
         TrajectorySequence ct;
         while (!isStopRequested()) {
+            s1.setPosition(SDESCHIS);
             if (!(rightBack.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) && brak) {
                 rightBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
                 rightFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -162,7 +167,15 @@ public class Test extends LinearOpMode {
             packet.put("El", leftEncoder.getCurrentPosition());
             packet.put("Er", rightEncoder.getCurrentPosition());
             packet.put("Ef", frontEncoder.getCurrentPosition());
-            packet.put("Ah", fixRetardation(imu.getAngularOrientation().firstAngle));
+            packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
+            /*packet.put("IMUX", imu.getPosition().x);
+            packet.put("IMUY", imu.getPosition().y);
+            packet.put("IMUZ", imu.getPosition().z);
+            packet.put("IMUTemp", imu.getTemperature().temperature);
+            packet.put("IMUAngAq", imu.getAngularOrientation().acquisitionTime);
+            packet.put("IMUTemAq", imu.getTemperature().acquisitionTime);
+            packet.put("IMUPosAq", imu.getPosition().acquisitionTime);*/
+
             double ahe = Math.abs(fixRetardation(imu.getAngularOrientation().firstAngle) - drive.getPoseEstimate().getHeading());
             if (Math.PI * 2 - ahe < ahe) {
                 ahe = Math.PI * 2 -ahe;

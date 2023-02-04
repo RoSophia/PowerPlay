@@ -46,6 +46,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -118,6 +119,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
         rightBack.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         leftFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
 
         if (BRAK == 1) {
             rightBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -368,7 +370,8 @@ public class OP_Mode_mk1 extends LinearOpMode {
                 telemetry.addData("left_stick_y", poz);
                 telemetry.addData("r_stick_y", gamepad2.right_stick_y);
                 telemetry.addData("pad", gamepad1.right_trigger);
-                telemetry.addData("Fps", ThreadInfo.fr);
+                telemetry.addData("PID Fps", ThreadInfo.fr);
+                telemetry.addData("Rob Fps", fps);
                 telemetry.update();
             } else if (OV3RDR1V3) {
                 telemetry.addLine("U HAV3 3NT3R3D 0V3RDR1V3 M0D3");
