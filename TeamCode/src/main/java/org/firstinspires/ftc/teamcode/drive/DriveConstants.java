@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
  * These are not the only parameters; some are located in the localizer classes, drive base classes,
  * and op modes themselves.
  */
-@Config
+
 public class DriveConstants {
 
     /*
@@ -54,8 +54,8 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0.0013;
+    public static double kV = 0.00635;
+    public static double kA = 0.001;
     public static double kStatic = 0.03;
 
     /*
@@ -65,9 +65,13 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 150;// True max: 170
-    public static double MAX_ACCEL = 110;
-    public static double MAX_DECEL = 60;
+    public static double MAX_VEL = 140;// True max: 170
+    public static double MAX_ACCEL = 100;
+    public static double MAX_DECEL = 70;
+
+    //public static double MAX_VEL = 110;// True max: 170
+    //public static double MAX_ACCEL = 110;
+    //public static double MAX_DECEL = 60;
     public static double MAX_ANG_VEL = Math.toRadians(180);
     public static double MAX_ANG_ACCEL = Math.toRadians(180);
 

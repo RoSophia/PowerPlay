@@ -139,7 +139,7 @@ public class Test extends LinearOpMode {
                 rightFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
                 leftBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
                 leftFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            } else {
+            } else if (!brak) {
                 rightBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
                 rightFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
                 leftBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);

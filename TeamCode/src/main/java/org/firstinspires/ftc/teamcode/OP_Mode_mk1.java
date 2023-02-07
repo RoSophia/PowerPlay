@@ -84,7 +84,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
     boolean switched = false;
 
     public static double AUT_POW = 0.811111212;
-    public static double POW_COEF = -0.9;
+    public static double POW_COEF = 0.9;
     public static double COB_COEF = 0.5;
     public static boolean OV3RDR1V3 = false;
 
@@ -199,7 +199,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
             L2RB = gamepad2.right_bumper;
 
             if (!L2B && gamepad2.b) {
-                ThreadInfo.target = 15;
+                ThreadInfo.target = 35;
                 //ridicareSlide.setTargetPosition(0);
             }
             L2B = gamepad2.b;
@@ -216,7 +216,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
             }
             L2D = gamepad2.dpad_down;
 
-            if (!R2RB && gamepad2.right_bumper &&
+            if (!R2RB && gamepad2.dpad_left &&
                     !R2LB && gamepad2.left_bumper
             ) {
                 OV3RDR1V3 = !OV3RDR1V3;
@@ -226,13 +226,6 @@ public class OP_Mode_mk1 extends LinearOpMode {
             R2RB = gamepad2.right_bumper;
             R2LB = gamepad2.left_bumper;
 
-            if (!R2LT && gamepad2.left_trigger > 0.01) {
-                USE_TELEMETRY = !USE_TELEMETRY;
-                telemetry.addLine("Nothing here, keep looking");
-                telemetry.update();
-            }
-            R2LT = gamepad2.left_trigger > 0.01;
-
             if (USE_TELEMETRY) {
                 telemetry.clear();
                 telemetry.clearAll();
@@ -240,6 +233,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                 //drive.updatePoseEstimate();
                 //telemetry.addData("Cpos", drive.getPoseEstimate());
             }
+            final double DPC = 1 - 0.6 * gamepad2.right_trigger;
             if (OV3RDR1V3) {
                 if (USE_TELEMETRY) {
                     telemetry.addLine("ALL 0V3");
@@ -250,7 +244,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     if (USE_TELEMETRY) {
                         telemetry.addLine("0V3RDR1V3 MAN");
                     }
-                    ridicareSlide.setPower(POW_COEF * gamepad2.right_stick_y);
+                    ridicareSlide.setPower(POW_COEF * -gamepad2.right_stick_y * DPC);
                 } else {
                     ThreadInfo.use = true;
                     if (LOV) {
@@ -305,12 +299,12 @@ public class OP_Mode_mk1 extends LinearOpMode {
                             if (USE_TELEMETRY) {
                                 telemetry.addLine("COB MAN");
                             }
-                            ridicareSlide.setPower(-COB_COEF * 1.3);
+                            ridicareSlide.setPower(COB_COEF * -gamepad2.right_stick_y * DPC);
                         } else {
                             if (USE_TELEMETRY) {
                                 telemetry.addLine("RID MAN");
                             }
-                            ridicareSlide.setPower(POW_COEF * gamepad2.right_stick_y);
+                            ridicareSlide.setPower(POW_COEF * -gamepad2.right_stick_y * DPC);
                         }
                         ThreadInfo.target = lpos;
                         //ridicareSlide.setTargetPosition(lpos);

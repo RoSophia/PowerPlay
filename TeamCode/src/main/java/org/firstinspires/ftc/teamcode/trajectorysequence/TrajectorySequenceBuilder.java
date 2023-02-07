@@ -248,18 +248,22 @@ public class TrajectorySequenceBuilder {
         return addPath(() -> currentTrajectoryBuilder.splineTo(endPosition, endHeading, velConstraint, accelConstraint));
     }
 
-    public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2) {
-        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint, currentDecelConstraint));
+    public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2, double h1, double h2) {
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, h1, h2, currentVelConstraint, currentAccelConstraint, currentDecelConstraint));
+        //return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint));
     }
 
     public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition,
                                                      Vector2d p1,
                                                      Vector2d p2,
+                                                     double h1,
+                                                     double h2,
                                                      TrajectoryVelocityConstraint velConstraint,
                                                      TrajectoryAccelerationConstraint accelConstraint,
                                                      TrajectoryAccelerationConstraint decelConstraint
     ) {
-        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint, decelConstraint));
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, h1, h2, velConstraint, accelConstraint, decelConstraint));
+        //return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint));
     }
 
     public TrajectorySequenceBuilder splineToConstantHeading(Vector2d endPosition, double endHeading) {
@@ -527,6 +531,7 @@ public class TrajectorySequenceBuilder {
         double tangent = setAbsoluteTangent ? absoluteTangent : Angle.norm(lastPose.getHeading() + tangentOffset);
 
         currentTrajectoryBuilder = new TrajectoryBuilder(lastPose, tangent, currentVelConstraint, currentAccelConstraint, currentDecelConstraint, resolution);
+        //currentTrajectoryBuilder = new TrajectoryBuilder(lastPose, tangent, currentVelConstraint, currentAccelConstraint, resolution);
     }
 
     public TrajectorySequence build() {

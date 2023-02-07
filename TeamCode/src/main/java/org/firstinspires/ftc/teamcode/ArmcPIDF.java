@@ -26,13 +26,13 @@ class ArmcPIDF implements Runnable {
         ridicareSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public static double ppd = 0.000;
-    public static double ppu = 0.000005;
-    public static double pd = 0.0008;
+    public static double ppd = 0.0;
+    public static double ppu = 0.0;
+    public static double pd = 0.001;
     public static double pu = 0.01;
     public static double d = 0;
-    public static double i = 0;
-    public static double Kf = 0.0005;
+    public static double i = 0.0001;
+    public static double Kf = 0.001;
 
     public static double LPC = 2.5;
 
@@ -47,29 +47,31 @@ class ArmcPIDF implements Runnable {
         int tc = 0;
         timer2.reset();
         FtcDashboard dashboard = FtcDashboard.getInstance();
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
         while (!ThreadInfo.shouldClose) {
             if (ThreadInfo.useTele) {
                 ++tc;
                 if (timer2.seconds() >= 1.0) {
-                    ThreadInfo.fr = tc;
-                    TelemetryPacket pack = new TelemetryPacket();
-                    pack.put("fr", tc / timer2.seconds());
-                    pack.put("Target", ThreadInfo.target);
-                    pack.put("Current", ridicareSlide.getCurrentPosition());
-                    pack.put("Power", outp);
-                    dashboard.sendTelemetryPacket(pack);
+                    ThreadInfo.fr = (int) (tc / timer2.seconds());
                     tc = 0;
                     timer2.reset();
                 }
+                TelemetryPacket pack = new TelemetryPacket();
+                pack.put("fr", ThreadInfo.fr);
+                pack.put("Target", ThreadInfo.target);
+                pack.put("Current", ridicareSlide.getCurrentPosition());
+                pack.put("Power", outp);
+                dashboard.sendTelemetryPacket(pack);
             }
             if (ThreadInfo.use) {
                 error = ThreadInfo.target - ridicareSlide.getCurrentPosition();
-                /*derivate = (error - lastError) / timer.seconds();
-                integralSum = integralSum + (error * timer.seconds());*/
+                //derivate = (error - lastError) / timer.seconds();
+                integralSum = integralSum + (error * timer.seconds());
                 if (error < -220) {
-                    outp = (ppd * error * error) + (pd * error) + (d * derivate) + (i * integralSum) + Kf;
+                    outp = /*-(ppd * error * error) +*/ (pd * error) + (d * derivate) + (i * integralSum) + Kf;
                 } else {
-                    outp = (ppu * error * error) + (pu * error) + (d * derivate) + (i * integralSum) + Kf;
+                    outp = /*(ppu * error * error) +*/ (pu * error) + (d * derivate) + (i * integralSum) + Kf;
                 }
                 if (ThreadInfo.target < 150 && ridicareSlide.getCurrentPosition() < 150) {
                     outp /= LPC;
@@ -77,7 +79,7 @@ class ArmcPIDF implements Runnable {
                 ridicareSlide.setPower(outp);
 
                 lastError = error;
-                //timer.reset();
+                timer.reset();
             } else {
                 error = derivate = lastError = integralSum = 0;
             }
@@ -87,5 +89,6 @@ class ArmcPIDF implements Runnable {
                 e.printStackTrace();
             }
         }
+        ridicareSlide.setPower(0);
     }
 }

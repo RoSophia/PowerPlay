@@ -60,9 +60,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(13, 0.0, 0);
-    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(15, 0.0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5.5, 0, 0);
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(8, 0.0, 0);
+    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(8, 0.0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -101,7 +101,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         follower = new HolonomicPIDVAFollower(AXIAL_PID, LATERAL_PID, HEADING_PID,
-                new Pose2d(0.2, 0.2, Math.toRadians(0.1)), 0.05);
+                new Pose2d(0.1, 0.1, Math.toRadians(0.1)), 0.2);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -188,6 +188,18 @@ public class SampleMecanumDrive extends MecanumDrive {
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
         return new TrajectoryBuilder(startPose, startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT, DECEL_CONSTRAINT);
     }
+
+    /*public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
+        return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
+        return new TrajectoryBuilder(startPose, reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
+        return new TrajectoryBuilder(startPose, startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }*/
 
     public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
         VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
@@ -316,12 +328,15 @@ public class SampleMecanumDrive extends MecanumDrive {
         return wheelVelocities;
     }
 
+    public static boolean MOVE = true;
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront .setPower(v );
-        leftRear  .setPower(v1);
-        rightRear .setPower(v2);
-        rightFront.setPower(v3);
+        if (MOVE) {
+            leftFront.setPower(v);
+            leftRear.setPower(v1);
+            rightRear.setPower(v2);
+            rightFront.setPower(v3);
+        }
     }
 
     @Override
