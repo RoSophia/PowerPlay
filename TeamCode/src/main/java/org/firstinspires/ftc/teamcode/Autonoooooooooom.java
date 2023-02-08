@@ -82,21 +82,22 @@ public class Autonoooooooooom extends LinearOpMode {
 
     public int F = 65;
 
-    public static double HEAD1 = 0.7;
+    public static double HEAD1 = 0.69;
     public static double PX1 = 148.77;
     public static double PY1 = 12;
     public static double HEAD2 = Math.toRadians(270);
-    public static double PX2 = 141.6;
-    public static double PY2 = -50;
+    public static double PX2 = 141;
+    public static double PY2 = -47.5;
     public static double HEAD3 = 0.83;
     public static double PX3 = PX1;
     public static double PY3 = 12;
-    public static double HEADC = 0.075;
-    public static double PXC = 0;
-    public static double PYC = 0.7;
-    public static double PCY = 0.2;
+    public static double HEADC = 0.065;
+    public static double PXC = 0.3;
+    public static double PXXC = 1.3;
+    public static double PYC = 1.5;
+    public static double PCY = 0.5;
 
-    public static double P1X = 50;
+    public static double P1X = 43;
     public static double P1Y = 3.7;
     public static double P2X = 50;
     public static double P2Y = 1.9;
@@ -108,29 +109,30 @@ public class Autonoooooooooom extends LinearOpMode {
 
     public static double MVEL = 150;//120;
     public static double MAL = 100;//120;
-    public static double MDL = 70;//70;
+    public static double MDL = 80;//70;
 
-    public double OPD = 0.3;
+    public double OPD = 0.04;
     public double UPD = 0.7;
-    public double WTD = 1.1;
-    public double WD = 0.2;
+    public double WTD = 0.3;
+    public double WD = 0.02;
+    public double WWD = 0.04;
     public static double PD = 0.3;
 
     public static double R1X = 25;
-    public static double R1Y = -0.1;
+    public static double R1Y = 0.1;
     public static double R2X = 35;
-    public static double R2Y = 3.9;
+    public static double R2Y = 3.8;
 
     public double H11 = -0.8;
     public double H12 = 0.8;
     public double H21 = -1;
     public double H22 = 1;
 
-    int GP1 = 260;
-    int GP2 = 230;
-    int GP3 = 210;
+    int GP1 = 280;
+    int GP2 = 250;
+    int GP3 = 230;
     int GP4 = 130;
-    int GP5 = 80;
+    int GP5 = 100;
 
     VoltageSensor batteryVoltageSensor;
 
@@ -217,7 +219,7 @@ public class Autonoooooooooom extends LinearOpMode {
                     })
                     .funnyRaikuCurve(new Pose2d(PX1, PY1, HEAD1), R1, R2, H11, H12, vc, ac, dc)
                     .addTemporalMarker(this::ltime)
-                    .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
                         ThreadInfo.target = TOP_POS - 300;
                         ridicareSlide.setTargetPosition(TOP_POS - 250);
@@ -226,7 +228,7 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0.1, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// PRELOAD 1
                     .UNSTABLE_addTemporalMarkerOffset(PD, () -> {
                         ThreadInfo.target = 375;
-                        ridicareSlide.setPower(0.7);
+                        ridicareSlide.setPower(0.5);
                         ridicareSlide.setTargetPosition(GP1);
                     })
                     .funnyRaikuCurve(new Pose2d(PX2, PY2, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 1
@@ -235,7 +237,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         getpos();
                         s1.setPosition(SINCHIS);
                     })
-                    .waitSeconds(0.12)
+                    .waitSeconds(WWD)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS / 2;
                         ridicareSlide.setPower(1);
@@ -255,13 +257,13 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 1
                     .UNSTABLE_addTemporalMarkerOffset(PD, () -> {
                         ThreadInfo.target = 310;
-                        ridicareSlide.setPower(0.7);
+                        ridicareSlide.setPower(0.5);
                         ridicareSlide.setTargetPosition(GP2);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC, PY2 + PCY, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 2
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXXC, PY2 + PCY, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 2
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
-                    .waitSeconds(0.12)
+                    .waitSeconds(WWD)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS / 2;
                         ridicareSlide.setPower(1);
@@ -281,13 +283,13 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 2
                     .UNSTABLE_addTemporalMarkerOffset(PD, () -> {
                         ThreadInfo.target = 260;
-                        ridicareSlide.setPower(0.7);
+                        ridicareSlide.setPower(0.5);
                         ridicareSlide.setTargetPosition(GP3);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 2, PY2 + PCY * 2, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 3
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXXC * 2, PY2 + PCY * 2, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 3
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
-                    .waitSeconds(0.12)
+                    .waitSeconds(WWD)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS / 2;
                         ridicareSlide.setPower(1);
@@ -307,13 +309,13 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 3
                     .UNSTABLE_addTemporalMarkerOffset(PD, () -> {
                         ThreadInfo.target = 210;
-                        ridicareSlide.setPower(0.7);
+                        ridicareSlide.setPower(0.5);
                         ridicareSlide.setTargetPosition(GP4);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 3, PY2 + PCY * 3, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 4
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXXC * 3, PY2 + PCY * 3, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 4
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
-                    .waitSeconds(0.12)
+                    .waitSeconds(WWD)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS / 2;
                         ridicareSlide.setPower(1);
@@ -333,13 +335,13 @@ public class Autonoooooooooom extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// CONE 4
                     .UNSTABLE_addTemporalMarkerOffset(PD, () -> {
                         ThreadInfo.target = 210;
-                        ridicareSlide.setPower(0.7);
+                        ridicareSlide.setPower(0.5);
                         ridicareSlide.setTargetPosition(GP5);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX2 + PXC * 4, PY2 + PCY * 4, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 5
+                    .funnyRaikuCurve(new Pose2d(PX2 + PXXC * 4, PY2 + PCY * 4, HEAD2), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 5
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> s1.setPosition(SINCHIS))
-                    .waitSeconds(0.12)
+                    .waitSeconds(WWD)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         ThreadInfo.target = TOP_POS / 2;
                         ridicareSlide.setPower(1);
