@@ -47,7 +47,7 @@ public class Test extends LinearOpMode {
 
     public Test() {
         dashboard = FtcDashboard.getInstance();
-        dashboard.setTelemetryTransmissionInterval(25);
+        //dashboard.setTelemetryTransmissionInterval(25);
     }
 
     double fixRetardation(double r) {
@@ -66,6 +66,8 @@ public class Test extends LinearOpMode {
     public static double XP = 1.0;
     public static double YP = 1.0;
 
+    public static double SSP = 0.65;
+
     @Override
     public void runOpMode() throws InterruptedException {
         Servo s1 = hardwareMap.get(Servo.class, "S1");
@@ -78,6 +80,8 @@ public class Test extends LinearOpMode {
         Servo S1 = hardwareMap.get(Servo.class, "SPe");
         Servo S2 = hardwareMap.get(Servo.class, "SPa1");
         Servo S3 = hardwareMap.get(Servo.class, "SPa2");
+
+        Servo SS = hardwareMap.get(Servo.class, "SSL");
 
         S1.setPosition(S1PC);
         S2.setPosition(S2PC);
@@ -134,6 +138,7 @@ public class Test extends LinearOpMode {
         TrajectorySequence ct;
         while (!isStopRequested()) {
             s1.setPosition(SDESCHIS);
+            SS.setPosition(SSP);
             if (!(rightBack.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) && brak) {
                 rightBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
                 rightFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -167,6 +172,9 @@ public class Test extends LinearOpMode {
             packet.put("El", leftEncoder.getCurrentPosition());
             packet.put("Er", rightEncoder.getCurrentPosition());
             packet.put("Ef", frontEncoder.getCurrentPosition());
+            packet.put("EVl", leftEncoder.getCorrectedVelocity());
+            packet.put("EVr", rightEncoder.getCorrectedVelocity());
+            packet.put("EVf", frontEncoder.getCorrectedVelocity());
             packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
             /*packet.put("IMUX", imu.getPosition().x);
             packet.put("IMUY", imu.getPosition().y);

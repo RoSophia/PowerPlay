@@ -33,6 +33,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.lifecycle:lifecycle-common:2.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.arch.core:core-common:2.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.collection:collection:1.1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.acmerobotics.dashboard:core:0.4.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.nanohttpd:nanohttpd-websocket:2.3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.firstinspires.ftc:Inspection:8.1.1@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.firstinspires.ftc:Blocks:8.1.1@aar" level="project" />
@@ -68,7 +69,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.interpolator:interpolator:1.0.0@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.drawerlayout:drawerlayout:1.0.0@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.firstinspires.ftc:gameAssets-PowerPlay:1.0.0@aar" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.acmerobotics.dashboard:dashboard:0.4.5@aar" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.acmerobotics.dashboard:dashboard:0.4.8@aar" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="PowerPlay.FtcRobotController.main" />
 </module>

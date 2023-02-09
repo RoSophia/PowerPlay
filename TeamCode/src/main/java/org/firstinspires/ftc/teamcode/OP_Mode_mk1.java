@@ -24,7 +24,7 @@ package org.firstinspires.ftc.teamcode;
  */
 
 /*
- * SOFT ARABESC PERVERS VERSIUNE 0.23b
+ * SOFT ARABESC PERVERS VERSIUNE 0.24b
  * AUTOR: VERICU
  * E PERVERS, RUPE ADERENTA
  *

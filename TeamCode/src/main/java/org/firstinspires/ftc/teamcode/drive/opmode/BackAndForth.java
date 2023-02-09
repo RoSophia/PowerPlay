@@ -1,6 +1,29 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.HEAD1;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.HEAD2;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.HEAD3;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.HEADC;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.P1X;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.P1Y;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.P2X;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.P2Y;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PX1;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PX2;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PX3;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PXC;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PXXC;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PY1;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PY2;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PY3;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PYC;
+import static org.firstinspires.ftc.teamcode.Autonoooooooooom.PYYC;
+import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -8,6 +31,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -30,12 +54,15 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
  * is recommended that you use the FollowerPIDTuner opmode for further fine tuning.
  */
 //@Config
-@Disabled
+//@Disabled
 @Autonomous(group = "drive")
 public class BackAndForth extends LinearOpMode {
 
     public static double DISTANCE = 200;
     public static double HEAD = 0;
+
+    public double H21 = -1;
+    public double H22 = 1;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -56,13 +83,29 @@ public class BackAndForth extends LinearOpMode {
 
         waitForStart();
 
-        Pose2d lpos = new Pose2d();
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        //drive.setPoseEstimate(new Pose2d(PX1, PY1, HEAD1));
+        drive.setPoseEstimate(new Pose2d(0, 0, 0));
 
+        double reps = 0;
+        VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         while (!isStopRequested()) {
+            // TrajectorySequence ct = drive.trajectorySequenceBuilder(new Pose2d()).lineToLinearHeading(new Pose2d(DISTANCE, 0, HEAD)).lineToLinearHeading(new Pose2d(0, 0, 0)).build();
+            if (!drive.isBusy()) {
+                Vector2d P1 = new Vector2d(P1X, P1Y);
+                Vector2d P2 = new Vector2d(P2X, P2Y);
+                TrajectorySequence ct = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                        .funnyRaikuCurve(new Pose2d(PX2 - PX1 + reps * PXXC, PY2 - PY1 + reps * PYYC, HEAD2), P1, P2, H21, H22)
+                        .funnyRaikuCurve(new Pose2d(PX3 - PX1 + reps * PXC, PY3 - PY1 + reps * PYC, HEAD3 + reps * HEADC), P2, P1, H21, H22)
+                        .build();
+                drive.followTrajectorySequenceAsync(ct);
+                reps += 1;
+            }
             drive.update();
-            TrajectorySequence ct = drive.trajectorySequenceBuilder(new Pose2d()).lineToLinearHeading(new Pose2d(DISTANCE, 0, HEAD)).lineToLinearHeading(new Pose2d(0, 0, 0)).build();
-            drive.followTrajectorySequence(ct);
+            TelemetryPacket pack = new TelemetryPacket();
+            pack.put("Ch", drive.getPoseEstimate().getHeading());
+            pack.put("Che", drive.getLastError().getHeading());
+            FtcDashboard.getInstance().sendTelemetryPacket(pack);
         }
     }
 }
