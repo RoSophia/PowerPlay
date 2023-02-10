@@ -11,9 +11,9 @@ public class RobotConstants {
     public static int MIU_POS = 840;
     public static int MID_POS = 540;
 
-    public static double S1PC = 0.68 ;
-    public static double S2PC = 0.325 ;
-    public static double S3PC = 0.105;
+    public static double S1PC = 0.2 ;
+    public static double S2PC = 0.27;
+    public static double S3PC = 0.3;
 
     public static double S1PO = 0.34;
     public static double S2PO = 0.7;

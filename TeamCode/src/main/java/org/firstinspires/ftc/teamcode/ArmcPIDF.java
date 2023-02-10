@@ -26,8 +26,6 @@ class ArmcPIDF implements Runnable {
         ridicareSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public static double ppd = 0.0;
-    public static double ppu = 0.0;
     public static double pd = 0.001;
     public static double pu = 0.01;
     public static double d = 0;
@@ -41,24 +39,19 @@ class ArmcPIDF implements Runnable {
     double lastError = 0;
     double integralSum = 0;
 
+    @SuppressWarnings("BusyWait")
     public void run() {
         ElapsedTime timer2 = new ElapsedTime();
         double outp = 0;
-        int tc = 0;
         timer2.reset();
         FtcDashboard dashboard = FtcDashboard.getInstance();
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (!ThreadInfo.shouldClose) {
             if (ThreadInfo.useTele) {
-                ++tc;
-                if (timer2.seconds() >= 1.0) {
-                    ThreadInfo.fr = (int) (tc / timer2.seconds());
-                    tc = 0;
-                    timer2.reset();
-                }
                 TelemetryPacket pack = new TelemetryPacket();
-                pack.put("fr", ThreadInfo.fr);
+                pack.put("CycleTimeArm", timer2.milliseconds());
+                timer2.reset();
                 pack.put("Target", ThreadInfo.target);
                 pack.put("Current", ridicareSlide.getCurrentPosition());
                 pack.put("Power", outp);

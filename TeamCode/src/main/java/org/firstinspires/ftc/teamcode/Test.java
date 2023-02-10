@@ -16,6 +16,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive")
+@TeleOp(group = "drive")
 @SuppressLint("DefaultLocale")
 public class Test extends LinearOpMode {
 
@@ -83,12 +84,12 @@ public class Test extends LinearOpMode {
         S2.setPosition(S2PC);
         S3.setPosition(S3PC);
 
-        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "EPa2"));
+        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "Underglow"));
         Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "EPe"));
-        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LF"));
+        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LED"));
 
-        frontEncoder.setDirection(Encoder.Direction.REVERSE);
-        leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        //frontEncoder.setDirection(Encoder.Direction.REVERSE);
+        //leftEncoder.setDirection(Encoder.Direction.REVERSE);
 
         leftBack = hardwareMap.get(DcMotorEx.class, "LB");
         leftFront = hardwareMap.get(DcMotorEx.class, "LF");
@@ -134,6 +135,9 @@ public class Test extends LinearOpMode {
         TrajectorySequence ct;
         while (!isStopRequested()) {
             s1.setPosition(SDESCHIS);
+            S1.setPosition(S1PC);
+            S2.setPosition(S2PC);
+            S3.setPosition(S3PC);
             if (!(rightBack.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) && brak) {
                 rightBack.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
                 rightFront.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -156,9 +160,6 @@ public class Test extends LinearOpMode {
             final double lbPower = mc + turn;
             final double rbPower = ms - turn;
 
-            S1.setPosition(S1PC);
-            S2.setPosition(S2PC);
-            S3.setPosition(S3PC);
             drive.updatePoseEstimate();
             packet = new TelemetryPacket();
             packet.put("px", drive.getPoseEstimate().getX());
@@ -168,13 +169,6 @@ public class Test extends LinearOpMode {
             packet.put("Er", rightEncoder.getCurrentPosition());
             packet.put("Ef", frontEncoder.getCurrentPosition());
             packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
-            /*packet.put("IMUX", imu.getPosition().x);
-            packet.put("IMUY", imu.getPosition().y);
-            packet.put("IMUZ", imu.getPosition().z);
-            packet.put("IMUTemp", imu.getTemperature().temperature);
-            packet.put("IMUAngAq", imu.getAngularOrientation().acquisitionTime);
-            packet.put("IMUTemAq", imu.getTemperature().acquisitionTime);
-            packet.put("IMUPosAq", imu.getPosition().acquisitionTime);*/
 
             double ahe = Math.abs(fixRetardation(imu.getAngularOrientation().firstAngle) - drive.getPoseEstimate().getHeading());
             if (Math.PI * 2 - ahe < ahe) {
@@ -182,7 +176,6 @@ public class Test extends LinearOpMode {
             }
             packet.put("Ahe", ahe);
             dashboard.sendTelemetryPacket(packet);
-            //drive.followTrajectorySequenceAsync(traj);
             drive.update();
             telemetry.addData("px", drive.getPoseEstimate().getX());
             telemetry.addData("py", drive.getPoseEstimate().getY());

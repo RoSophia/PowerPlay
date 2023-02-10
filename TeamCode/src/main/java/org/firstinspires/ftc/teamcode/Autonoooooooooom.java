@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -135,6 +136,7 @@ public class Autonoooooooooom extends LinearOpMode {
     int GP5 = 100;
 
     VoltageSensor batteryVoltageSensor;
+    public static boolean CYCLE = false;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -148,12 +150,13 @@ public class Autonoooooooooom extends LinearOpMode {
     void follow_traj(TrajectorySequence traj) {
         drive.followTrajectorySequenceAsync(traj);
         drive.update();
+        ElapsedTime timer = new ElapsedTime(0);
         while (drive.isBusy() && !isStopRequested() && traj != null) {
-            /*telemetry.speak("Buna ziua!");
-            telemetry.addData("Traj", "Going from (%f, %f, %f) to (%f, %f, %f) for %f", traj.start().getX(), traj.start().getY(), traj.start().getHeading(),
-                    traj.end().getX(), traj.end().getY(), traj.end().getHeading(),
-                    traj.duration());
-            telemetry.addData("Normal", NORMAL);*/
+            if (CYCLE) {
+                TelemetryPacket pack = new TelemetryPacket();
+                pack.put("CycleTime", timer.milliseconds());
+                dashboard.sendTelemetryPacket(pack);
+            }
             drive.update();
         }
     }
@@ -162,6 +165,7 @@ public class Autonoooooooooom extends LinearOpMode {
             Canvas fieldOverlay,
             TrajectorySequence sequence
     ) {
+        double ITC = 1 / 2.54;
         if (sequence != null) {
             for (int i = 0; i < sequence.size(); i++) {
                 SequenceSegment segment = sequence.get(i);
@@ -170,19 +174,18 @@ public class Autonoooooooooom extends LinearOpMode {
                     fieldOverlay.setStrokeWidth(1);
                     fieldOverlay.setStroke(COLOR_INACTIVE_TRAJECTORY);
 
-
                     DashboardUtil.drawSampledPath(fieldOverlay, ((TrajectorySegment) segment).getTrajectory().getPath());
                 } else if (segment instanceof TurnSegment) {
                     Pose2d pose = segment.getStartPose();
 
                     fieldOverlay.setFill(COLOR_INACTIVE_TURN);
-                    fieldOverlay.fillCircle(pose.getX(), pose.getY(), 2);
+                    fieldOverlay.fillCircle(pose.getX() * ITC, pose.getY() * ITC, 2);
                 } else if (segment instanceof WaitSegment) {
                     Pose2d pose = segment.getStartPose();
 
                     fieldOverlay.setStrokeWidth(1);
                     fieldOverlay.setStroke(COLOR_INACTIVE_WAIT);
-                    fieldOverlay.strokeCircle(pose.getX(), pose.getY(), 3);
+                    fieldOverlay.strokeCircle(pose.getX() * ITC, pose.getY() * ITC, 3);
                 }
             }
         }

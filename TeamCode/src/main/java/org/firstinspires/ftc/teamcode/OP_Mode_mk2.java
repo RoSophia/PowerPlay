@@ -24,7 +24,7 @@ package org.firstinspires.ftc.teamcode;
  */
 
 /*
- * SOFT ARABESC PERVERS VERSIUNE 0.23b
+ * SOFT ARABESC PERVERS VERSIUNE 0.24b
  * AUTOR: VERICU
  * E PERVERS, RUPE ADERENTA
  *
@@ -43,19 +43,18 @@ import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-//@Config
-@Disabled
+@Config
 @TeleOp
-public class OP_Mode_mk1 extends LinearOpMode {
+public class OP_Mode_mk2 extends LinearOpMode {
     //sasiu
     public DcMotorEx leftBack;
     public DcMotorEx leftFront;
@@ -98,6 +97,8 @@ public class OP_Mode_mk1 extends LinearOpMode {
     public static double UPP = 100;
     public static double UPPP = 100;
 
+    DcMotor led, underglow;
+
     public void runOpMode() {
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
         FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -111,6 +112,8 @@ public class OP_Mode_mk1 extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "RB");
         rightFront = hardwareMap.get(DcMotorEx.class, "RF");
         ridicareSlide = hardwareMap.get(DcMotorEx.class, "RS");
+        led = hardwareMap.get(DcMotor.class, "LED");
+        underglow = hardwareMap.get(DcMotor.class, "Underglow");
 
         Runnable armRun = new ArmcPIDF(ridicareSlide);
         Thread armThread = new Thread(armRun);
@@ -165,18 +168,16 @@ public class OP_Mode_mk1 extends LinearOpMode {
 
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        int fps = 0;
         while (opModeIsActive()) {
             if (ThreadInfo.useTele) {
-                ++fps;
-                if (timer.seconds() >= 1.0) {
-                    TelemetryPacket fp = new TelemetryPacket();
-                    fp.put("fps", fps / timer.seconds());
-                    dashboard.sendTelemetryPacket(fp);
-                    fps = 0;
-                    timer.reset();
-                }
+                TelemetryPacket fp = new TelemetryPacket();
+                fp.put("CycleTime", timer.milliseconds());
+                timer.reset();
+                dashboard.sendTelemetryPacket(fp);
             }
+
+            led.setPower(gamepad2.left_stick_x);
+            underglow.setPower(gamepad2.left_stick_y);
 
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
@@ -254,11 +255,16 @@ public class OP_Mode_mk1 extends LinearOpMode {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
                         LOV = false;
                     }
+                    /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
+                        ridicareSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    }*/
                     if (USE_TELEMETRY) {
                         telemetry.addLine("0V3RDR1V3 AUT");
                     }
 
                     ThreadInfo.target = 0;
+                    /*ridicareSlide.setTargetPosition(0);
+                    ridicareSlide.setPower(POW_COEF / 2);*/
                 }
             } else {
                 if (Math.abs(gamepad2.right_stick_y) > 0.01) {
@@ -362,7 +368,6 @@ public class OP_Mode_mk1 extends LinearOpMode {
                 telemetry.addData("r_stick_y", gamepad2.right_stick_y);
                 telemetry.addData("pad", gamepad1.right_trigger);
                 telemetry.addData("PID Fps", ThreadInfo.fr);
-                telemetry.addData("Rob Fps", fps);
                 telemetry.update();
             } else if (OV3RDR1V3) {
                 telemetry.addLine("U HAV3 3NT3R3D 0V3RDR1V3 M0D3");

@@ -60,9 +60,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(9, 0.0, 0);
-    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(9, 0.0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(10, 0, 0);
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(10, 0.02, 0.2);
+    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(10, 0.02, 0.4);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 0, 0.1);
 
     public static double LATERAL_MULTIPLIER = 1;
 

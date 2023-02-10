@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.acmerobotics.dashboard:core:0.4.8">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.acmerobotics.dashboard/core/0.4.8/4abd867b5d351f59a3ac139105720b3b6338baab/core-0.4.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.acmerobotics.dashboard/core/0.4.8/bcd76643b00df9477d765cd35ff5b139546d768d/core-0.4.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
