@@ -31,6 +31,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -85,8 +87,9 @@ public class Test extends LinearOpMode {
         S3.setPosition(S3PC);
 
         Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "Underglow"));
-        Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "EPe"));
-        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LED"));
+        Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RF"));
+        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
+        leftEncoder.setDirection(Encoder.Direction.REVERSE);
 
         //frontEncoder.setDirection(Encoder.Direction.REVERSE);
         //leftEncoder.setDirection(Encoder.Direction.REVERSE);
@@ -119,12 +122,12 @@ public class Test extends LinearOpMode {
         }
 
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        /*BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.temperatureUnit = BNO055IMU.TempUnit.CELSIUS;
-        imu.initialize(parameters);
+        imu.initialize(parameters);*/
 
         TelemetryPacket packet;
         waitForStart();
@@ -132,7 +135,7 @@ public class Test extends LinearOpMode {
         ridicareSlide.setTargetPosition(40);
         ridicareSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        TrajectorySequence ct;
+        ElapsedTime timer = new ElapsedTime(0);
         while (!isStopRequested()) {
             s1.setPosition(SDESCHIS);
             S1.setPosition(S1PC);
@@ -168,14 +171,17 @@ public class Test extends LinearOpMode {
             packet.put("El", leftEncoder.getCurrentPosition());
             packet.put("Er", rightEncoder.getCurrentPosition());
             packet.put("Ef", frontEncoder.getCurrentPosition());
-            packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
+            packet.put("EVl", leftEncoder.getCorrectedVelocity());
+            packet.put("EVr", rightEncoder.getCorrectedVelocity());
+            packet.put("EVf", frontEncoder.getCorrectedVelocity());
+            //packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
 
+            /*
             double ahe = Math.abs(fixRetardation(imu.getAngularOrientation().firstAngle) - drive.getPoseEstimate().getHeading());
             if (Math.PI * 2 - ahe < ahe) {
                 ahe = Math.PI * 2 -ahe;
             }
-            packet.put("Ahe", ahe);
-            dashboard.sendTelemetryPacket(packet);
+            packet.put("Ahe", ahe);*/
             drive.update();
             telemetry.addData("px", drive.getPoseEstimate().getX());
             telemetry.addData("py", drive.getPoseEstimate().getY());
@@ -189,6 +195,9 @@ public class Test extends LinearOpMode {
             rightFront.setPower(rfPower * fcoef);
             leftBack.setPower(lbPower * fcoef);
             rightBack.setPower(rbPower * fcoef);
+            packet.put("CycleTime", timer.seconds());
+            timer.reset();
+            dashboard.sendTelemetryPacket(packet);
         }
     }
 }

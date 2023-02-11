@@ -59,9 +59,9 @@ class ArmcPIDF implements Runnable {
             }
             if (ThreadInfo.use) {
                 error = ThreadInfo.target - ridicareSlide.getCurrentPosition();
-                //derivate = (error - lastError) / timer.seconds();
+                derivate = (error - lastError) / timer.seconds();
                 integralSum = integralSum + (error * timer.seconds());
-                if (error < -220) {
+                if (error < 0) {
                     outp = /*-(ppd * error * error) +*/ (pd * error) + (d * derivate) + (i * integralSum) + Kf;
                 } else {
                     outp = /*(ppu * error * error) +*/ (pu * error) + (d * derivate) + (i * integralSum) + Kf;

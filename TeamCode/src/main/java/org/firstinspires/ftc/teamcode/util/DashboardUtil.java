@@ -48,8 +48,8 @@ public class DashboardUtil {
     public static void drawRobot(Canvas canvas, Pose2d pose) {
         canvas.strokeCircle(pose.getX() * ITC, pose.getY() * ITC, ROBOT_RADIUS);
         Vector2d v = pose.headingVec().times(ROBOT_RADIUS);
-        double x1 = pose.getX() * ITC + v.getX() * ITC / 2, y1 = pose.getY() * ITC+ v.getY() * ITC / 2;
-        double x2 = pose.getX() * ITC + v.getX() * ITC, y2 = pose.getY() * ITC + v.getY() * ITC;
+        double x1 = pose.getX() * ITC + v.getX() / 2, y1 = pose.getY() * ITC+ v.getY() / 2;
+        double x2 = pose.getX() * ITC + v.getX(), y2 = pose.getY() * ITC + v.getY();
         canvas.strokeLine(x1, y1, x2, y2);
     }
 }

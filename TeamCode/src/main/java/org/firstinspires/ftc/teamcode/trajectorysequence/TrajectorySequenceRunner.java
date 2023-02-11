@@ -190,14 +190,16 @@ public class TrajectorySequenceRunner {
 
         packet.put("xError", getLastPoseError().getX());
         packet.put("yError", getLastPoseError().getY());
-        packet.put("headingError (deg)", Math.toDegrees(getLastPoseError().getHeading()));
-        dashboard.sendTelemetryPacket(packet);*/
+        packet.put("headingError (deg)", Math.toDegrees(getLastPoseError().getHeading()));*/
 
         draw(fieldOverlay, currentTrajectorySequence, currentSegment, targetPose, poseEstimate);
+        dashboard.sendTelemetryPacket(packet);
 
 
         return driveSignal;
     }
+
+    public double ITC = 1 / 2.54;
 
     private void draw(
             Canvas fieldOverlay,
@@ -217,13 +219,13 @@ public class TrajectorySequenceRunner {
                     Pose2d pose = segment.getStartPose();
 
                     fieldOverlay.setFill(COLOR_INACTIVE_TURN);
-                    fieldOverlay.fillCircle(pose.getX(), pose.getY(), 2);
+                    fieldOverlay.fillCircle(pose.getX() * ITC, pose.getY() * ITC, 2);
                 } else if (segment instanceof WaitSegment) {
                     Pose2d pose = segment.getStartPose();
 
                     fieldOverlay.setStrokeWidth(1);
                     fieldOverlay.setStroke(COLOR_INACTIVE_WAIT);
-                    fieldOverlay.strokeCircle(pose.getX(), pose.getY(), 3);
+                    fieldOverlay.strokeCircle(pose.getX() * ITC, pose.getY() * ITC, 3);
                 }
             }
         }
@@ -240,13 +242,13 @@ public class TrajectorySequenceRunner {
                 Pose2d pose = currentSegment.getStartPose();
 
                 fieldOverlay.setFill(COLOR_ACTIVE_TURN);
-                fieldOverlay.fillCircle(pose.getX(), pose.getY(), 3);
+                fieldOverlay.fillCircle(pose.getX() * ITC, pose.getY() * ITC, 3);
             } else if (currentSegment instanceof WaitSegment) {
                 Pose2d pose = currentSegment.getStartPose();
 
                 fieldOverlay.setStrokeWidth(1);
                 fieldOverlay.setStroke(COLOR_ACTIVE_WAIT);
-                fieldOverlay.strokeCircle(pose.getX(), pose.getY(), 3);
+                fieldOverlay.strokeCircle(pose.getX() * ITC, pose.getY() * ITC, 3);
             }
         }
 

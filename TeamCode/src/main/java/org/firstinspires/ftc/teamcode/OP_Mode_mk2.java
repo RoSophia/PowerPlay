@@ -97,7 +97,26 @@ public class OP_Mode_mk2 extends LinearOpMode {
     public static double UPP = 100;
     public static double UPPP = 100;
 
-    DcMotor led, underglow;
+    DcMotor underglow;
+
+    public double FC = 0.5;
+    public double SPC = 1.2;
+    public double MINP = 0.2;
+    double luv = 0;
+
+    ElapsedTime et = new ElapsedTime(0);
+    void upd_underglow(double speed) {
+        double cs = Math.abs(speed) * Math.sqrt(2) / 2 * SPC;
+        if (cs > luv) {
+            luv = cs;
+        } else {
+            luv -= et.seconds() * FC;
+        }
+        luv = Math.min(Math.max(luv, MINP), 1);
+
+        underglow.setPower(-luv);
+        et.reset();
+    }
 
     public void runOpMode() {
         VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -112,7 +131,6 @@ public class OP_Mode_mk2 extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotorEx.class, "RB");
         rightFront = hardwareMap.get(DcMotorEx.class, "RF");
         ridicareSlide = hardwareMap.get(DcMotorEx.class, "RS");
-        led = hardwareMap.get(DcMotor.class, "LED");
         underglow = hardwareMap.get(DcMotor.class, "Underglow");
 
         Runnable armRun = new ArmcPIDF(ridicareSlide);
@@ -148,11 +166,10 @@ public class OP_Mode_mk2 extends LinearOpMode {
         Servo S2 = hardwareMap.get(Servo.class, "SPa1");
         Servo S3 = hardwareMap.get(Servo.class, "SPa2");
 
+        s1.setPosition(SDESCHIS);
         S1.setPosition(S1PO);
         S2.setPosition(S2PO);
         S3.setPosition(S3PO);
-
-        s1.setPosition(SDESCHIS);
 
         waitForStart();
 
@@ -169,15 +186,16 @@ public class OP_Mode_mk2 extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (opModeIsActive()) {
+            S1.setPosition(S1PO);
+            S2.setPosition(S2PO);
+            S3.setPosition(S3PO);
+
             if (ThreadInfo.useTele) {
                 TelemetryPacket fp = new TelemetryPacket();
                 fp.put("CycleTime", timer.milliseconds());
                 timer.reset();
                 dashboard.sendTelemetryPacket(fp);
             }
-
-            led.setPower(gamepad2.left_stick_x);
-            underglow.setPower(gamepad2.left_stick_y);
 
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
@@ -189,6 +207,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
             final double rfPower = mc - turn;
             final double lbPower = mc + turn;
             final double rbPower = ms - turn;
+            upd_underglow(Math.abs(turn) + Math.abs(speed));
 
             if (!L2A && gamepad2.a) {
                 ThreadInfo.target = TOP_POS + (int) (gamepad2.left_trigger * UPP);

@@ -35,14 +35,13 @@ import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
  * for the forward offset. You can run this procedure as many times as necessary until a
  * satisfactory result is produced.
  */
-//@Config
-@Disabled
+@Config
+//@Disabled
 @Autonomous(group="drive")
 public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
     public static double ANGLE = 180; // deg
     public static int NUM_TRIALS = 5;
     public static int DELAY = 1000; // ms
-    public static boolean EXT = true;
 
     double fixRetardation(double r) {
         if (r < 0) {
@@ -67,10 +66,10 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
         telemetry.addLine("Make sure your robot has enough clearance to turn smoothly");
         telemetry.update();
 
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        /*BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        imu.initialize(parameters);*/
 
         waitForStart();
 
@@ -93,12 +92,7 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
 
             while (!isStopRequested() && drive.isBusy()) {
                 double heading;
-                if (EXT) {
-                    heading = fixRetardation(imu.getAngularOrientation().firstAngle);
-                }  else {
-                    heading = drive.getPoseEstimate().getHeading();
-                }
-
+                heading = drive.getPoseEstimate().getHeading();
                 headingAccumulator += Angle.norm(heading - lastHeading);
                 lastHeading = heading;
 

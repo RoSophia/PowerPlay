@@ -101,7 +101,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         follower = new HolonomicPIDVAFollower(AXIAL_PID, LATERAL_PID, HEADING_PID,
-                new Pose2d(0.1, 0.1, Math.toRadians(0.1)), 0.1);
+                new Pose2d(1, 1, Math.toRadians(5)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -110,10 +110,11 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
+        /*
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        imu.initialize(parameters);*/
 
         // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
         // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
