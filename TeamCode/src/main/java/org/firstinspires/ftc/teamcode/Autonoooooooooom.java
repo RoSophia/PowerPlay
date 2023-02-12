@@ -87,21 +87,22 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static double HEAD1 = 0.63;
-    public static double PX1 = 148.77;
-    public static double PY1 = 11;
-    public static double HEAD2 = 4.5;
-    public static double PX2 = 142;
-    public static double PY2 = -50;
-    public static double HEAD3 = 0.65;
-    public static double PX3 = 148;
-    public static double PY3 = 10;
-    public static double HEADC = 0.07;
-    public static double HEADCC = 0.03;
+    public static double HEAD1 = 0.535;
+    public static double PX1 = 147;
+    public static double PY1 = 5;
+    public static double HEAD2 = 4.66;
+    public static double PX2 = 140;
+    public static double PY2 = -58;
+    public static double HEAD3 = 0.523;
+    public static double PX3 = 150;
+    public static double PY3 = 5;
+    public static double HEADC = -0.08;
+    public static double HEADCC = -0.05;
+    public static double HEADCCC = -0.07;
     public static double PXC = 0.5;
     public static double PXXC = -1;
-    public static double PYC = 1.8;
-    public static double PYYC = 1.4;
+    public static double PYC = 0;
+    public static double PYYC = 0.5;
 
     public static double P1X = 34;
     public static double P1Y = 3.5;
@@ -124,8 +125,8 @@ public class Autonoooooooooom extends LinearOpMode {
     public double WWD = 0.08;
     public static double PD = 0.3;
 
-    public static double R1X = 25;
-    public static double R1Y = 0.1;
+    public static double R1X = 30;
+    public static double R1Y = -0.1;
     public static double R2X = 35;
     public static double R2Y = 3.8;
 
@@ -332,7 +333,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 2, PY3 + PYC * 2, HEAD3 + HEADC * 2), P2, P1, H21, H22)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 2, PY3 + PYC * 2, HEAD3 + HEADC * 2 + HEADCCC), P2, P1, H21, H22)
                     //.addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
@@ -362,7 +363,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 3, PY3 + PYC * 3, HEAD3 + HEADC * 2.9), P2, P1, H21, H22)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 3, PY3 + PYC * 3, HEAD3 + HEADC * 3 + HEADCCC * 2), P2, P1, H21, H22)
                     //.addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
@@ -392,7 +393,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 4, PY3 + PYC * 4, HEAD3 + HEADC * 3.8), P2, P1, H21, H22)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 4, PY3 + PYC * 4, HEAD3 + HEADC * 4 + HEADCCC * 3), P2, P1, H21, H22)
                     //.addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
