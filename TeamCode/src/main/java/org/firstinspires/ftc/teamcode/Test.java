@@ -171,9 +171,9 @@ public class Test extends LinearOpMode {
             packet.put("El", leftEncoder.getCurrentPosition());
             packet.put("Er", rightEncoder.getCurrentPosition());
             packet.put("Ef", frontEncoder.getCurrentPosition());
-            packet.put("EVl", leftEncoder.getCorrectedVelocity());
-            packet.put("EVr", rightEncoder.getCorrectedVelocity());
-            packet.put("EVf", frontEncoder.getCorrectedVelocity());
+            packet.put("vel", leftEncoder.getCorrectedVelocity());
+            packet.put("ver", rightEncoder.getCorrectedVelocity());
+            packet.put("vef", frontEncoder.getCorrectedVelocity());
             //packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
 
             /*

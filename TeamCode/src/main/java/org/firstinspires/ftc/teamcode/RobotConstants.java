@@ -4,8 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class RobotConstants {
-    public static double SDESCHIS = 0.6;
-    public static double SINCHIS = 0.75;
+    public static double SDESCHIS = 0.73;
+    public static double SINCHIS = 0.85;
 
     public static int TOP_POS = 1130;
     public static int MIU_POS = 840;

@@ -87,31 +87,32 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static double HEAD1 = 0.535;
-    public static double PX1 = 147;
-    public static double PY1 = 5;
-    public static double HEAD2 = 4.66;
+    public static double HEAD1 = 0.42;
+    public static double PX1 = 146;
+    public static double PY1 = 7;
+    public static double HEAD2 = 4.59;
     public static double PX2 = 140;
-    public static double PY2 = -58;
+    public static double PY2 = -60.5;
     public static double HEAD3 = 0.523;
-    public static double PX3 = 150;
+    public static double PX3 = 148;
     public static double PY3 = 5;
-    public static double HEADC = -0.08;
+    public static double HEADC = 0.01;
     public static double HEADCC = -0.05;
-    public static double HEADCCC = -0.07;
-    public static double PXC = 0.5;
-    public static double PXXC = -1;
-    public static double PYC = 0;
+    public static double HEADCCC = 0.00;
+    public static double PXC = 0.7;
+    public static double PXXC = 0;
+    public static double PYC = -0.5;
     public static double PYYC = 0.5;
+    public static double PYYYC = 0.2;
 
-    public static double P1X = 34;
-    public static double P1Y = 3.5;
-    public static double P2X = 30;
-    public static double P2Y = 2.2;
+    public static double P1X = 35;
+    public static double P1Y = 3.3;
+    public static double P2X = 25;
+    public static double P2Y = 2;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
-    public static boolean RECURRING_SINGULARITY = true;
+    public static boolean RECURRING_SINGULARITY = false;
     public static boolean GPOS = false;
 
     public static double MVEL = 150;//150;
@@ -126,7 +127,7 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double PD = 0.3;
 
     public static double R1X = 30;
-    public static double R1Y = -0.1;
+    public static double R1Y = -0.2;
     public static double R2X = 35;
     public static double R2Y = 3.8;
 
@@ -135,11 +136,11 @@ public class Autonoooooooooom extends LinearOpMode {
     public double H21 = -1;
     public double H22 = 1;
 
-    int GP1 = 300;
-    int GP2 = 250;
-    int GP3 = 190;
-    int GP4 = 100;
-    int GP5 =  10;
+    int GP1 = 275;
+    int GP2 = 225;
+    int GP3 = 170;
+    int GP4 = 120;
+    int GP5 =  60;
 
     Encoder frontEncoder;
     Encoder rightEncoder;
@@ -333,7 +334,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 2, PY3 + PYC * 2, HEAD3 + HEADC * 2 + HEADCCC), P2, P1, H21, H22)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 2, PY3 + PYC * 2 + PYYYC, HEAD3 + HEADC * 2 + HEADCCC), P2, P1, H21, H22)
                     //.addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
@@ -363,7 +364,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 3, PY3 + PYC * 3, HEAD3 + HEADC * 3 + HEADCCC * 2), P2, P1, H21, H22)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 3, PY3 + PYC * 3 + PYYYC * 2, HEAD3 + HEADC * 3 + HEADCCC * 2), P2, P1, H21, H22)
                     //.addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
@@ -393,7 +394,7 @@ public class Autonoooooooooom extends LinearOpMode {
                         ThreadInfo.target = TOP_POS;
                         ridicareSlide.setTargetPosition(TOP_POS);
                     })
-                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 4, PY3 + PYC * 4, HEAD3 + HEADC * 4 + HEADCCC * 3), P2, P1, H21, H22)
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC * 4, PY3 + PYC * 4 + PYYYC * 3, HEAD3 + HEADC * 4 + HEADCCC * 3), P2, P1, H21, H22)
                     //.addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
@@ -422,12 +423,13 @@ public class Autonoooooooooom extends LinearOpMode {
             while (!isStopRequested()) {
                 drive.updatePoseEstimate();
                 telemetry.addData("PE", drive.getPoseEstimate());
+                telemetry.addData("PEH", drive.getPoseEstimate().getHeading() / 180 * Math.PI);
                 telemetry.addData("Pe", drive.getLastError());
                 telemetry.update();
                 TelemetryPacket p = new TelemetryPacket();
                 p.put("Rx", drive.getPoseEstimate().getX());
                 p.put("Ry", drive.getPoseEstimate().getY());
-                p.put("Rh", drive.getPoseEstimate().getHeading());
+                p.put("Rh", drive.getPoseEstimate().getHeading() * Math.PI / 180);
                 p.put("Ex", drive.getLastError().getX());
                 p.put("Ey", drive.getLastError().getY());
                 p.put("Eh", drive.getLastError().getHeading());
@@ -465,6 +467,8 @@ public class Autonoooooooooom extends LinearOpMode {
     DcMotorEx ridicareSlide;
     DcMotor underglow;
 
+    public static boolean UNDERGLOW = true;
+
     @Override
     public void runOpMode() throws InterruptedException {
         Servo s1 = hardwareMap.get(Servo.class, "S1");
@@ -479,8 +483,10 @@ public class Autonoooooooooom extends LinearOpMode {
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
 
-        underglow = hardwareMap.get(DcMotor.class, "Underglow");
-        underglow.setPower(-1);
+        if (UNDERGLOW) {
+            underglow = hardwareMap.get(DcMotor.class, "Underglow");
+            underglow.setPower(-1);
+        }
 
         leftBack = hardwareMap.get(DcMotorEx.class, "LB");
         leftFront = hardwareMap.get(DcMotorEx.class, "LF");
@@ -491,7 +497,7 @@ public class Autonoooooooooom extends LinearOpMode {
         leftFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
-        telemetry.speak("Dami whynd bo-ooh-le!");
+        //telemetry.speak("Dami whynd bo-ooh-le!");
 
         /*Runnable armRun = new ArmcPIDF(ridicareSlide);
         Thread armThread = new Thread(armRun);*/
@@ -503,7 +509,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
         TelemetryPacket packet;
 
-        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         pipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
         webcam.setPipeline(pipeline);
@@ -524,6 +530,12 @@ public class Autonoooooooooom extends LinearOpMode {
             }
         });
 
+        TrajectorySequence traj = null;
+
+        if (BBBBBBBBBBBBBB) {
+            traj = mktraj(ridicareSlide, s1);
+        }
+
         while (!isStarted() && !isStopRequested()) {
             if (OPENED) {
                 if (LAST_ID == 0) {
@@ -538,22 +550,22 @@ public class Autonoooooooooom extends LinearOpMode {
                     dashboard.sendTelemetryPacket(packet);
                     telemetry.addData("Got id: ", LAST_ID);
                     telemetry.update();
+                    webcam.closeCameraDevice();
+                    break;
                 }
             } else {
                 telemetry.addLine("Waiting on cam open");
                 telemetry.update();
             }
-            sleep(100);
-        }*/
-        /*packet = new TelemetryPacket();
-        packet.put("bat", batteryVoltageSensor.getVoltage());
-        dashboard.sendTelemetryPacket(packet);*/
-
-        TrajectorySequence traj = null;
-
-        if (BBBBBBBBBBBBBB) {
-            traj = mktraj(ridicareSlide, s1);
+            sleep(10);
         }
+
+        packet = new TelemetryPacket();
+        packet.put("bat", batteryVoltageSensor.getVoltage());
+        dashboard.sendTelemetryPacket(packet);
+
+        telemetry.addData("All done! Got ID: ", LAST_ID);
+
         waitForStart();
 
         /*ThreadInfo.shouldClose = false;
@@ -567,10 +579,6 @@ public class Autonoooooooooom extends LinearOpMode {
         ridicareSlide.setPower(0.5);
         ridicareSlide.setTargetPosition(40);
         ridicareSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (OPENED) {
-            webcam.closeCameraDeviceAsync(() -> {
-            });
-        }
 
         if (!BBBBBBBBBBBBBB) {
             telemetry.addLine("Start");
@@ -641,7 +649,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
                 TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
                 TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
-                /*if (!isStopRequested()) {
+                if (!isStopRequested()) {
                     switch (LAST_ID) {
                         default:
                             telemetry.addLine("DEFAULT");
@@ -663,7 +671,7 @@ public class Autonoooooooooom extends LinearOpMode {
                             telemetry.addLine("7");
                             traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                     //.funnyRaikuCurve(new Pose2d(F * 2.15, F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .lineToLinearHeading(new Pose2d(F * 2, F, 0))
+                                    .lineToLinearHeading(new Pose2d(F * 2, F * 0.95, 0))
                                     .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> {
                                         ThreadInfo.target = 70;
                                         ridicareSlide.setPower(0.5);
@@ -677,7 +685,7 @@ public class Autonoooooooooom extends LinearOpMode {
                             telemetry.addLine("8");
                             traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                                     //.funnyRaikuCurve(new Pose2d(F * 2.15, -F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .lineToLinearHeading(new Pose2d(F * 2, -F, 0))
+                                    .lineToLinearHeading(new Pose2d(F * 2, -F * 0.95, 0))
                                     .addTemporalMarker(this::ltime)
                                     .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> {
                                         ThreadInfo.target = 70;
@@ -690,7 +698,7 @@ public class Autonoooooooooom extends LinearOpMode {
                     }
                     telemetry.update();
                     follow_traj(traj);
-                }*/
+                }
             }
 
             if (GPOS) {

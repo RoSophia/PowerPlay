@@ -26,13 +26,13 @@ class ArmcPIDF implements Runnable {
         ridicareSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public static double pd = 0.001;
+    public static double pd = 0.01;
     public static double pu = 0.01;
     public static double d = 0;
     public static double i = 0.0001;
     public static double Kf = 0.001;
 
-    public static double LPC = 2.5;
+    public static double LPC = 1.7;
 
     double error = 0;
     double derivate = 0;
