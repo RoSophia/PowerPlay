@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 //@Config
-@Disabled
+//@Disabled
 @Autonomous(group = "drive")
 @SuppressLint("DefaultLocale")
 public class AutonoomSTANGAUwU extends LinearOpMode {

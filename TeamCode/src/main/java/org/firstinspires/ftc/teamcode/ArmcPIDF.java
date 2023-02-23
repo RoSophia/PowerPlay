@@ -12,8 +12,10 @@ class ThreadInfo {
     public static int target = 0;
     public static boolean shouldClose = false;
     public static boolean use = true;
+    public static boolean fast = false;
     public static int fr;
     public static boolean useTele = false;
+    public static double pcoef;
 }
 
 @Config
@@ -27,10 +29,18 @@ class ArmcPIDF implements Runnable {
     }
 
     public static double pd = 0.01;
+    public static double pf = 0.02;
     public static double pu = 0.01;
-    public static double d = 0;
-    public static double i = 0.0001;
-    public static double Kf = 0.001;
+    public static double d = 0.00002;
+    public static double dd = 0.00001;
+    public static double i = 0.0000;
+    public static double Kfu = 0.001;
+    public static double Kfd = 0.001;
+
+    public static double accu = 50000;
+    public static double accd = 3000;
+    public static double accdd = 100000;
+    public static double MINS = 1000;
 
     public static double LPC = 1.7;
 
@@ -38,38 +48,57 @@ class ArmcPIDF implements Runnable {
     double derivate = 0;
     double lastError = 0;
     double integralSum = 0;
+    double lastTarget = 0;
+    double ctarg = 0;
 
     @SuppressWarnings("BusyWait")
     public void run() {
-        ElapsedTime timer2 = new ElapsedTime();
+        ElapsedTime timer2 = new ElapsedTime(0);
+        lastTarget = ThreadInfo.target;
+        ctarg = ThreadInfo.target;
         double outp = 0;
-        timer2.reset();
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
+        ElapsedTime timer = new ElapsedTime(0);
+        ElapsedTime tt = new ElapsedTime(0);
         while (!ThreadInfo.shouldClose) {
             if (ThreadInfo.useTele) {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put("CycleTimeArm", timer2.milliseconds());
                 timer2.reset();
                 pack.put("Target", ThreadInfo.target);
+                pack.put("cTarg", ctarg);
                 pack.put("Current", ridicareSlide.getCurrentPosition());
                 pack.put("Power", outp);
                 dashboard.sendTelemetryPacket(pack);
             }
             if (ThreadInfo.use) {
-                error = ThreadInfo.target - ridicareSlide.getCurrentPosition();
+                if (lastTarget != ThreadInfo.target) {
+                    lastTarget = ThreadInfo.target;
+                }
+
+                if (ctarg > ThreadInfo.target) {
+                    double cd = Math.min(-timer.seconds() * accd + timer.seconds() * timer.seconds() * accdd, -MINS * timer.seconds());
+                    ctarg = Math.max(ctarg + cd, ThreadInfo.target);
+                } else {
+                    ctarg = Math.min(ctarg + timer.seconds() * accu, ThreadInfo.target);
+                }
+                error = ctarg - ridicareSlide.getCurrentPosition();
                 derivate = (error - lastError) / timer.seconds();
                 integralSum = integralSum + (error * timer.seconds());
-                if (error < 0) {
-                    outp = /*-(ppd * error * error) +*/ (pd * error) + (d * derivate) + (i * integralSum) + Kf;
+                if (ThreadInfo.fast) {
+                    ctarg = ThreadInfo.target;
+                    outp = (pf * error) + (dd * derivate) + Kfu;
                 } else {
-                    outp = /*(ppu * error * error) +*/ (pu * error) + (d * derivate) + (i * integralSum) + Kf;
+                    if (error < 0) {
+                        outp = /*-(ppd * error * error) +*/ (pd * error) + (d * derivate) + (i * integralSum) + Kfd;
+                    } else {
+                        outp = /*(ppu * error * error) +*/ (pu * error) + (d * derivate) + (i * integralSum) + Kfd;
+                    }
                 }
-                if (ThreadInfo.target < 150 && ridicareSlide.getCurrentPosition() < 150) {
+                if (ctarg < 150 && ridicareSlide.getCurrentPosition() < 150) {
                     outp /= LPC;
                 }
-                ridicareSlide.setPower(outp);
+                ridicareSlide.setPower(outp * ThreadInfo.pcoef);
 
                 lastError = error;
                 timer.reset();
