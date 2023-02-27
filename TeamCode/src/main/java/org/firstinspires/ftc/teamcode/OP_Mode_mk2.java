@@ -38,23 +38,22 @@ package org.firstinspires.ftc.teamcode;
  * Cu de toate fara ceapa boss
  */
 
-import static org.firstinspires.ftc.teamcode.RobotConstants.BOT_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.MID_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.MIU_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S1PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S2PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S3PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.USE_PHOTON;
+import static org.firstinspires.ftc.teamcode.RobotVars.BOT_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.MID_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.MIU_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.S3PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.TOP_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -119,12 +118,12 @@ public class OP_Mode_mk2 extends LinearOpMode {
     public double SPC = 1.2;
     public double MINP = 0.2;
 
-    public double P1 = 1;
-    public double P2 = 1;
-    public double P3 = 1;
-    public double P4 = 1;
+    public static double P1 = 1;
+    public static double P2 = 1;
+    public static double P3 = 1;
+    public static double P4 = 1;
     double luv = 0;
-    public static double CSM = 0;
+    public static double CSM = -0.00015;
 
     ElapsedTime et = new ElapsedTime(0);
 
@@ -144,7 +143,9 @@ public class OP_Mode_mk2 extends LinearOpMode {
     public double WT = 0.2;
     public static double HMIN = 0.005;
 
-    Rev2mDistanceSensor ss, sd, cs;
+    public double MDIST = 48;
+    public double MMDIST = 25;
+    DistanceSensor ss, sd, cs;
 
     public void runOpMode() {
         if (USE_PHOTON) {
@@ -164,7 +165,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
         ridicareSlide = hardwareMap.get(DcMotorEx.class, "RS");
         underglow = hardwareMap.get(DcMotor.class, "Underglow");
 
-        cs = hardwareMap.get(Rev2mDistanceSensor.class, "Claw");
+        cs = hardwareMap.get(DistanceSensor.class, "Claw");
         /*sd = hardwareMap.get(Rev2mDistanceSensor.class, "SD");
         ss = hardwareMap.get(Rev2mDistanceSensor.class, "SS");*/
 
@@ -239,7 +240,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
 
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             double ch = imu.getAngularOrientation().firstAngle;
-            final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4 + ch;
+            final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;// + ch;
             double hdif = 0;
             if (Math.abs(gamepad1.right_stick_x) > 0.01) {
                 g1t.reset();
@@ -432,19 +433,29 @@ public class OP_Mode_mk2 extends LinearOpMode {
                 telemetry.update();
             }
 
+            final double cd = cs.getDistance(DistanceUnit.MM);
             if (!G2X && gamepad2.x) {
                 if (switched) {
                     s1.setPosition(SDESCHIS);
                     switched = false;
                 } else {
-                    final double cd = cs.getDistance(DistanceUnit.MM);
-                    if (cd < 100) {
-                        s1.setPosition(SINCHIS + cs.getDistance(DistanceUnit.MM) * CSM);
+                    if (cd < MDIST) {
+                        if (cd < MMDIST) {
+                            s1.setPosition(SINCHIS);
+                        } else {
+                            s1.setPosition(SINCHIS + (MDIST - cs.getDistance(DistanceUnit.MM)) * CSM);
+                        }
                         switched = true;
                     }
                 }
             }
             G2X = gamepad2.x;
+            /*if (cd < MDIST) {
+                s1.setPosition(SINCHIS + (MDIST - cs.getDistance(DistanceUnit.MM)) * CSM);
+                switched = true;
+            } else {
+                s1.setPosition(SDESCHIS);
+            }*/
 
             //dam blana in motoare
             ThreadInfo.pcoef = 12.0 / batteryVoltageSensor.getVoltage();

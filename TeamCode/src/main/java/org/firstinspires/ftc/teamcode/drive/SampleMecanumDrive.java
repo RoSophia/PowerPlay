@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import static org.firstinspires.ftc.teamcode.RobotConstants.S1PC;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S2PC;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S3PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.S1PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.S2PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.S3PC;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;

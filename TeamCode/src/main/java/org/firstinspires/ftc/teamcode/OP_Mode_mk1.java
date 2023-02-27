@@ -31,23 +31,21 @@ package org.firstinspires.ftc.teamcode;
  * Cu de toate fara ceapa boss
  */
 
-import static org.firstinspires.ftc.teamcode.RobotConstants.MID_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.MIU_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S1PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S2PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S3PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.MID_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.MIU_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.S3PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.TOP_POS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;

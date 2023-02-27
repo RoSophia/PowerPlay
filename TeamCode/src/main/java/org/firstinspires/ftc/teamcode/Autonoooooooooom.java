@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.AutoStanga.PXC;
-import static org.firstinspires.ftc.teamcode.RobotConstants.BOT_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.USE_PHOTON;
+import static org.firstinspires.ftc.teamcode.RobotVars.BOT_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.TOP_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_TRAJECTORY;

@@ -1,20 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.RobotConstants.S1PC;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S1PO;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S2PC;
-import static org.firstinspires.ftc.teamcode.RobotConstants.S3PC;
-import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.S1PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.S2PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.S3PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 
 import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -22,19 +17,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.Encoder;
-import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
+
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import java.util.ArrayList;
-import java.util.Vector;
 
 @Config
 @TeleOp(group = "drive")
