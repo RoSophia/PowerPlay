@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
+import static org.firstinspires.ftc.teamcode.RobotVars.IN_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
@@ -11,6 +15,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
+import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -22,14 +27,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @SuppressWarnings("ALL")
 @Config
-public class Transf implements Runnable {
+public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 0.01;
     public static double ETC = 0.3;
 
-    private Servo sa, sb, sh, sg, sMClaw;
+    private Servo sa, sb, sHeading, sClaw, sBalans, sMClaw;
     private DcMotorEx ce;
     private boolean cput = false;
+    private boolean cget = false;
     public boolean toPut = false;
     public boolean toGet = false;
     public boolean shouldClose = true;
@@ -37,18 +43,26 @@ public class Transf implements Runnable {
     boolean toOpenSC;
     ElapsedTime et = new ElapsedTime(0);
 
-    public Transf(Servo sa, Servo sb, Servo sh, Servo sg, Servo sMClaw, DcMotorEx ce) {
+    public Clown(Servo sa, Servo sb, Servo sHeading, Servo sClaw, Servo sMClaw, Servo sBalans, DcMotorEx ce) {
         this.sa = sa;
         sa.setPosition(SAG);
         this.sb = sb;
         sb.setPosition(SBG);
-        this.sh = sh;
-        sh.setPosition(SHG);
-        this.sg = sg;
-        sg.setPosition(SDESCHIS);
+        this.sHeading = sHeading;
+        sHeading.setPosition(SHG);
+        this.sClaw = sClaw;
+        sClaw.setPosition(SDESCHIS);
         this.sMClaw = sMClaw;
         sMClaw.setPosition(SCO);
+        this.sBalans = sBalans;
+        sBalans.setPosition(SBAG);
         this.ce = ce;
+    }
+
+    void upd_balans() {
+        if (!IN_TESTING) {
+            sBalans.setPosition(SBAG + ((sa.getPosition() - SAG) / (SAG - SAP)) * (SBAG - SBAP));
+        }
     }
 
     public void run() {
@@ -56,18 +70,23 @@ public class Transf implements Runnable {
             if (USE_TELE) {
                 TelemetryPacket packet = new TelemetryPacket();
 
+                packet.put("toGet", toGet);
                 packet.put("toPut", toPut);
+                packet.put("cready", coneReady);
+                packet.put("cclaw", coneClaw);
                 packet.put("cput", cput);
+                packet.put("toOpen", toOpenSC);
+                packet.put("cget", cget);
                 packet.put("sa", (sa.getPosition() - SAP) / (SAP - SAG));
                 packet.put("sb", (sb.getPosition() - SBP) / (SBP - SBG));
-                packet.put("sh", (sh.getPosition() - SHP) / (SHP - SHG));
-                packet.put("sg", (sg.getPosition() - SINCHIS) / (SINCHIS - SDESCHIS));
+                packet.put("sh", (sHeading.getPosition() - SHP) / (SHP - SHG));
+                packet.put("sg", (sClaw.getPosition() - SINCHIS) / (SINCHIS - SDESCHIS));
                 packet.put("sc", (sMClaw.getPosition() - SCC) / (SCC - SCO));
 
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
             }
 
-            if (cput && toPut) {
+            if ((cput || !coneClaw) && toPut) {
                 toPut = false;
             }
 
@@ -76,14 +95,14 @@ public class Transf implements Runnable {
                 cput = true;
                 sa.setPosition(SAP);
                 sb.setPosition(SBP);
-                sh.setPosition(SHP);
-                sg.setPosition(SINCHIS);
+                sHeading.setPosition(SHP);
+                sClaw.setPosition(SINCHIS);
                 sMClaw.setPosition(SCC);
             }
 
             if (cput) {
-                if (Math.abs(sa.getPosition() - SAP) > ME) {
-                    sg.setPosition(SDESCHIS);
+                if (Math.abs(sa.getPosition() - SAP) < ME) {
+                    sClaw.setPosition(SDESCHIS);
                     toOpenSC = true;
                     et.reset();
                     cput = false;
@@ -93,18 +112,26 @@ public class Transf implements Runnable {
             if (toOpenSC && et.seconds() > ETC) {
                 sMClaw.setPosition(SCO);
                 coneReady = true;
+                coneClaw = false;
                 toOpenSC = false;
             }
 
             if (toGet) {
+                cget = true;
                 toGet = false;
                 toPut = false;
                 cput = false;
                 sa.setPosition(SAG);
                 sb.setPosition(SBG);
-                sh.setPosition(SHG);
-                sg.setPosition(SDESCHIS);
+                sHeading.setPosition(SHG);
+                sClaw.setPosition(SDESCHIS);
                 sMClaw.setPosition(SCO);
+            }
+
+            if (cget) {
+                if (Math.abs(ce.getCurrentPosition() - EMAX) < ME) {
+                    cget = false;
+                }
             }
             try {
                 Thread.sleep(10);

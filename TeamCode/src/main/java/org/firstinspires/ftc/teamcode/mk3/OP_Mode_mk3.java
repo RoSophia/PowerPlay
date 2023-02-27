@@ -40,6 +40,7 @@ package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
+import static org.firstinspires.ftc.teamcode.RobotVars.IN_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
@@ -47,42 +48,64 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.S3PO;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
-import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
+import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
+import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
+import static org.firstinspires.ftc.teamcode.RobotVars.ed;
+import static org.firstinspires.ftc.teamcode.RobotVars.ei;
+import static org.firstinspires.ftc.teamcode.RobotVars.ep;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
+import static org.firstinspires.ftc.teamcode.RobotVars.rbp;
+import static org.firstinspires.ftc.teamcode.RobotVars.rd;
+import static org.firstinspires.ftc.teamcode.RobotVars.ri;
+import static org.firstinspires.ftc.teamcode.RobotVars.rp;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S1;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S2;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S3;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.batteryVoltageSensor;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.endma;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.prep_cone;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightBack;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightFront;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rpd;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sHeading;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextB;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.outoftheboxrobotics.photoncore.PhotonCore;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@SuppressWarnings({"CommentedOutCode", "SpellCheckingInspection"})
+@SuppressWarnings({"SpellCheckingInspection"})
 @Config
 @TeleOp
 public class OP_Mode_mk3 extends LinearOpMode {
-    //sasiu
-    public DcMotorEx leftBack;
-    public DcMotorEx leftFront;
-    public DcMotorEx rightBack;
-    public DcMotorEx rightFront;
-    //restu
-    public DcMotorEx ridA, ridB;
-    public DcMotorEx extA, extB;
-    public Servo sextA, sextB;
-    public Servo sClose, sHeading, sMCLaw;
-
     boolean L2A = false;
     boolean L2RB = false;
     boolean L2B = false;
@@ -103,16 +126,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
     double UPP = 100;
     public static double UPPP = 100;
 
-    public static double ep = 0;
-    public static double ed = 0;
-    public static double ei = 0;
-    public static double ebp = 0;
     public double lep, led, lei, lebp;
-
-    public static double rp = 0;
-    public static double rd = 0;
-    public static double ri = 0;
-    public static double rbp = 0;
     public double rep, red, rei, rebp;
 
     public static double P1 = 1;
@@ -120,181 +134,18 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double P3 = 1;
     public static double P4 = 1;
 
-    /* You will not be forgotten
-    DcMotor underglow;
-    ElapsedTime et = new ElapsedTime(0);
-    double luv = 0;
-    public double FC = 0.5;
-    public double SPC = 1.2;
-    public double MINP = 0.2;
-    void upd_underglow(double speed) { /// Underglow cam pervers
-        double cs = Math.abs(speed) * Math.sqrt(2) / 2 * SPC;
-        if (cs > luv) {
-            luv = cs;
-        } else {
-            luv -= et.seconds() * FC;
-        }
-        luv = Math.min(Math.max(luv, MINP), 1);
-
-        underglow.setPower(-luv);
-        et.reset();
-    }
-     */
-
     public double WT = 0.2;
     public static double HMIN = 0.005;
 
-    PIDF epd, rpd;
-    Transf tra;
-
-    void ep(double p) {
-        extA.setPower(p);
-        extB.setPower(p);
-    }
-
-    void rp(double p) {
-        ridA.setPower(p);
-        ridB.setPower(p);
-    }
-
-    void spe(boolean er, double p) {
-        if (!er) {
-            if (p == 0) {
-                epd.use = true;
-            } else {
-                epd.use = false;
-                if (extA.getCurrentPosition() < EMIN) {
-                    ep(0);
-                    return;
-                }
-                if (extA.getCurrentPosition() > EMAX) {
-                    ep(0);
-                    return;
-                }
-                ep(p);
-            }
-        } else {
-            if (p == 0) {
-                rpd.use = true;
-            } else {
-                rpd.use = false;
-                if (ridA.getCurrentPosition() < RBOT_POS) {
-                    rp(0);
-                    return;
-                }
-                if (ridA.getCurrentPosition() > RTOP_POS) {
-                    rp(0);
-                    return;
-                }
-                rp(p);
-            }
-        }
-    }
-
-    void rid(int pos) {
-        if (coneReady || pos == RBOT_POS) {
-            if (pos == RBOT_POS) {
-                sMCLaw.setPosition(SCO);
-                coneReady = false;
-            }
-            rpd.set_target(pos, false);
-        } else {
-            tra.toGet = true;
-        }
-    }
-
-    void ext(int pos) {
-        if (pos == EMAX) {
-            tra.toGet = true;
-            coneReady = false;
-        } else {
-            sClose.setPosition(SCC);
-        }
-        rid(RBOT_POS);
-        epd.set_target(pos, false);
-    }
-
-    DcMotorEx initm(String s, boolean e, boolean r) {
-        DcMotorEx m = hardwareMap.get(DcMotorEx.class, s);
-        if (e) {
-            m.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            m.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        } else {
-            m.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        }
-        m.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        m.setDirection(r ? DcMotorEx.Direction.REVERSE : DcMotorEx.Direction.FORWARD);
-        return m;
-    }
-
     public void runOpMode() {
-        if (USE_PHOTON) {
-            PhotonCore.enable();
-            PhotonCore.experimental.setSinglethreadedOptimized(false);
-        }
-        VoltageSensor batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = switched = coneReady = false;
         UPP = UPPS;
 
-        rightBack = initm("RB", false, false);
-        rightFront = initm("RF", false, false);
-        leftBack = initm("LB", false, true);
-        leftFront = initm("LF", false, true);
-        extA = initm("extA", true, true);
-        extB = initm("extB", true, true);
-        ridA = initm("ridA", true, true);
-        ridB = initm("ridB", true, true);
-        //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
-
-        sClose = hardwareMap.get(Servo.class, "gho");
-        sHeading = hardwareMap.get(Servo.class, "ghh");
-        sMCLaw = hardwareMap.get(Servo.class, "ghc");
-        sextA = hardwareMap.get(Servo.class, "sextA");
-        sextB = hardwareMap.get(Servo.class, "sextB");
-
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        /*parameters.mode = BNO055IMU.SensorMode.COMPASS;
-        parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.FAST;
-        parameters.gyroBandwidth = BNO055IMU.GyroBandwidth.HZ523; /// TODO ???????
-        parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;*/
-        imu.initialize(parameters);
-
-        epd = new PIDF(extA, extB, ep, ed, ei, ebp);
-        rpd = new PIDF(ridA, ridB, rp, rd, ri, rbp);
-        tra = new Transf(sextA, sextB, sHeading, sClose, sMCLaw, extA);
-
-        Thread extT = new Thread(epd);
-        Thread ridT = new Thread(rpd);
-        Thread traT = new Thread(tra);
-
-        Servo S1 = hardwareMap.get(Servo.class, "SPe");
-        Servo S2 = hardwareMap.get(Servo.class, "SPa1");
-        Servo S3 = hardwareMap.get(Servo.class, "SPa2");
-        S1.setPosition(S1PO);
-        S2.setPosition(S2PO);
-        S3.setPosition(S3PO);
+        initma();
 
         waitForStart();
 
-        pcoef = 12.0 / batteryVoltageSensor.getVoltage();
-
-        epd.shouldClose = false;
-        epd.use = true;
-        epd.target = 0;
-        extT.start();
-
-        rpd.shouldClose = false;
-        rpd.use = true;
-        rpd.target = 0;
-        ridT.start();
-
-        tra.shouldClose = true;
-        traT.start();
-
+        startma();
 
         ElapsedTime timer = new ElapsedTime(0);
         ElapsedTime g1t = new ElapsedTime(0);
@@ -330,6 +181,18 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 dashboard.sendTelemetryPacket(fp);
             }
 
+            if (IN_TESTING) {
+                sextA.setPosition(SAG);
+                sextB.setPosition(SBG);
+                sClose.setPosition(SINCHIS);
+                sHeading.setPosition(SHG);
+                sMCLaw.setPosition(SCC);
+                sBalans.setPosition(SBAG);
+                S1.setPosition(S1PO);
+                S2.setPosition(S2PO);
+                S3.setPosition(S3PO);
+            }
+
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
             double ch = imu.getAngularOrientation().firstAngle;
             final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;// + ch;
@@ -359,7 +222,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
             final double rfPower = mc - turn;
             final double lbPower = mc + turn;
             final double rbPower = ms - turn;
-            //upd_underglow(Math.abs(turn) + Math.abs(speed));
 
             if (!L2RB && gamepad2.right_bumper) {
                 UPP += UPPP;
@@ -385,12 +247,16 @@ public class OP_Mode_mk3 extends LinearOpMode {
             L2B = gamepad2.b;
 
             if (!L2Y && gamepad2.y) {
-                tra.toPut = true;
+                clo.toPut = true;
             }
             L2Y = gamepad2.y;
 
+            if (!R2LB && gamepad2.left_bumper) {
+                prep_cone();
+            }
+            R2LB = gamepad2.left_bumper;
+
             if (!R2RB && gamepad2.right_bumper) {
-                rid(RBOT_POS);
                 ext(EMAX);
             }
             R2RB = gamepad2.right_bumper;
@@ -407,14 +273,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
             } else {
                 spe(true, 0);
             }
-
-            if (!RB && gamepad2.left_bumper) {
-                rpd.set_target(rpd.target - dif, true);
-            }
-            if (RB && !gamepad2.left_bumper) {
-                rpd.set_target(rpd.target + dif, false);
-            }
-            RB = gamepad2.left_bumper;
 
             if (!G2X && gamepad2.x) {
                 if (switched) {
@@ -435,24 +293,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
             leftBack.setPower(lbPower * fcoef * P3);   // RB
             rightBack.setPower(rbPower * fcoef * P4);  // RF
         }
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-        leftBack.setPower(0);
-        rightBack.setPower(0);
 
-        epd.shouldClose = true;
-        rpd.shouldClose = true;
-        tra.shouldClose = true;
-        try {
-            extT.join(10);
-            ridT.join(10);
-            traT.join(10);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-        leftBack.setPower(0);
-        rightBack.setPower(0);
+        endma();
     }
 }

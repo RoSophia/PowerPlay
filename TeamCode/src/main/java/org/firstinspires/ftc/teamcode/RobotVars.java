@@ -24,17 +24,40 @@ public class RobotVars {
     public static double S3PO = 0.54;
 
     public static double SAG = 0.54;
-    public static double SBG = 0.54;
-    public static double SHG = 0.54;
+    public static double SAH = 0.54;
     public static double SAP = 0.54;
+
+    public static double SBG = 0.54;
+    public static double SBH = 0.54;
     public static double SBP = 0.54;
+
+    public static double SBAG = 0.54;
+    public static double SBAH = 0.54;
+    public static double SBAP = 0.54;
+
+    public static double SHG = 0.54;
     public static double SHP = 0.54;
+
     public static double SCO = 0.54;
     public static double SCC = 0.54;
 
     public static boolean USE_PHOTON = true;
 
     public static boolean USE_TELE = true;
+    public static boolean IN_TESTING = true;
+    public static boolean TESTINGAB = true;
     public static double pcoef = 1.0;
+    public static boolean coneClaw = false;
     public static boolean coneReady = false;
+
+    public static double ep = 0;
+    public static double ed = 0;
+    public static double ei = 0;
+    public static double ebp = 0;
+
+    public static double rp = 0;
+    public static double rd = 0;
+    public static double ri = 0;
+    public static double rbp = 0;
+
 }
