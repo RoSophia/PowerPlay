@@ -15,30 +15,37 @@ class PIDF implements Runnable {
 
     public boolean shouldClose = false;
     public boolean use = true;
-    public boolean useTele = false;
+    public boolean useTele = true;
+    public String name;
 
     public double p;
     public double d;
     public double i;
+    public double f;
     public double b;
 
-    public PIDF(DcMotorEx motA, DcMotorEx motB, double p, double d, double i, double b) {
+    public PIDF(DcMotorEx motA, DcMotorEx motB, String n, double p, double d, double i, double f, double b) {
         this.motA = motA;
         motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.motB = motB;
-        motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (motB != null) {
+            this.motB = motB;
+            motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
         this.p = p;
         this.d = d;
         this.i = i;
+        this.f = f;
         this.b = b;
+        this.name = n;
     }
 
-    public void update_pid(double p, double d, double i, double b) {
+    public void update_pid(double p, double d, double i, double f, double b) {
         this.p = p;
         this.d = d;
         this.i = i;
+        this.f = f;
         this.b = b;
     }
 
@@ -46,25 +53,23 @@ class PIDF implements Runnable {
     int ctarg = 0;
     int ltarg = 0;
 
-    ElapsedTime ttim = new ElapsedTime(0);
-    public void set_target(int t, boolean fast) {
-        ltarg = target;
-        target = t;
-        if (fast) {
-            ctarg = t;
-            ltarg = t;
-        }
-        ttim.reset();
-    }
-
     public static double A = 0.1;
     public static double B = 2.9;
     public static double DUR = 1;
 
+    ElapsedTime ttim = new ElapsedTime(0);
+    public void set_target(int t, double T) {
+        ltarg = target;
+        target = t;
+        DUR = T;
+        ttim.reset();
+    }
+
     void updt() {
         double x = ttim.seconds() * (1 / DUR);
         if (x <= 1) {
-            ctarg = ltarg + (int)(A * (1 - x) * x * x * x + B * (1 - x) * x + x * x * x) * (target - ltarg);
+            ctarg = ltarg + (int)(x * (target - ltarg));
+            //ctarg = ltarg + (int)((A * x * (1 - x) * (1 - x) * (1 - x) + B * (1 - x) * x + x * x * x) * (target - ltarg));
         } else {
             ctarg = target;
         }
@@ -87,13 +92,17 @@ class PIDF implements Runnable {
         while (!shouldClose) {
             if (useTele) {
                 TelemetryPacket pack = new TelemetryPacket();
-                pack.put("CycleTimeArm", timer2.milliseconds());
+                pack.put(name + "CycleTimeArm", timer2.milliseconds());
                 timer2.reset();
-                pack.put("Target", target);
-                pack.put("cTarg", ctarg);
-                pack.put("CA", motA.getCurrentPosition());
-                pack.put("CB", motB.getCurrentPosition());
-                pack.put("Power", outp);
+                pack.put(name + "Target", target);
+                pack.put(name + "lTarg", ltarg);
+                pack.put(name + "cTarg", ctarg);
+                pack.put(name + "ttim", ttim.seconds());
+                pack.put(name + "CA", motA.getCurrentPosition());
+                if (motB != null) {
+                    pack.put(name + "CB", motB.getCurrentPosition());
+                }
+                pack.put(name + "Power", outp);
                 dashboard.sendTelemetryPacket(pack);
             }
             updt();
@@ -105,11 +114,20 @@ class PIDF implements Runnable {
                 derivate = (error - lastError) / timer.seconds();
                 integralSum = integralSum + (error * timer.seconds());
 
-                outp = (p * error) + (d * derivate) + (i * integralSum);
-                motA.setPower(outp * pcoef);
+                outp = (p * error) + (d * derivate) + (i * integralSum) + f;
+                if (!shouldClose) {
+                    motA.setPower(outp * pcoef);
 
-                double bdif = (motA.getCurrentPosition() - motB.getCurrentPosition()) * b;
-                motB.setPower((outp + bdif) * pcoef);
+                    if (motB != null) {
+                        double bdif = (motA.getCurrentPosition() - motB.getCurrentPosition()) * b;
+                        motB.setPower((outp + bdif) * pcoef);
+                    }
+                } else {
+                    motA.setPower(0);
+                    if (motB != null) {
+                        motB.setPower(0);
+                    }
+                }
 
                 lastError = error;
                 timer.reset();
@@ -124,6 +142,8 @@ class PIDF implements Runnable {
             }
         }
         motA.setPower(0);
-        motB.setPower(0);
+        if (motB != null) {
+            motB.setPower(0);
+        }
     }
 }

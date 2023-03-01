@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.AutoStanga.PXC;
@@ -172,7 +173,7 @@ public class Autonoooooooooom extends LinearOpMode {
             telemetry.addData("Traj", "Going from (%f, %f, %f) to (%f, %f, %f) for %f", traj.start().getX(), traj.start().getY(), traj.start().getHeading(),
                     traj.end().getX(), traj.end().getY(), traj.end().getHeading(),
                     traj.duration());
-            telemetry.addData("Normal", NORMAL);*/
+            telemetry.addData("Normal", NORMAL);
             drive.update();
             pack = new TelemetryPacket();
             pack.put("Ex", drive.getLastError().getX());
@@ -510,7 +511,7 @@ public class Autonoooooooooom extends LinearOpMode {
         /*parameters.mode = BNO055IMU.SensorMode.GYRONLY;
         parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.FAST;
         parameters.gyroBandwidth = BNO055IMU.GyroBandwidth.HZ523; /// TODO ???????
-        parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;*/
+        parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;
         imu.initialize(parameters);
 
         leftBack = hardwareMap.get(DcMotorEx.class, "LB");
@@ -749,3 +750,5 @@ public class Autonoooooooooom extends LinearOpMode {
 
     }
 }
+
+ */

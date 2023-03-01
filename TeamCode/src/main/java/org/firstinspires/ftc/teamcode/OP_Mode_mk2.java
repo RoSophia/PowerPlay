@@ -38,6 +38,7 @@ package org.firstinspires.ftc.teamcode;
  * Cu de toate fara ceapa boss
  */
 
+/*
 import static org.firstinspires.ftc.teamcode.RobotVars.BOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.MID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.MIU_POS;
@@ -167,7 +168,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
 
         cs = hardwareMap.get(DistanceSensor.class, "Claw");
         /*sd = hardwareMap.get(Rev2mDistanceSensor.class, "SD");
-        ss = hardwareMap.get(Rev2mDistanceSensor.class, "SS");*/
+        ss = hardwareMap.get(Rev2mDistanceSensor.class, "SS");/
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -175,7 +176,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
         /*parameters.mode = BNO055IMU.SensorMode.COMPASS;
         parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.FAST;
         parameters.gyroBandwidth = BNO055IMU.GyroBandwidth.HZ523; /// TODO ???????
-        parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;*/
+        parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;/
         imu.initialize(parameters);
 
         Runnable armRun = new ArmcPIDF(ridicareSlide);
@@ -455,7 +456,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
                 switched = true;
             } else {
                 s1.setPosition(SDESCHIS);
-            }*/
+            }/
 
             //dam blana in motoare
             ThreadInfo.pcoef = 12.0 / batteryVoltageSensor.getVoltage();
@@ -479,3 +480,6 @@ public class OP_Mode_mk2 extends LinearOpMode {
         }
     }
 }
+
+
+ */

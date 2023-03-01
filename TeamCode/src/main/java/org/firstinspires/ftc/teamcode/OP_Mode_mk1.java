@@ -30,15 +30,13 @@ package org.firstinspires.ftc.teamcode;
  *
  * Cu de toate fara ceapa boss
  */
+/*
 
-import static org.firstinspires.ftc.teamcode.RobotVars.MID_POS;
-import static org.firstinspires.ftc.teamcode.RobotVars.MIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.S3PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.TOP_POS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -159,7 +157,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
         /*TelemetryPacket pack;
         while (opModeIsActive()) {
             ThreadInfo.use = true;
-        }*/
+        }
 
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -266,7 +264,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     }
                     /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_USING_ENCODER) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                    }*/
+                    }
                     lpos = ridicareSlide.getCurrentPosition();
                     if (lpos < 0) {
                         if (USE_TELEMETRY) {
@@ -315,7 +313,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     ThreadInfo.use = true;
                     /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                    }*/
+                    }
                     if (USE_TELEMETRY) {
                         telemetry.addLine("ALL AUT");
                     }
@@ -395,3 +393,5 @@ public class OP_Mode_mk1 extends LinearOpMode {
         }
     }
 }
+
+ */

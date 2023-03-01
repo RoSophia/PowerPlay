@@ -38,50 +38,53 @@ package org.firstinspires.ftc.teamcode.mk3;
  * Cu de toate fara ceapa boss
  */
 
+import static org.firstinspires.ftc.teamcode.RobotVars.CU_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
-import static org.firstinspires.ftc.teamcode.RobotVars.IN_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
-import static org.firstinspires.ftc.teamcode.RobotVars.S3PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SBG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
+import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
 import static org.firstinspires.ftc.teamcode.RobotVars.ed;
+import static org.firstinspires.ftc.teamcode.RobotVars.ef;
 import static org.firstinspires.ftc.teamcode.RobotVars.ei;
 import static org.firstinspires.ftc.teamcode.RobotVars.ep;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.RobotVars.rbp;
 import static org.firstinspires.ftc.teamcode.RobotVars.rd;
+import static org.firstinspires.ftc.teamcode.RobotVars.rf;
 import static org.firstinspires.ftc.teamcode.RobotVars.ri;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S1;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S2;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S3;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.batteryVoltageSensor;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.endma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.prep_cone;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightFront;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rpd;
@@ -89,17 +92,13 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sHeading;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @SuppressWarnings({"SpellCheckingInspection"})
@@ -119,15 +118,14 @@ public class OP_Mode_mk3 extends LinearOpMode {
     boolean RB = false;
     boolean switched = false;
 
-    public static int dif = 170;
     public static double headP = 1.2;
 
     public static double UPPS = 100;
     double UPP = 100;
     public static double UPPP = 100;
 
-    public double lep, led, lei, lebp;
-    public double rep, red, rei, rebp;
+    public double lep, led, lei, lef, lebp;
+    public double rep, red, rei, ref, rebp;
 
     public static double P1 = 1;
     public static double P2 = 1;
@@ -141,7 +139,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = switched = coneReady = false;
         UPP = UPPS;
 
-        initma();
+        initma(hardwareMap);
 
         waitForStart();
 
@@ -153,21 +151,23 @@ public class OP_Mode_mk3 extends LinearOpMode {
         lep = ep;
         lei = ei;
         led = ed;
+        lef = ef;
         lebp = ebp;
         rep = rp;
         rei = ri;
         red = rd;
+        ref = rf;
         rebp = rbp;
         while (opModeIsActive()) {
-            if (lep != ep || lei != ei || led != ed || lebp != ebp) {
-                epd.update_pid(ep, ei, ed, ebp);
+            if (lep != ep || lei != ei || led != ed || lef != ef || lebp != ebp) {
+                epd.update_pid(ep, ei, ed, ef, ebp);
                 lep = ep;
                 lei = ei;
                 led = ed;
                 lebp = ebp;
             }
-            if (rep != rp || rei != ri || red != rd || rebp != rbp) {
-                rpd.update_pid(rp, ri, rd, rbp);
+            if (rep != rp || rei != ri || red != rd || ref != rf || rebp != rbp) {
+                rpd.update_pid(rp, ri, rd, rf, rbp);
                 rep = rp;
                 rei = ri;
                 red = rd;
@@ -177,20 +177,19 @@ public class OP_Mode_mk3 extends LinearOpMode {
             if (USE_TELE) {
                 TelemetryPacket fp = new TelemetryPacket();
                 fp.put("CycleTime", timer.milliseconds());
+                fp.put("Orient", imu.getAngularOrientation());
                 timer.reset();
                 dashboard.sendTelemetryPacket(fp);
             }
 
-            if (IN_TESTING) {
-                sextA.setPosition(SAG);
-                sextB.setPosition(SBG);
+            if (CU_TESTING) {
+                conversiePerverssa(SAG);
                 sClose.setPosition(SINCHIS);
                 sHeading.setPosition(SHG);
                 sMCLaw.setPosition(SCC);
                 sBalans.setPosition(SBAG);
                 S1.setPosition(S1PO);
                 S2.setPosition(S2PO);
-                S3.setPosition(S3PO);
             }
 
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
@@ -214,7 +213,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 }
             }
 
-            final double turn = hdif * headP - gamepad1.right_stick_x;
+            final double turn = -hdif * headP + gamepad1.right_stick_x;
             final double ms = speed * Math.sin(angle);
             final double mc = speed * Math.cos(angle);
 
@@ -241,6 +240,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             L2D = gamepad2.dpad_down;
             if (!L2B && gamepad2.b) {
+                clo.toGet = true;
                 rid(RBOT_POS);
                 ext(EMIN);
             }
@@ -252,7 +252,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
             L2Y = gamepad2.y;
 
             if (!R2LB && gamepad2.left_bumper) {
-                prep_cone();
+                clo.toPrepCone = true;
             }
             R2LB = gamepad2.left_bumper;
 
@@ -263,13 +263,15 @@ public class OP_Mode_mk3 extends LinearOpMode {
 
             final double DPC = 1 - 0.6 * gamepad2.right_trigger;
             if (Math.abs(gamepad2.right_stick_y) > 0.001) {
-                spe(false, gamepad2.right_stick_y * DPC);
+                spe(false, -gamepad2.right_stick_y * DPC);
+                epd.set_target(extA.getCurrentPosition(), 0);
             } else {
                 spe(false, 0);
             }
 
             if (Math.abs(gamepad2.left_stick_y) > 0.001) {
-                spe(true, gamepad2.left_stick_y * DPC);
+                spe(true, -gamepad2.left_stick_y * DPC);
+                rpd.set_target(ridA.getCurrentPosition(), 0);
             } else {
                 spe(true, 0);
             }
@@ -284,14 +286,22 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             G2X = gamepad2.x;
 
-            //dam blana in motoare
+            if (USE_TELE) {
+                TelemetryPacket pack = new TelemetryPacket();
+                pack.put("extA", extA.getCurrentPosition());
+                pack.put("extB", extB.getCurrentPosition());
+                pack.put("ridA", ridA.getCurrentPosition());
+                pack.put("ch", ch);
+                dashboard.sendTelemetryPacket(pack);
+            }
+
             pcoef = 12.0 / batteryVoltageSensor.getVoltage();
             final double spcoef = 1 - 0.6 * gamepad1.right_trigger;
             final double fcoef = pcoef * spcoef;
-            leftFront.setPower(lfPower * fcoef * P1);  // LB
-            rightFront.setPower(rfPower * fcoef * P2); // LF
-            leftBack.setPower(lbPower * fcoef * P3);   // RB
-            rightBack.setPower(rbPower * fcoef * P4);  // RF
+            leftFront.setPower(lfPower * fcoef * P1);
+            rightFront.setPower(rfPower * fcoef * P2);
+            leftBack.setPower(lbPower * fcoef * P3);
+            rightBack.setPower(rbPower * fcoef * P4);
         }
 
         endma();

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.S1PC;
 import static org.firstinspires.ftc.teamcode.RobotVars.S2PC;
-import static org.firstinspires.ftc.teamcode.RobotVars.S3PC;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
@@ -88,11 +87,9 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
         Servo S1 = hardwareMap.get(Servo.class, "SPe");
         Servo S2 = hardwareMap.get(Servo.class, "SPa1");
-        Servo S3 = hardwareMap.get(Servo.class, "SPa2");
 
         S1.setPosition(S1PC);
         S2.setPosition(S2PC);
-        S3.setPosition(S3PC);
 
         try {
             sleep(500);

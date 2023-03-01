@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
-import static org.firstinspires.ftc.teamcode.AutoStanga.PXC;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
@@ -12,7 +11,6 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
@@ -104,6 +102,7 @@ public class Auto extends LinearOpMode {
     public static double HEADC = -0.01;
     public static double HEADCVC = -0.01;
     public static double HEADCC = -0.05;
+    public static double PXC = 0;
     public static double PXXC = 0;
     public static double PYC = -0.5;
     public static double PYYC = 0.5;
@@ -335,7 +334,8 @@ public class Auto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initma();
+        initma(hardwareMap);
+        drive = new SampleMecanumDrive(hardwareMap);
         coneReady = true;
         sMCLaw.setPosition(SCC);
 

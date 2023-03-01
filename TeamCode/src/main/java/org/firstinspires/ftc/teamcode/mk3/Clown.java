@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
-import static org.firstinspires.ftc.teamcode.RobotVars.IN_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
-import static org.firstinspires.ftc.teamcode.RobotVars.SBG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
@@ -15,8 +14,11 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
+import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -30,24 +32,33 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 0.01;
-    public static double ETC = 0.3;
+    public static double ETC = 0.14;
+    public static double CPT = 0.7;
+    public static double TTT = 0.3;
+    public static boolean CLAW = false;
+    public static double PUTC = 1.212;
+    public static double PREPC = 0.8;
+    public static double CIP = 0.11;
 
     private Servo sa, sb, sHeading, sClaw, sBalans, sMClaw;
     private DcMotorEx ce;
     private boolean cput = false;
     private boolean cget = false;
+    private boolean cprepCone = false;
     public boolean toPut = false;
     public boolean toGet = false;
-    public boolean shouldClose = true;
+    public boolean shouldClose = false;
+    public boolean toPrepCone = false;
+    public boolean tppc = false;
 
-    boolean toOpenSC;
+    boolean toCloseSC;
     ElapsedTime et = new ElapsedTime(0);
+    ElapsedTime ct = new ElapsedTime(0);
 
     public Clown(Servo sa, Servo sb, Servo sHeading, Servo sClaw, Servo sMClaw, Servo sBalans, DcMotorEx ce) {
+        conversiePerverssa(SAG);
         this.sa = sa;
-        sa.setPosition(SAG);
-        this.sb = sb;
-        sb.setPosition(SBG);
+        this.sb = sa;
         this.sHeading = sHeading;
         sHeading.setPosition(SHG);
         this.sClaw = sClaw;
@@ -59,73 +70,114 @@ public class Clown implements Runnable {
         this.ce = ce;
     }
 
-    void upd_balans() {
-        if (!IN_TESTING) {
-            sBalans.setPosition(SBAG + ((sa.getPosition() - SAG) / (SAG - SAP)) * (SBAG - SBAP));
-        }
-    }
-
+    double sp;
+    double DT = 1.212;
     public void run() {
-        while (shouldClose) {
+        while (!shouldClose) {
             if (USE_TELE) {
                 TelemetryPacket packet = new TelemetryPacket();
 
-                packet.put("toGet", toGet);
-                packet.put("toPut", toPut);
-                packet.put("cready", coneReady);
-                packet.put("cclaw", coneClaw);
                 packet.put("cput", cput);
-                packet.put("toOpen", toOpenSC);
                 packet.put("cget", cget);
-                packet.put("sa", (sa.getPosition() - SAP) / (SAP - SAG));
-                packet.put("sb", (sb.getPosition() - SBP) / (SBP - SBG));
-                packet.put("sh", (sHeading.getPosition() - SHP) / (SHP - SHG));
-                packet.put("sg", (sClaw.getPosition() - SINCHIS) / (SINCHIS - SDESCHIS));
-                packet.put("sc", (sMClaw.getPosition() - SCC) / (SCC - SCO));
+                packet.put("cpre", cprepCone);
+                packet.put("tpre", toPrepCone);
+                packet.put("tput", toPut);
+                packet.put("tget", toGet);
+                packet.put("tppc", tppc);
+                packet.put("DT", DT);
 
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
             }
 
-            if ((cput || !coneClaw) && toPut) {
+            if (CLAW) {
+                sClaw.setPosition(SINCHIS);
+                CLAW = false;
+                coneReady = true;
+            }
+
+            if (cput && toPut) {
                 toPut = false;
             }
 
-            if (toPut && ce.getCurrentPosition() < MIP) {
+            if (coneClaw && toPut && ce.getCurrentPosition() < MIP) {
+                tppc = false;
                 toPut = false;
                 cput = true;
-                sa.setPosition(SAP);
-                sb.setPosition(SBP);
-                sHeading.setPosition(SHP);
+                toPrepCone = false;
+                cprepCone = false;
+                cget = false;
+                sp = sa.getPosition();
+
+                conversiePerverssa(SAP);
+                //sHeading.setPosition(SHP);
                 sClaw.setPosition(SINCHIS);
-                sMClaw.setPosition(SCC);
+                sMClaw.setPosition(SCO);
+                sBalans.setPosition(SBAP);
+                et.reset();
             }
 
             if (cput) {
-                if (Math.abs(sa.getPosition() - SAP) < ME) {
+                conversiePerverssa(SAP);
+                sClaw.setPosition(SINCHIS);
+                sMClaw.setPosition(SCO);
+                sBalans.setPosition(SBAP);
+                if (et.seconds() > TTT * DT) {
+                    sHeading.setPosition(SHP);
+                }
+                if (et.seconds() > CPT * DT) {
                     sClaw.setPosition(SDESCHIS);
-                    toOpenSC = true;
+                    toCloseSC = true;
                     et.reset();
                     cput = false;
                 }
             }
 
-            if (toOpenSC && et.seconds() > ETC) {
-                sMClaw.setPosition(SCO);
+            if (toPrepCone) {
+                sClaw.setPosition(SINCHIS);
+                toPrepCone = false;
+                cprepCone = true;
+                if (tppc) {
+                    DT = PUTC;
+                } else {
+                    DT = PREPC;
+                }
+                ct.reset();
+            }
+
+            if (!coneClaw && !cprepCone && !toPrepCone && toPut) {
+                tppc = true;
+                toPrepCone = true;
+            }
+
+
+            if (cprepCone && ct.seconds() > CIP) {
+                cprepCone = false;
+                conversiePerverssa(SAH);
+                sBalans.setPosition(SBAH);
+                coneClaw = true;
+            }
+
+            if (toCloseSC && et.seconds() > ETC * DT) {
+                sMClaw.setPosition(SCC);
                 coneReady = true;
+                armHolding = false;
                 coneClaw = false;
-                toOpenSC = false;
+                toCloseSC = false;
+                toGet = true;
             }
 
             if (toGet) {
-                cget = true;
-                toGet = false;
-                toPut = false;
-                cput = false;
-                sa.setPosition(SAG);
-                sb.setPosition(SBG);
-                sHeading.setPosition(SHG);
+                if (sa.getPosition() != SAG || sHeading.getPosition() != SHG || sBalans.getPosition() != SBAG) {
+                    tppc = false;
+                    cget = true;
+                    toPut = false;
+                    cput = false;
+                    conversiePerverssa(SAG);
+                    sHeading.setPosition(SHG);
+                    sBalans.setPosition(SBAG);
+                }
                 sClaw.setPosition(SDESCHIS);
-                sMClaw.setPosition(SCO);
+                toGet = false;
             }
 
             if (cget) {

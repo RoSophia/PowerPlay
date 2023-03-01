@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Config
 class ThreadInfo {
     public static int target = 0;
     public static boolean shouldClose = false;
@@ -18,7 +17,6 @@ class ThreadInfo {
     public static double pcoef;
 }
 
-@Config
 class ArmcPIDF implements Runnable {
     DcMotorEx ridicareSlide;
 
