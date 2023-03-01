@@ -99,7 +99,10 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 @SuppressWarnings({"SpellCheckingInspection"})
 @Config
@@ -135,11 +138,16 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public double WT = 0.2;
     public static double HMIN = 0.005;
 
+
+    Encoder enc0, enc1, enc2;
     public void runOpMode() {
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = switched = coneReady = false;
         UPP = UPPS;
 
         initma(hardwareMap);
+        enc0 = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
+        enc1 = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
+        enc2 = new Encoder(hardwareMap.get(DcMotorEx.class, "LF"));
 
         waitForStart();
 
@@ -240,7 +248,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             L2D = gamepad2.dpad_down;
             if (!L2B && gamepad2.b) {
-                clo.toGet = true;
+                //clo.toGet = true;
                 rid(RBOT_POS);
                 ext(EMIN);
             }
@@ -291,6 +299,9 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 pack.put("extA", extA.getCurrentPosition());
                 pack.put("extB", extB.getCurrentPosition());
                 pack.put("ridA", ridA.getCurrentPosition());
+                pack.put("enc0", enc0.getCurrentPosition());
+                pack.put("enc1", enc1.getCurrentPosition());
+                pack.put("enc2", enc2.getCurrentPosition());
                 pack.put("ch", ch);
                 dashboard.sendTelemetryPacket(pack);
             }

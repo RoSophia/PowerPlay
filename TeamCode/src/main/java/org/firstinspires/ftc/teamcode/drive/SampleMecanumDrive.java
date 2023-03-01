@@ -85,8 +85,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
-        Servo S1 = hardwareMap.get(Servo.class, "SPe");
-        Servo S2 = hardwareMap.get(Servo.class, "SPa1");
+        Servo S1 = hardwareMap.get(Servo.class, "SPa1");
+        Servo S2 = hardwareMap.get(Servo.class, "SPa2");
 
         S1.setPosition(S1PC);
         S2.setPosition(S2PC);

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAGE;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
@@ -50,6 +51,7 @@ public class Clown implements Runnable {
     public boolean shouldClose = false;
     public boolean toPrepCone = false;
     public boolean tppc = false;
+    public boolean cext = false;
 
     boolean toCloseSC;
     ElapsedTime et = new ElapsedTime(0);
@@ -84,6 +86,10 @@ public class Clown implements Runnable {
                 packet.put("tput", toPut);
                 packet.put("tget", toGet);
                 packet.put("tppc", tppc);
+                packet.put("cext", cext);
+                packet.put("cred", coneReady);
+                packet.put("ahol", armHolding);
+                packet.put("ccla", coneClaw);
                 packet.put("DT", DT);
 
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
@@ -154,6 +160,7 @@ public class Clown implements Runnable {
                 cprepCone = false;
                 conversiePerverssa(SAH);
                 sBalans.setPosition(SBAH);
+                armHolding = true;
                 coneClaw = true;
             }
 
@@ -172,7 +179,13 @@ public class Clown implements Runnable {
                     cget = true;
                     toPut = false;
                     cput = false;
-                    conversiePerverssa(SAG);
+                    coneClaw = false;
+                    armHolding = false;
+                    if (cext) {
+                        conversiePerverssa(SAGE);
+                    } else {
+                        conversiePerverssa(SAG);
+                    }
                     sHeading.setPosition(SHG);
                     sBalans.setPosition(SBAG);
                 }

@@ -68,8 +68,8 @@ class PIDF implements Runnable {
     void updt() {
         double x = ttim.seconds() * (1 / DUR);
         if (x <= 1) {
-            ctarg = ltarg + (int)(x * (target - ltarg));
-            //ctarg = ltarg + (int)((A * x * (1 - x) * (1 - x) * (1 - x) + B * (1 - x) * x + x * x * x) * (target - ltarg));
+            //ctarg = ltarg + (int)(x * (target - ltarg));
+            ctarg = ltarg + (int)((A * x * (1 - x) * (1 - x) * (1 - x) + B * (1 - x) * x + x * x * x) * (target - ltarg));
         } else {
             ctarg = target;
         }

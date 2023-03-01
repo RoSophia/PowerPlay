@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.EBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
+import static org.firstinspires.ftc.teamcode.RobotVars.EXTT;
 import static org.firstinspires.ftc.teamcode.RobotVars.IN_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.RAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
 import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
@@ -14,6 +17,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIF;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIP;
 import static org.firstinspires.ftc.teamcode.RobotVars.TESTINGID;
+import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
@@ -96,8 +100,6 @@ public class RobotFuncs {
         }
     }
 
-    public static double DOT = 1.5;
-    public static double UPT = 0.5;
     static void rid(int pos) {
         if (coneReady || pos == RBOT_POS) {
             if (pos == RBOT_POS) {
@@ -118,15 +120,14 @@ public class RobotFuncs {
         sextB.setPosition(1 - p + SDIF + (1 - p) * SDIP);
     }
 
-    public static double EXTT = 1.0;
-    public static double RETT = 1.5;
     static void ext(int pos) {
         if (pos == EMAX) {
+            clo.cext = true;
             clo.toGet = true;
             coneReady = false;
             epd.set_target(pos, EXTT);
         } else {
-            clo.toPrepCone = true;
+            clo.cext = false;
             epd.set_target(pos, RETT);
         }
         rid(RBOT_POS);
