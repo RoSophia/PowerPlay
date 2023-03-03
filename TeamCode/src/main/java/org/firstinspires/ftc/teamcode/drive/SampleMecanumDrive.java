@@ -39,6 +39,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -60,9 +61,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(10, 0.02, 0.2);
-    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(10, 0.02, 0.4);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 0, 0.1);
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(11, 0.02, 0.2);
+    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(13, 0.02, 0.4);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7, 0, 0.1);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -156,15 +157,14 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        // setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
             setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        //rightFront.setDirection(DcMotorEx.Direction.REVERSE);
-        //rightRear.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
+        rightRear.setDirection(DcMotorEx.Direction.FORWARD);
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
         leftRear.setDirection(DcMotorEx.Direction.REVERSE);
 
@@ -329,15 +329,14 @@ public class SampleMecanumDrive extends MecanumDrive {
         return wheelVelocities;
     }
 
-    public static boolean MOVE = true;
+    public static double MP = 0.9;
+
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        if (MOVE) {
-            leftFront.setPower(v);
-            leftRear.setPower(v1);
-            rightRear.setPower(v2);
-            rightFront.setPower(v3);
-        }
+        leftFront.setPower(v * MP);
+        leftRear.setPower(v1 * MP);
+        rightRear.setPower(v2 * MP);
+        rightFront.setPower(v3 * MP);
     }
 
     @Override

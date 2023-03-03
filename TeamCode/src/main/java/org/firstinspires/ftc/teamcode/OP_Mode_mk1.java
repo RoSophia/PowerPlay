@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode;
 
 /*
@@ -21,7 +22,7 @@ package org.firstinspires.ftc.teamcode;
         | |_) | | | | |_) |  _|     / _ \ | | | |  _| | |_) |  _| |  \| | | | / _ \
         |  _ <| |_| |  __/| |___   / ___ \| |_| | |___|  _ <| |___| |\  | | |/ ___ \
         |_| \_\\___/|_|   |_____| /_/   \_\____/|_____|_| \_\_____|_| \_| |_/_/   \_\
- */
+ /
 
 /*
  * SOFT ARABESC PERVERS VERSIUNE 0.23b
@@ -29,7 +30,7 @@ package org.firstinspires.ftc.teamcode;
  * E PERVERS, RUPE ADERENTA
  *
  * Cu de toate fara ceapa boss
- */
+ /
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.MID_POS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.MIU_POS;
@@ -161,7 +162,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
         /*TelemetryPacket pack;
         while (opModeIsActive()) {
             ThreadInfo.use = true;
-        }*/
+        }/
 
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -268,7 +269,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     }
                     /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_USING_ENCODER) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                    }*/
+                    }/
                     lpos = ridicareSlide.getCurrentPosition();
                     if (lpos < 0) {
                         if (USE_TELEMETRY) {
@@ -317,7 +318,7 @@ public class OP_Mode_mk1 extends LinearOpMode {
                     ThreadInfo.use = true;
                     /*if (ridicareSlide.getMode() != DcMotorEx.RunMode.RUN_TO_POSITION) {
                         ridicareSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                    }*/
+                    }/
                     if (USE_TELEMETRY) {
                         telemetry.addLine("ALL AUT");
                     }
@@ -397,3 +398,6 @@ public class OP_Mode_mk1 extends LinearOpMode {
         }
     }
 }
+
+
+ */

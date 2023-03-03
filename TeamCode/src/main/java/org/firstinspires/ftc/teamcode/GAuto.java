@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.BOT_POS;
+import static org.firstinspires.ftc.teamcode.RobotConstants.CSM;
 import static org.firstinspires.ftc.teamcode.RobotConstants.DOT;
 import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.SINCHIS;
@@ -8,8 +9,10 @@ import static org.firstinspires.ftc.teamcode.RobotConstants.TOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotConstants.UPT;
 import static org.firstinspires.ftc.teamcode.RobotConstants.dif;
 import static org.firstinspires.ftc.teamcode.RobotConstants.pcoef;
+import static org.firstinspires.ftc.teamcode.RobotConstants.ri;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.armRun;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.batteryVoltageSensor;
+import static org.firstinspires.ftc.teamcode.RobotFuncs.cs;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.endma;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.imu;
@@ -39,9 +42,11 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -50,6 +55,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.Traject
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -65,8 +71,7 @@ import java.util.Vector;
 @Config
 @Autonomous(group = "drive")
 @SuppressLint("DefaultLocale")
-public class Autonoooooooooom extends LinearOpMode {
-
+public class GAuto extends LinearOpMode {
     OpenCvCamera webcam;
     AprilTagDetectionPipeline pipeline;
 
@@ -95,35 +100,36 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static double HEAD1 = 0.69;
-    public static double PX1 = 153;
-    public static double PY1 = 7;
-    public static double HEAD2 = 4.7;
+    public static double HEAD1 = 5.54;
+    public static double PX1 = 156;
+    public static double PY1 = -4.0;
+    public static double HEAD2 = -4.7;
     public static double PX2 = 143;
-    public static double PY2 = -60.5;
-    public static double HEAD3 = 0.523;
-    public static double PX3 = 148;
-    public static double PY3 = 5;
-    public static double HEADC = -0.01;
-    public static double HEADCVC = -0.01;
-    public static double HEADCC = -0.05;
+    public static double PY2 = 59;
+    public static double HEAD3 = 5.72;
+    public static double PX3 = 147;
+    public static double PY3 = -9;
+    public static double HEADC = -0.006;
+    public static double HEADCVC = 0.00;
+    public static double HEADCC = 0.05;
     public static double PXXC = 0;
-    public static double PXC = 0.7;
-    public static double PYC = -0.5;
-    public static double PYYC = 0.5;
+    public static double PXC = -0.3;
+    public static double PYC = -0.3;
+    public static double PYYC = -0.0;
+    public static int ADIF = 350;
 
     public static double P1X = 35;
-    public static double P1Y = 3.3;
+    public static double P1Y = -3.3;
     public static double P2X = 25;
-    public static double P2Y = 2;
+    public static double P2Y = -2;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
-    public static boolean RECURRING_SINGULARITY = true;
+    public static boolean RECURRING_SINGULARITY = false;
     public static boolean GPOS = true;
 
-    public static double MVEL = 160;//150;
-    public static double MAL = 130;//100;
+    public static double MVEL = 140;//150;
+    public static double MAL = 100;//100;
     public static double MDL = 70;//70;
 
     public double OPD = 0.04;
@@ -134,17 +140,17 @@ public class Autonoooooooooom extends LinearOpMode {
     public static double PD = 0.3;
 
     public static double R1X = 30;
-    public static double R1Y = 0.1;
+    public static double R1Y = -0.1;
     public static double R1YVC = 0.09;
     public static double R2X = 40;
-    public static double R2Y = 4;
+    public static double R2Y = -4;
 
     public double H11 = -0.8;
     public double H12 = 0.8;
     public double H21 = -1;
     public double H22 = 1;
 
-    List<Integer> GP = Arrays.asList(275, 225, 170, 120, 60);
+    List<Integer> GP = Arrays.asList(245, 195, 143, 100, 40);
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -156,23 +162,25 @@ public class Autonoooooooooom extends LinearOpMode {
         e.add(drive.getLastError());
     }
 
+    Encoder frontEncoder;
+    Encoder rightEncoder;
+    Encoder leftEncoder;
+
     void follow_traj(TrajectorySequence traj) {
         drive.followTrajectorySequenceAsync(traj);
         drive.update();
         TelemetryPacket pack;
         ElapsedTime timer = new ElapsedTime(0);
-        while (drive.isBusy() && !isStopRequested() && traj != null) {
-            /*telemetry.speak("Buna ziua!");
-            telemetry.addData("Traj", "Going from (%f, %f, %f) to (%f, %f, %f) for %f", traj.start().getX(), traj.start().getY(), traj.start().getHeading(),
-                    traj.end().getX(), traj.end().getY(), traj.end().getHeading(),
-                    traj.duration());
-            telemetry.addData("Normal", NORMAL);*/
+        while (drive.isBusy() && !isStopRequested() && traj != null && !PARK) {
             drive.update();
             pack = new TelemetryPacket();
             pack.put("Ex", drive.getLastError().getX());
             pack.put("Ey", drive.getLastError().getY());
             pack.put("Eh", drive.getLastError().getHeading());
-            pack.put("CycleTime", timer.milliseconds());
+            pack.put("vel", leftEncoder.getCorrectedVelocity());
+            pack.put("ver", rightEncoder.getCorrectedVelocity());
+            pack.put("vef", frontEncoder.getCorrectedVelocity());
+
             timer.reset();
             dashboard.sendTelemetryPacket(pack);
         }
@@ -217,6 +225,20 @@ public class Autonoooooooooom extends LinearOpMode {
         ++c;
     }
 
+    public static boolean KOOKY = false;
+    boolean PARK = false;
+    void vc() {
+        if (KOOKY) {
+            final double cd = cs.getDistance(DistanceUnit.MM);
+            if (cd > 100) {
+                PARK = true;
+                armRun.set_target(TOP_POS / 2, UPT);
+            }
+        }
+    }
+
+    public static int NCON = 5;
+
     @SuppressWarnings("ConstantConditions")
     TrajectorySequence mktraj() {
         if (false) {
@@ -245,11 +267,11 @@ public class Autonoooooooooom extends LinearOpMode {
                     .addTemporalMarker(this::ltime)
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         getpos();
-                        armRun.set_target(TOP_POS - dif, 0);
+                        armRun.set_target(TOP_POS - ADIF, 0);
                     })
                     .waitSeconds(WD)
                     .UNSTABLE_addTemporalMarkerOffset(0.1, () -> s1.setPosition(SDESCHIS)); ///////////////////////////// PRELOAD 1
-            for (int i = 0; i < 5; ++i) {
+            for (int i = 0; i < NCON; ++i) {
                 cs.UNSTABLE_addTemporalMarkerOffset(PD, this::sp)
                         .funnyRaikuCurve(new Pose2d(PX2 + PXXC * i, PY2 + PYYC * i, HEAD2 + HEADCC * i), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 1
                         .addTemporalMarker(this::ltime)
@@ -258,13 +280,16 @@ public class Autonoooooooooom extends LinearOpMode {
                             s1.setPosition(SINCHIS);
                         })
                         .waitSeconds(WWD)
-                        .UNSTABLE_addTemporalMarkerOffset(0, () -> armRun.set_target(TOP_POS / 2, DOT))
+                        .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                            armRun.set_target(TOP_POS / 2, UPT / 2);
+                            vc();
+                        })
                         .UNSTABLE_addTemporalMarkerOffset(UPD, () -> armRun.set_target(TOP_POS, UPT))
                         .funnyRaikuCurve(new Pose2d(PX3 + PXC * i, PY3 + PYC * i, HEAD3 + HEADC * i + HEADCVCC * i), P2, P1, H21, H22)
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                             getpos();
-                            armRun.set_target(TOP_POS - dif, 0);
+                            armRun.set_target(TOP_POS - ADIF, 0);
                         })
                         .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)); ///////////////////////////// CONE 1
             }
@@ -339,13 +364,12 @@ public class Autonoooooooooom extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(SPOSX, SPOSY, SPOSH));
         s1.setPosition(SINCHIS);
 
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LED"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "Underglow"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
+
         TelemetryPacket packet;
 
-        /*CamGirl cg = new CamGirl();
-        Thread cgt = new Thread(cg);
-        cg.shouldClose = false;
-        cg.LAST_ID = 0;
-        cgt.start();*/
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         pipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
@@ -402,7 +426,6 @@ public class Autonoooooooooom extends LinearOpMode {
         telemetry.addData("All done! Got ID: ", LAST_ID);
 
         waitForStart();
-        //cg.shouldClose = true;
         if (OPENED) {
             webcam.closeCameraDeviceAsync(() -> {
             });
@@ -473,6 +496,7 @@ public class Autonoooooooooom extends LinearOpMode {
 
                 it = getRuntime();
                 follow_traj(traj);
+                PARK = false;
 
                 if (!isStopRequested()) {
                     switch (LAST_ID) {
@@ -499,7 +523,9 @@ public class Autonoooooooooom extends LinearOpMode {
                         case 8:
                             telemetry.addLine("8");
                             traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToLinearHeading(new Pose2d(F * 2, -F * 1.2, 0))
+                                    //.funnyRaikuCurve(new Pose2d(F * 2, -F * 1.2, 0), new Vector2d(20, 4.5), new Vector2d(1, 0), H21, H11)
+                                    .lineToLinearHeading(new Pose2d(F * 2, -5, 0))
+                                    .lineToLinearHeading(new Pose2d(F * 2, -F * 1, 0))
                                     .addTemporalMarker(this::ltime)
                                     .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> armRun.set_target(70, 1))
                                     .waitSeconds(1)

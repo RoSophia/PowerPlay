@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.SDESCHIS;
@@ -99,7 +100,6 @@ public class AutoStanga extends LinearOpMode {
     public static double HEADC = -0.01;
     public static double HEADCC = 0.05;
     public static double HEADCCC = 0.00;
-    public static double PXC = 0.7;
     public static double PXXC = 0;
     public static double PYC = 0.5;
     public static double PYYC = -0.5;
@@ -163,11 +163,12 @@ public class AutoStanga extends LinearOpMode {
         TelemetryPacket pack;
         ElapsedTime timer = new ElapsedTime(0);
         while (drive.isBusy() && !isStopRequested() && traj != null) {
+        /*
             /*telemetry.speak("Buna ziua!");
             telemetry.addData("Traj", "Going from (%f, %f, %f) to (%f, %f, %f) for %f", traj.start().getX(), traj.start().getY(), traj.start().getHeading(),
                     traj.end().getX(), traj.end().getY(), traj.end().getHeading(),
                     traj.duration());
-            telemetry.addData("Normal", NORMAL);*/
+            telemetry.addData("Normal", NORMAL);/
             drive.update();
             pack = new TelemetryPacket();
             pack.put("Ex", drive.getLastError().getX());
@@ -500,7 +501,7 @@ public class AutoStanga extends LinearOpMode {
         //telemetry.speak("Dami whynd bo-ooh-le!");
 
         /*Runnable armRun = new ArmcPIDF(ridicareSlide);
-        Thread armThread = new Thread(armRun);*/
+        Thread armThread = new Thread(armRun);/
 
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(new Pose2d(SPOSX, SPOSY, SPOSH));
@@ -571,7 +572,7 @@ public class AutoStanga extends LinearOpMode {
         /*ThreadInfo.shouldClose = false;
         armThread.start();
         ThreadInfo.use = true;
-        ThreadInfo.target = 40;*/
+        ThreadInfo.target = 40;/
 
         //drive.setPoseEstimate(new Pose2d(SPOSX, SPOSY, SPOSH));
         drive.setPoseEstimate(new Pose2d(0, 0, 0));
@@ -722,7 +723,7 @@ public class AutoStanga extends LinearOpMode {
             armThread.join();
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }/
         leftBack.setPower(0);
         rightBack.setPower(0);
         leftFront.setPower(0);
@@ -740,3 +741,6 @@ public class AutoStanga extends LinearOpMode {
 
     }
 }
+
+
+ */

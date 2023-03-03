@@ -43,9 +43,6 @@ public class Test extends LinearOpMode {
 
     private final FtcDashboard dashboard;
 
-    OpenCvCamera webcam;
-    AprilTagDetectionPipeline pipeline;
-
     SampleMecanumDrive drive;
 
     public Test() {
@@ -86,8 +83,8 @@ public class Test extends LinearOpMode {
         S2.setPosition(S2PC);
         S3.setPosition(S3PC);
 
-        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "Underglow"));
-        Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RF"));
+        Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LED"));
+        Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "Underglow"));
         Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
 
@@ -174,6 +171,7 @@ public class Test extends LinearOpMode {
             packet.put("vel", leftEncoder.getCorrectedVelocity());
             packet.put("ver", rightEncoder.getCorrectedVelocity());
             packet.put("vef", frontEncoder.getCorrectedVelocity());
+            packet.put("pvel", drive.getLocalizer().getPoseVelocity());
             //packet.put("IMUH", fixRetardation(imu.getAngularOrientation().firstAngle));
 
             /*
@@ -188,7 +186,7 @@ public class Test extends LinearOpMode {
             telemetry.addData("ph", Math.toDegrees(drive.getPoseEstimate().getHeading()));
             telemetry.update();
 
-            final double pcoef = 12.0 / batteryVoltageSensor.getVoltage();
+            final double pcoef = 14.0 / batteryVoltageSensor.getVoltage();
             final double spcoef = 1 - 0.6 * gamepad1.right_trigger;
             final double fcoef = pcoef * spcoef;
             leftFront.setPower(lfPower * fcoef);
