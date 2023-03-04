@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.BOT_POS;
@@ -9,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.RobotConstants.UPT;
 import static org.firstinspires.ftc.teamcode.RobotConstants.pcoef;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.armRun;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.batteryVoltageSensor;
+import static org.firstinspires.ftc.teamcode.RobotFuncs.cs;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.endma;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.imu;
@@ -41,6 +43,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -63,9 +66,9 @@ import java.util.Vector;
 
 @SuppressWarnings("CommentedOutCode")
 @Config
-@Autonomous(group = "drive")
+@Autonomous(group = "drive", name="+")
 @SuppressLint("DefaultLocale")
-public class GAuto extends LinearOpMode {
+public class P extends LinearOpMode {
     OpenCvCamera webcam;
     AprilTagDetectionPipeline pipeline;
 
@@ -94,36 +97,41 @@ public class GAuto extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static double HEAD1 = 5.543;
-    public static double PX1 = 158;
+    public static double HEAD1 = 5.54;
+    public static double PX1 = 156;
     public static double PY1 = -4.0;
     public static double HEAD2 = -4.7;
-    public static double PX2 = 147;
-    public static double PY2 = 60.5;
-    public static double HEAD3 = 5.84;
-    public static double PX3 = 150;
-    public static double PY3 = -9;
-    public static double HEADC = -0.01;
+    public static double PX2 = 143;
+    public static double PY2 = 59;
+    public static double HEAD3 = 4.2778;
+    public static double PX3 = 134;
+    public static double PY3 = -63;
+    public static double HEADC = -0.006;
     public static double HEADCVC = 0.00;
-    public static double HEADCC = -0.02;
-    public static double PXXC = 1.35;
+    public static double HEADCC = 0.05;
+    public static double PXXC = 0;
     public static double PXC = -0.3;
-    public static double PYC = -0.6;
-    public static double PYYC = 0.3;
+    public static double PYC = -0.3;
+    public static double PYYC = -0.0;
     public static int ADIF = 350;
 
-    public static double P1X = 35;
-    public static double P1Y = -3.0;
-    public static double P2X = 25;
-    public static double P2Y = -2;
+    public static double H1X = 35;
+    public static double H1Y = -3.3;
+    public static double H2X = 25;
+    public static double H2Y = -2;
+
+    public static double P1X = 10;
+    public static double P1Y = -1;
+    public static double P2X = 10;
+    public static double P2Y = 1;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
     public static boolean RECURRING_SINGULARITY = false;
     public static boolean GPOS = false;
 
-    public static double MVEL = 160;//150;
-    public static double MAL = 120;//100;
+    public static double MVEL = 140;//150;
+    public static double MAL = 100;//100;
     public static double MDL = 70;//70;
 
     public double OPD = 0.04;
@@ -143,8 +151,10 @@ public class GAuto extends LinearOpMode {
     public double H12 = 0.8;
     public double H21 = -1;
     public double H22 = 1;
+    public static double H31 = 3;
+    public static double H32 = 0.8;
 
-    List<Integer> GP = Arrays.asList(245, 195, 143, 100, 20);
+    List<Integer> GP = Arrays.asList(245, 195, 143, 100, 40);
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -165,7 +175,7 @@ public class GAuto extends LinearOpMode {
         drive.update();
         TelemetryPacket pack;
         ElapsedTime timer = new ElapsedTime(0);
-        while (drive.isBusy() && !isStopRequested() && traj != null) {
+        while (drive.isBusy() && !isStopRequested() && traj != null && !PARK) {
             drive.update();
             pack = new TelemetryPacket();
             pack.put("Ex", drive.getLastError().getX());
@@ -219,7 +229,6 @@ public class GAuto extends LinearOpMode {
         ++c;
     }
 
-    /*
     public static boolean KOOKY = false;
     boolean PARK = false;
     void vc() {
@@ -230,9 +239,9 @@ public class GAuto extends LinearOpMode {
                 armRun.set_target(TOP_POS / 2, UPT);
             }
         }
-    }*/
+    }
 
-    public static int NCON = 2;
+    public static int NCON = 5;
 
     @SuppressWarnings("ConstantConditions")
     TrajectorySequence mktraj() {
@@ -243,6 +252,8 @@ public class GAuto extends LinearOpMode {
                     .lineToConstantHeading(new Vector2d(F * 2, 0), vc, ac)
                     .build();
         } else {
+            Vector2d H1 = new Vector2d(H1X, H1Y);
+            Vector2d H2 = new Vector2d(H2X, H2Y);
             Vector2d P1 = new Vector2d(P1X, P1Y);
             Vector2d P2 = new Vector2d(P2X, P2Y);
             double R1YVCC = (13.4 - batteryVoltageSensor.getVoltage()) * R1YVC;
@@ -265,10 +276,31 @@ public class GAuto extends LinearOpMode {
                         armRun.set_target(TOP_POS - ADIF, 0);
                     })
                     .waitSeconds(WD)
-                    .UNSTABLE_addTemporalMarkerOffset(0.1, () -> s1.setPosition(SDESCHIS)); ///////////////////////////// PRELOAD 1
+                    .UNSTABLE_addTemporalMarkerOffset(0.1, () -> s1.setPosition(SDESCHIS)) ///////////////////////////// PRELOAD 1
+                    .UNSTABLE_addTemporalMarkerOffset(PD, this::sp)
+                    .funnyRaikuCurve(new Pose2d(PX2, PY2, HEAD2), H1, H2, H21, H22) //////////////////////////////////////////// GET CONE 1
+                    .addTemporalMarker(this::ltime)
+                    .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> {
+                        getpos();
+                        s1.setPosition(SINCHIS);
+                    })
+                    .waitSeconds(WWD)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        armRun.set_target(TOP_POS / 2, UPT / 2);
+                        vc();
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(UPD, () -> armRun.set_target(TOP_POS, UPT))
+                    .funnyRaikuCurve(new Pose2d(PX3 + PXC, PY3 + PYC, HEAD3 + HEADC + HEADCVCC), P1, P2, H31, H32)
+                    .addTemporalMarker(this::ltime)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        getpos();
+                        armRun.set_target(TOP_POS - ADIF, 0);
+                    })
+                    .UNSTABLE_addTemporalMarkerOffset(OPD, () -> s1.setPosition(SDESCHIS)); ///////////////////////////// CONE 1
+
             for (int i = 0; i < NCON; ++i) {
                 cs.UNSTABLE_addTemporalMarkerOffset(PD, this::sp)
-                        .funnyRaikuCurve(new Pose2d(PX2 + PXXC * i, PY2 + PYYC * i, HEAD2 + HEADCC * i), P1, P2, H21, H22) //////////////////////////////////////////// GET CONE 1
+                        .funnyRaikuCurve(new Pose2d(PX2 + PXXC * i, PY2 + PYYC * i, HEAD2 + HEADCC * i), P2, P1, H21, H22) //////////////////////////////////////////// GET CONE 1
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(-0.03, () -> {
                             getpos();
@@ -277,10 +309,10 @@ public class GAuto extends LinearOpMode {
                         .waitSeconds(WWD)
                         .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                             armRun.set_target(TOP_POS / 2, UPT / 2);
-                            //vc();
+                            vc();
                         })
                         .UNSTABLE_addTemporalMarkerOffset(UPD, () -> armRun.set_target(TOP_POS, UPT))
-                        .funnyRaikuCurve(new Pose2d(PX3 + PXC * i, PY3 + PYC * i, HEAD3 + HEADC * i + HEADCVCC * i), P2, P1, H21, H22)
+                        .funnyRaikuCurve(new Pose2d(PX3 + PXC * i, PY3 + PYC * i, HEAD3 + HEADC * i + HEADCVCC * i), P1, P2, H31, H32)
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                             getpos();
@@ -491,6 +523,7 @@ public class GAuto extends LinearOpMode {
 
                 it = getRuntime();
                 follow_traj(traj);
+                PARK = false;
 
                 if (!isStopRequested()) {
                     switch (LAST_ID) {
@@ -499,10 +532,10 @@ public class GAuto extends LinearOpMode {
                         case 7:
                             telemetry.addLine("6");
                             traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    .lineToLinearHeading(new Pose2d(F * 2, 6, 0))
+                                    .lineToLinearHeading(new Pose2d(F * 2, -10, 0))
                                     .addTemporalMarker(this::ltime)
                                     .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> armRun.set_target(70, 1))
-                                    .waitSeconds(1.5)
+                                    .waitSeconds(1)
                                     .build();
                             break;
                         case 6:
@@ -511,18 +544,18 @@ public class GAuto extends LinearOpMode {
                                     .lineToLinearHeading(new Pose2d(F * 2, F * 0.95, 0))
                                     .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> armRun.set_target(70, 1))
                                     .addTemporalMarker(this::ltime)
-                                    .waitSeconds(1.5)
+                                    .waitSeconds(1)
                                     .build();
                             break;
                         case 8:
                             telemetry.addLine("8");
                             traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2, -F * 1.2, 0), new Vector2d(20, 4.5), new Vector2d(1, 0), H21, H11)
-                                    .lineToLinearHeading(new Pose2d(F * 2, -16, 0))
-                                    .lineToLinearHeading(new Pose2d(F * 2, -F, 0))
+                                    .funnyRaikuCurve(new Pose2d(F * 2, -F, 0), new Vector2d(20, 4.5), new Vector2d(1, 0), H21, H11)
+                                    /*.lineToLinearHeading(new Pose2d(F * 2, -5, 0))
+                                    .lineToLinearHeading(new Pose2d(F * 2, -F, 0))/
                                     .addTemporalMarker(this::ltime)
                                     .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> armRun.set_target(70, 1))
-                                    .waitSeconds(1.5)
+                                    .waitSeconds(1)
                                     .build();
                             break;
                     }
@@ -561,3 +594,4 @@ public class GAuto extends LinearOpMode {
 
     }
 }
+*/

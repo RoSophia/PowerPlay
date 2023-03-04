@@ -7,17 +7,17 @@ public class RobotConstants {
     public static double SDESCHIS = 0.73;
     public static double SINCHIS = 0.85;
 
-    public static int TOP_POS = 1080;
-    public static int MIU_POS = 777;
-    public static int MID_POS = 510;
+    public static int TOP_POS = 1140;
+    public static int MIU_POS = 870;
+    public static int MID_POS = 580;
     public static int BOT_POS = 10;
 
     public static double S1PO = 0.8;
-    public static double S2PO = 0.39;
+    public static double S2PO = 0.4;
     public static double S3PO = 0.2;
 
     public static double S1PC = 0.58;
-    public static double S2PC = 0.339;
+    public static double S2PC = 0.347;
     public static double S3PC = 0.24;
 
     public static double rp = 0.004;

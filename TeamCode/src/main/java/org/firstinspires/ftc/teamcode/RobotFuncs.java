@@ -32,7 +32,7 @@ public class RobotFuncs {
     public static DcMotor underglow;
     public static Servo s1, s2;
     public static Servo S1, S2, S3;
-    public static Rev2mDistanceSensor cs;
+    //public static Rev2mDistanceSe0sor cs;
     public static VoltageSensor batteryVoltageSensor;
     public static FtcDashboard dashboard;
     public static BNO055IMU imu;
@@ -89,14 +89,14 @@ public class RobotFuncs {
         leftFront = initm("LF", false, false);
         rightBack = initm("RB", false, true);
         rightFront = initm("RF", false, true);
-        ridicareSlide = initm("RS", true, false);
+        ridicareSlide = initm("RS", true, true);
         underglow = initm("Underglow", false, false);
 
         s1 = hardwareMap.get(Servo.class, "S1");
         S1 = hardwareMap.get(Servo.class, "SPe");
         S2 = hardwareMap.get(Servo.class, "SPa1");
         S3 = hardwareMap.get(Servo.class, "SPa2");
-        cs = hardwareMap.get(Rev2mDistanceSensor.class, "Claw");
+        //cs = hardwareMap.get(Rev2mDistanceSensor.class, "Claw");
 
         armRun = new PIDF(ridicareSlide, "Ri", rp, ri, rd, rf);
         armThread = new Thread(armRun);
@@ -118,6 +118,8 @@ public class RobotFuncs {
         armRun.shouldClose = false;
         armRun.use = true;
         armRun.lom = lom;
+        ridicareSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ridicareSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armThread.start();
     }
 

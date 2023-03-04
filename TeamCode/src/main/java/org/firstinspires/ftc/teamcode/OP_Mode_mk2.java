@@ -39,8 +39,6 @@ package org.firstinspires.ftc.teamcode;
  */
 
 import static org.firstinspires.ftc.teamcode.RobotConstants.BOT_POS;
-import static org.firstinspires.ftc.teamcode.RobotConstants.CSM;
-import static org.firstinspires.ftc.teamcode.RobotConstants.DIFP;
 import static org.firstinspires.ftc.teamcode.RobotConstants.DOT;
 import static org.firstinspires.ftc.teamcode.RobotConstants.FC;
 import static org.firstinspires.ftc.teamcode.RobotConstants.MID_POS;
@@ -72,7 +70,6 @@ import static org.firstinspires.ftc.teamcode.RobotFuncs.S2;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.S3;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.armRun;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.batteryVoltageSensor;
-import static org.firstinspires.ftc.teamcode.RobotFuncs.cs;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.endma;
 import static org.firstinspires.ftc.teamcode.RobotFuncs.imu;
@@ -92,8 +89,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
 @TeleOp
@@ -136,6 +131,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
     public static double YOEF = 1.0;
 
     double lrp, lri, lrd, lrf;
+
     void st(int p) {
         armRun.set_target(p, (p != BOT_POS) ? UPT : DOT);
     }
@@ -212,11 +208,11 @@ public class OP_Mode_mk2 extends LinearOpMode {
                     s1.setPosition(SDESCHIS);
                     switched = false;
                 } else {
-                    final double cd = cs.getDistance(DistanceUnit.MM);
-                    if (cd < 100) {
-                        s1.setPosition(SINCHIS + cs.getDistance(DistanceUnit.MM) * CSM);
-                        switched = true;
-                    }
+                    /*final double cd = cs.getDistance(DistanceUnit.MM);
+                    if (cd < 100) {*/
+                    s1.setPosition(SINCHIS);// + cs.getDistance(DistanceUnit.MM) * CSM);
+                    switched = true;
+                    //}
                 }
             }
             G2X = gamepad2.x;
@@ -224,7 +220,7 @@ public class OP_Mode_mk2 extends LinearOpMode {
             if (USE_TELEMETRY) {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put("Acc", imu.getCalibrationStatus());
-                pack.put("cs", cs.getDistance(DistanceUnit.MM));
+                //pack.put("cs", cs.getDistance(DistanceUnit.MM));
                 pack.put("Ridicare", ridicareSlide.getCurrentPosition());
                 pack.put("Cpow", ridicareSlide.getPower());
                 pack.put("left_stick_y", poz);

@@ -85,7 +85,7 @@ public class Test extends LinearOpMode {
 
         Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LED"));
         Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "Underglow"));
-        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
+        Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
 
         //frontEncoder.setDirection(Encoder.Direction.REVERSE);
