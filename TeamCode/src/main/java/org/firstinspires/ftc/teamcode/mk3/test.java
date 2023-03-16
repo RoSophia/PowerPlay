@@ -13,8 +13,9 @@ public class test extends LinearOpMode {
     public static double ccp = 0;
     public Servo ccs, ccs2 = null;
     public static int CT = 1;
-    public static double OFF = -0.01;
-    public static double OFP = 0.1;
+    public static boolean CC = false;
+    public static double OFF = 0.27;
+    public static double OFP = 0.01;
     public void runOpMode() {
         if ((CT & 1) != 0) {
             ccs = hardwareMap.get(Servo.class, "sClose");
@@ -26,13 +27,11 @@ public class test extends LinearOpMode {
             ccs = hardwareMap.get(Servo.class, "sMCLaw");
         } else if ((CT & 16) != 0) {
             ccs = hardwareMap.get(Servo.class, "sextA");
-            ccs2 = hardwareMap.get(Servo.class, "sextB");
+            if (CC) {
+                ccs2 = hardwareMap.get(Servo.class, "sextB");
+            }
         } else if ((CT & 32) != 0) {
             ccs = hardwareMap.get(Servo.class, "sextB");
-        } else if ((CT & 64) != 0) {
-            ccs = hardwareMap.get(Servo.class, "SPa1");
-        } else if ((CT & 128) != 0) {
-            ccs = hardwareMap.get(Servo.class, "SPa2");
         } else {
             ccs = hardwareMap.get(Servo.class, "Toate");
         }

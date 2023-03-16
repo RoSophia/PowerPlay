@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import static org.firstinspires.ftc.teamcode.RobotVars.S1PC;
-import static org.firstinspires.ftc.teamcode.RobotVars.S2PC;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
@@ -14,6 +13,9 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksTo
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
 import static java.lang.Thread.sleep;
 
 import androidx.annotation.NonNull;
@@ -38,6 +40,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -59,9 +62,10 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(10, 0.02, 0.2);
-    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(10, 0.02, 0.4);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 0, 0.1);
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(5, 0, 0);
+    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(5, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 0, 0);
+    public static double CORT = 0.4;
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -85,11 +89,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
-        Servo S1 = hardwareMap.get(Servo.class, "SPa1");
-        Servo S2 = hardwareMap.get(Servo.class, "SPa2");
-
-        S1.setPosition(S1PC);
-        S2.setPosition(S2PC);
 
         try {
             sleep(500);
@@ -160,8 +159,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        //rightFront.setDirection(DcMotorEx.Direction.REVERSE);
-        //rightRear.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFront.setDirection(DcMotorEx.Direction.FORWARD);
+        rightRear.setDirection(DcMotorEx.Direction.FORWARD);
         leftFront.setDirection(DcMotorEx.Direction.REVERSE);
         leftRear.setDirection(DcMotorEx.Direction.REVERSE);
 

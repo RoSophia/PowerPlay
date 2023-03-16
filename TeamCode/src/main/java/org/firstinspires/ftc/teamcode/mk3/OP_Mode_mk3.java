@@ -41,13 +41,11 @@ package org.firstinspires.ftc.teamcode.mk3;
 import static org.firstinspires.ftc.teamcode.RobotVars.CU_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
-import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
-import static org.firstinspires.ftc.teamcode.RobotVars.S1PO;
-import static org.firstinspires.ftc.teamcode.RobotVars.S2PO;
-import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
@@ -68,8 +66,6 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rf;
 import static org.firstinspires.ftc.teamcode.RobotVars.ri;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S1;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.S2;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.batteryVoltageSensor;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
@@ -104,7 +100,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
-@SuppressWarnings({"SpellCheckingInspection"})
+@SuppressWarnings({"SpellCheckingInspection", "CommentedOutCode"})
 @Config
 @TeleOp
 public class OP_Mode_mk3 extends LinearOpMode {
@@ -119,9 +115,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
     boolean R2LB = false;
     boolean R2LT = false;
     boolean RB = false;
-    boolean switched = false;
-
-    public static double headP = 1.2;
 
     public static double UPPS = 100;
     double UPP = 100;
@@ -135,27 +128,32 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double P3 = 1;
     public static double P4 = 1;
 
+    /*
     public double WT = 0.2;
     public static double HMIN = 0.005;
+    public static double headP = 1.2;
+     */
 
+    Encoder leftEncoder, rightEncoder, frontEncoder;
 
-    Encoder enc0, enc1, enc2;
     public void runOpMode() {
-        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = switched = coneReady = false;
+        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = coneReady = false;
         UPP = UPPS;
 
         initma(hardwareMap);
-        enc0 = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
-        enc1 = new Encoder(hardwareMap.get(DcMotorEx.class, "LB"));
-        enc2 = new Encoder(hardwareMap.get(DcMotorEx.class, "LF"));
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RF"));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LF"));
+        frontEncoder.setDirection(Encoder.Direction.REVERSE);
+        leftEncoder.setDirection(Encoder.Direction.REVERSE);
 
         waitForStart();
 
-        startma();
+        startma(this, true);
 
         ElapsedTime timer = new ElapsedTime(0);
-        ElapsedTime g1t = new ElapsedTime(0);
-        double lhpos = 0;
+        /*ElapsedTime g1t = new ElapsedTime(0);
+        double lhpos = 0;*/
         lep = ep;
         lei = ei;
         led = ed;
@@ -166,6 +164,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
         red = rd;
         ref = rf;
         rebp = rbp;
+        timer.reset();
         while (opModeIsActive()) {
             if (lep != ep || lei != ei || led != ed || lef != ef || lebp != ebp) {
                 epd.update_pid(ep, ei, ed, ef, ebp);
@@ -182,27 +181,18 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 rebp = rbp;
             }
 
-            if (USE_TELE) {
-                TelemetryPacket fp = new TelemetryPacket();
-                fp.put("CycleTime", timer.milliseconds());
-                fp.put("Orient", imu.getAngularOrientation());
-                timer.reset();
-                dashboard.sendTelemetryPacket(fp);
-            }
-
             if (CU_TESTING) {
-                conversiePerverssa(SAG);
+                conversiePerverssa(SAP);
                 sClose.setPosition(SINCHIS);
                 sHeading.setPosition(SHG);
                 sMCLaw.setPosition(SCC);
                 sBalans.setPosition(SBAG);
-                S1.setPosition(S1PO);
-                S2.setPosition(S2PO);
             }
 
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double ch = imu.getAngularOrientation().firstAngle;
+            //double ch = imu.getAngularOrientation().firstAngle;
             final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;// + ch;
+            /*
             double hdif = 0;
             if (Math.abs(gamepad1.right_stick_x) > 0.001) {
                 g1t.reset();
@@ -219,9 +209,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 if (Math.abs(hdif) < HMIN || speed > 0.01) {
                     hdif = 0;
                 }
-            }
+            }*/
 
-            final double turn = -hdif * headP + gamepad1.right_stick_x;
+            //final double turn = -hdif * headP + gamepad1.right_stick_x;
+            final double turn = -gamepad1.right_stick_x;
             final double ms = speed * Math.sin(angle);
             final double mc = speed * Math.cos(angle);
 
@@ -248,8 +239,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             L2D = gamepad2.dpad_down;
             if (!L2B && gamepad2.b) {
-                //clo.toGet = true;
-                rid(RBOT_POS);
                 ext(EMIN);
             }
             L2B = gamepad2.b;
@@ -260,7 +249,11 @@ public class OP_Mode_mk3 extends LinearOpMode {
             L2Y = gamepad2.y;
 
             if (!R2LB && gamepad2.left_bumper) {
-                clo.toPrepCone = true;
+                if (!clo.rtg) {
+                    clo.toGet = true;
+                } else {
+                    clo.toPrepCone = true;
+                }
             }
             R2LB = gamepad2.left_bumper;
 
@@ -285,29 +278,33 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
 
             if (!G2X && gamepad2.x) {
-                if (switched) {
+                if (sClose.getPosition() == SINCHIS) {
                     sClose.setPosition(SDESCHIS);
+                    coneClaw = false;
                 } else {
                     sClose.setPosition(SINCHIS);
+                    coneClaw = true;
                 }
-                switched = !switched;
             }
             G2X = gamepad2.x;
 
             if (USE_TELE) {
                 TelemetryPacket pack = new TelemetryPacket();
+                pack.put("CycleTime", timer.milliseconds());
+                pack.put("Orient", imu.getAngularOrientation());
                 pack.put("extA", extA.getCurrentPosition());
                 pack.put("extB", extB.getCurrentPosition());
                 pack.put("ridA", ridA.getCurrentPosition());
-                pack.put("enc0", enc0.getCurrentPosition());
-                pack.put("enc1", enc1.getCurrentPosition());
-                pack.put("enc2", enc2.getCurrentPosition());
-                pack.put("ch", ch);
+                pack.put("vel", leftEncoder.getCorrectedVelocity());
+                pack.put("ver", rightEncoder.getCorrectedVelocity());
+                pack.put("vef", frontEncoder.getCorrectedVelocity());
                 dashboard.sendTelemetryPacket(pack);
+                timer.reset();
+
             }
 
             pcoef = 12.0 / batteryVoltageSensor.getVoltage();
-            final double spcoef = 1 - 0.6 * gamepad1.right_trigger;
+            final double spcoef = 1 - 0.4 * gamepad1.right_trigger;
             final double fcoef = pcoef * spcoef;
             leftFront.setPower(lfPower * fcoef * P1);
             rightFront.setPower(rfPower * fcoef * P2);

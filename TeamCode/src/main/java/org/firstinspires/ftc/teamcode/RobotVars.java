@@ -4,43 +4,37 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class RobotVars {
-    public static double SDESCHIS = 0.94;
-    public static double SINCHIS = 0.8;
+    public static double SDESCHIS = 0.95;
+    public static double SINCHIS = 0.83;
 
     public static int EMIN = 0;
-    public static int EMAX = 520;
+    public static int EMAX = 595;
 
-    public static int RTOP_POS = 593;
+    public static int RTOP_POS = 531;
     public static int RMIU_POS = 400;
     public static int RMID_POS = 200;
     public static int RBOT_POS = 4;
 
-    public static double S1PC = 0.33;
-    public static double S2PC = 0.64;
+    public static double SAG = 0.4705;
+    public static double SAH = 0.415;
+    public static double SAP = 0.385;
+    public static double SAW = 0.4;
 
-    public static double S1PO = 0.68;
-    public static double S2PO = 0.27;
+    public static double SBAG = 0.43;
+    public static double SBAH = 0.45;
+    public static double SBAP = 0.0;
 
-    public static double SAG = 0.984;
-    public static double SAGE = 0.9765;
-    public static double SAH = 0.946;
-    public static double SAP = 0.9234;
+    public static double SDIF = 0.276;
+    public static double SDIP = 0.01;
 
-    public static double SBAG = 0.65;
-    public static double SBAH = 0.785;
-    public static double SBAP = 0.33;
+    public static double SHG = 0.1;
+    public static double SHP = 0.76;
 
-    public static double SDIF = -0.01;
-    public static double SDIP = 0.1;
+    public static double SCO = 0.0;
+    public static double SCC = 0.32;
 
-    public static double SHG = 0.11;
-    public static double SHP = 0.785;
-
-    public static double SCO = 0.4;
-    public static double SCC = 0.86;
-
-    public static double DOT = 2.0;
-    public static double UPT = 0.5;
+    public static double DOT = 0.0;
+    public static double UPT = 0.0;
     public static double EXTT = 0.5;
     public static double RETT = 0.7;
 
@@ -57,14 +51,14 @@ public class RobotVars {
 
     public static double ep = 0.01;
     public static double ed = 0;
-    public static double ei = 0;
+    public static double ei = 0.0005;
     public static double ef = 0;
-    public static double ebp = 0.01;
+    public static double ebp = 0;//0.01;
 
     public static double rp = 0.01;
-    public static double rd = 0;
-    public static double ri = 0;
-    public static double rf = 0.001;
+    public static double rd = 0.0;
+    public static double ri = 0.0;
+    public static double rf = 0.0008;
     public static double rbp = 0;
 
     public static double EAP = 1.0;

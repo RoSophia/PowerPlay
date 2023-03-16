@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,6 +18,7 @@ class PIDF implements Runnable {
     public boolean use = true;
     public boolean useTele = true;
     public String name;
+    public LinearOpMode lom;
 
     public double p;
     public double d;
@@ -55,18 +57,27 @@ class PIDF implements Runnable {
 
     public static double A = 0.1;
     public static double B = 2.9;
-    public static double DUR = 1;
+    double DUR = 1;
 
     ElapsedTime ttim = new ElapsedTime(0);
-    public void set_target(int t, double T) {
+    public void set_target(int targ, double tim) {
+        TelemetryPacket cp = new TelemetryPacket();
+        cp.put(name + "GoToLpos", target);
+        cp.put(name + "GoToCpos", targ);
+        cp.put(name + "GoToTime", tim);
+        dashboard.sendTelemetryPacket(cp);
         ltarg = target;
-        target = t;
-        DUR = T;
+        target = targ;
+        DUR = tim;
         ttim.reset();
     }
 
     void updt() {
         double x = ttim.seconds() * (1 / DUR);
+        TelemetryPacket cp = new TelemetryPacket();
+        cp.put(name + "CurX", x);
+        dashboard.sendTelemetryPacket(cp);
+
         if (x <= 1) {
             //ctarg = ltarg + (int)(x * (target - ltarg));
             ctarg = ltarg + (int)((A * x * (1 - x) * (1 - x) * (1 - x) + B * (1 - x) * x + x * x * x) * (target - ltarg));
@@ -87,9 +98,14 @@ class PIDF implements Runnable {
         lastTarget = target;
         ctarg = target;
         double outp = 0;
-        FtcDashboard dashboard = FtcDashboard.getInstance();
         ElapsedTime timer = new ElapsedTime(0);
-        while (!shouldClose) {
+        motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (motB != null) {
+            motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        while (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) {
             if (useTele) {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put(name + "CycleTimeArm", timer2.milliseconds());
@@ -98,6 +114,7 @@ class PIDF implements Runnable {
                 pack.put(name + "lTarg", ltarg);
                 pack.put(name + "cTarg", ctarg);
                 pack.put(name + "ttim", ttim.seconds());
+                pack.put(name + "Dur", DUR);
                 pack.put(name + "CA", motA.getCurrentPosition());
                 if (motB != null) {
                     pack.put(name + "CB", motB.getCurrentPosition());
@@ -115,7 +132,7 @@ class PIDF implements Runnable {
                 integralSum = integralSum + (error * timer.seconds());
 
                 outp = (p * error) + (d * derivate) + (i * integralSum) + f;
-                if (!shouldClose) {
+                if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) {
                     motA.setPower(outp * pcoef);
 
                     if (motB != null) {

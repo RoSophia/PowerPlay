@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
-import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
+import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SAGE;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
@@ -19,7 +19,8 @@ import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -28,18 +29,31 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.Arrays;
+import java.util.List;
+
 @SuppressWarnings("ALL")
 @Config
 public class Clown implements Runnable {
     public static int MIP = 100;
-    public static double ME = 0.01;
+    public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.7;
-    public static double TTT = 0.3;
+    public static double CPT = 0.85;
+    public static double CET = 0.5;
+    public static double CHT = 0.75;
+    public static double TTT = 0.0;
     public static boolean CLAW = false;
     public static double PUTC = 1.212;
     public static double PREPC = 0.8;
     public static double CIP = 0.11;
+    public static double GB = 0.20;
+    public static double GHT = 0.1;
+    public static double CD = 0.15;
+    public static double ED = 0.2;
+
+    public static double ST = 0.4;
+    public static double SD = 0.01;
+    public int UST = 0;
 
     private Servo sa, sb, sHeading, sClaw, sBalans, sMClaw;
     private DcMotorEx ce;
@@ -52,32 +66,34 @@ public class Clown implements Runnable {
     public boolean toPrepCone = false;
     public boolean tppc = false;
     public boolean cext = false;
+    public boolean waiting = true;
+    public boolean rtg = false;
 
-    boolean toCloseSC;
+    List<Double> tims = Arrays.asList(CPT, CET, CHT);
+    int timt = 0;
+
     ElapsedTime et = new ElapsedTime(0);
     ElapsedTime ct = new ElapsedTime(0);
 
     public Clown(Servo sa, Servo sb, Servo sHeading, Servo sClaw, Servo sMClaw, Servo sBalans, DcMotorEx ce) {
-        conversiePerverssa(SAG);
         this.sa = sa;
         this.sb = sa;
         this.sHeading = sHeading;
-        sHeading.setPosition(SHG);
         this.sClaw = sClaw;
-        sClaw.setPosition(SDESCHIS);
         this.sMClaw = sMClaw;
-        sMClaw.setPosition(SCO);
         this.sBalans = sBalans;
-        sBalans.setPosition(SBAG);
         this.ce = ce;
     }
 
     double sp;
     double DT = 1.212;
+    ElapsedTime gtim = new ElapsedTime(0);
+
     public void run() {
         while (!shouldClose) {
             if (USE_TELE) {
                 TelemetryPacket packet = new TelemetryPacket();
+                tims = Arrays.asList(CPT, CET, CHT);
 
                 packet.put("cput", cput);
                 packet.put("cget", cget);
@@ -91,6 +107,9 @@ public class Clown implements Runnable {
                 packet.put("ahol", armHolding);
                 packet.put("ccla", coneClaw);
                 packet.put("DT", DT);
+                packet.put("rtg", rtg);
+                packet.put("timt", timt);
+                packet.put("ctim", tims.get(timt));
 
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
             }
@@ -123,25 +142,45 @@ public class Clown implements Runnable {
             }
 
             if (cput) {
-                conversiePerverssa(SAP);
-                sClaw.setPosition(SINCHIS);
-                sMClaw.setPosition(SCO);
-                sBalans.setPosition(SBAP);
                 if (et.seconds() > TTT * DT) {
                     sHeading.setPosition(SHP);
+                } else {
+                    conversiePerverssa(SAP);
+                    sClaw.setPosition(SINCHIS);
+                    sMClaw.setPosition(SCO);
+                    sBalans.setPosition(SBAP);
                 }
-                if (et.seconds() > CPT * DT) {
+
+                if (et.seconds() > tims.get(timt) * DT) {
                     sClaw.setPosition(SDESCHIS);
-                    toCloseSC = true;
-                    et.reset();
-                    cput = false;
+                    conversiePerverssa(SAW);
                 }
+                if (et.seconds() > (tims.get(timt) + CD) * DT) {
+                    sMClaw.setPosition(SCC);
+                }
+                if (et.seconds() > (tims.get(timt) + ED) * DT) {
+                    sBalans.setPosition(SBAG);
+                    sClaw.setPosition(SDESCHIS);
+                    sHeading.setPosition(SHG);
+                    coneReady = true;
+                    armHolding = false;
+                    coneClaw = false;
+                    toGet = false;
+                    cget = false;
+                    cput = false;
+                    waiting = true;
+                    timt = 0;
+                    et.reset();
+                }
+
             }
 
             if (toPrepCone) {
                 sClaw.setPosition(SINCHIS);
                 toPrepCone = false;
                 cprepCone = true;
+                cget = false;
+                rtg = false;
                 if (tppc) {
                     DT = PUTC;
                 } else {
@@ -153,8 +192,8 @@ public class Clown implements Runnable {
             if (!coneClaw && !cprepCone && !toPrepCone && toPut) {
                 tppc = true;
                 toPrepCone = true;
+                cget = false;
             }
-
 
             if (cprepCone && ct.seconds() > CIP) {
                 cprepCone = false;
@@ -162,42 +201,45 @@ public class Clown implements Runnable {
                 sBalans.setPosition(SBAH);
                 armHolding = true;
                 coneClaw = true;
-            }
-
-            if (toCloseSC && et.seconds() > ETC * DT) {
-                sMClaw.setPosition(SCC);
-                coneReady = true;
-                armHolding = false;
-                coneClaw = false;
-                toCloseSC = false;
-                toGet = true;
+                cget = false;
+                if (!toPut) {
+                    timt = 2;
+                } else{
+                    timt = 0;
+                }
+                if (epd.target > MIP && toPut) {
+                    sHeading.setPosition(SHP);
+                    sBalans.setPosition(SBAP);
+                    conversiePerverssa(SAP);
+                    ext(EMIN);
+                    timt = 1;
+                }
             }
 
             if (toGet) {
-                if (sa.getPosition() != SAG || sHeading.getPosition() != SHG || sBalans.getPosition() != SBAG) {
-                    tppc = false;
-                    cget = true;
-                    toPut = false;
-                    cput = false;
-                    coneClaw = false;
-                    armHolding = false;
-                    if (cext) {
-                        conversiePerverssa(SAGE);
-                    } else {
-                        conversiePerverssa(SAG);
-                    }
-                    sHeading.setPosition(SHG);
-                    sBalans.setPosition(SBAG);
+                tppc = false;
+                cget = true;
+                toPut = false;
+                cput = false;
+                coneClaw = false;
+                armHolding = false;
+                if (UST > 0) {
+                    conversiePerverssa(ST - SD * (UST - 1));
+                } else {
+                    conversiePerverssa(SAG);
                 }
+                sBalans.setPosition(SBAG);
                 sClaw.setPosition(SDESCHIS);
                 toGet = false;
+                rtg = true;
+                gtim.reset();
             }
 
-            if (cget) {
-                if (Math.abs(ce.getCurrentPosition() - EMAX) < ME) {
-                    cget = false;
-                }
+            if (cget && gtim.seconds() > GHT * DT) {
+                sHeading.setPosition(SHG);
+                cget = false;
             }
+
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
