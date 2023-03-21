@@ -44,6 +44,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
@@ -88,6 +89,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sHeading;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
 
@@ -95,6 +97,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -113,7 +116,8 @@ public class OP_Mode_mk3 extends LinearOpMode {
     boolean G2X = false;
     boolean R2RB = false;
     boolean R2LB = false;
-    boolean R2LT = false;
+    boolean G2LT = false;
+    boolean G2L = false;
     boolean RB = false;
 
     public static double UPPS = 100;
@@ -128,16 +132,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double P3 = 1;
     public static double P4 = 1;
 
-    /*
-    public double WT = 0.2;
-    public static double HMIN = 0.005;
-    public static double headP = 1.2;
-     */
-
     Encoder leftEncoder, rightEncoder, frontEncoder;
 
     public void runOpMode() {
-        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = R2LT = RB = coneReady = false;
+        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = coneReady = false;
         UPP = UPPS;
 
         initma(hardwareMap);
@@ -154,6 +152,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime(0);
         /*ElapsedTime g1t = new ElapsedTime(0);
         double lhpos = 0;*/
+        clo.hdif = 0;
         lep = ep;
         lei = ei;
         led = ed;
@@ -190,28 +189,8 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
 
             final double speed = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            //double ch = imu.getAngularOrientation().firstAngle;
             final double angle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;// + ch;
-            /*
-            double hdif = 0;
-            if (Math.abs(gamepad1.right_stick_x) > 0.001) {
-                g1t.reset();
-            }
-            if (g1t.seconds() < WT) {
-                lhpos = ch;
-            } else {
-                hdif = lhpos - ch;
-                if (hdif > Math.PI / 2) {
-                    hdif = Math.PI - hdif;
-                } else if (hdif < -Math.PI / 2) {
-                    hdif -= Math.PI;
-                }
-                if (Math.abs(hdif) < HMIN || speed > 0.01) {
-                    hdif = 0;
-                }
-            }*/
 
-            //final double turn = -hdif * headP + gamepad1.right_stick_x;
             final double turn = -gamepad1.right_stick_x;
             final double ms = speed * Math.sin(angle);
             final double mc = speed * Math.cos(angle);
@@ -242,6 +221,12 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 ext(EMIN);
             }
             L2B = gamepad2.b;
+
+            if (!G2L && gamepad2.dpad_left) {
+                sMCLaw.setPosition(SCC);
+                coneReady = true;
+            }
+            G2L = gamepad2.dpad_left;
 
             if (!L2Y && gamepad2.y) {
                 clo.toPut = true;
@@ -287,6 +272,26 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 }
             }
             G2X = gamepad2.x;
+
+            if (!G2LT && gamepad2.left_trigger > 0.9) {
+                extA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                extA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                extB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                extB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ridA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                ridA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                clo.toPrepCone = clo.cprepCone = clo.cput = clo.toPut = clo.chput = clo.cget = false;
+                epd.set_target(0, 0);
+                rpd.set_target(0, 0);
+                sClose.setPosition(SDESCHIS);
+                conversiePerverssa(SAG);
+                sHeading.setPosition(SHG);
+                sBalans.setPosition(SBAG);
+
+                telemetry.addLine("RESET EVERYTHING!");
+                telemetry.update();
+            }
+            G2LT = gamepad2.left_trigger > 0.9;
 
             if (USE_TELE) {
                 TelemetryPacket pack = new TelemetryPacket();

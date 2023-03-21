@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
+import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
@@ -38,7 +39,7 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.85;
+    public static double CPT = 0.88;
     public static double CET = 0.5;
     public static double CHT = 0.75;
     public static double TTT = 0.0;
@@ -48,26 +49,26 @@ public class Clown implements Runnable {
     public static double CIP = 0.11;
     public static double GB = 0.20;
     public static double GHT = 0.1;
-    public static double CD = 0.15;
+    public static double CD = 0.0;
     public static double ED = 0.2;
-
-    public static double ST = 0.4;
-    public static double SD = 0.01;
-    public int UST = 0;
+    public static double GDI = -0.002;
 
     private Servo sa, sb, sHeading, sClaw, sBalans, sMClaw;
     private DcMotorEx ce;
-    private boolean cput = false;
-    private boolean cget = false;
-    private boolean cprepCone = false;
+    public boolean cput = false;
+    public boolean cget = false;
+    public boolean cprepCone = false;
     public boolean toPut = false;
     public boolean toGet = false;
+    public boolean rtg = false;
     public boolean shouldClose = false;
     public boolean toPrepCone = false;
     public boolean tppc = false;
-    public boolean cext = false;
     public boolean waiting = true;
-    public boolean rtg = false;
+    public boolean hput = false;
+    public boolean chput = false;
+    public double hdif = 0.000;
+    ElapsedTime ht = new ElapsedTime(0);
 
     List<Double> tims = Arrays.asList(CPT, CET, CHT);
     int timt = 0;
@@ -102,16 +103,31 @@ public class Clown implements Runnable {
                 packet.put("tput", toPut);
                 packet.put("tget", toGet);
                 packet.put("tppc", tppc);
-                packet.put("cext", cext);
                 packet.put("cred", coneReady);
                 packet.put("ahol", armHolding);
                 packet.put("ccla", coneClaw);
                 packet.put("DT", DT);
-                packet.put("rtg", rtg);
                 packet.put("timt", timt);
                 packet.put("ctim", tims.get(timt));
 
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
+            }
+
+            if (hput) {
+                sHeading.setPosition(SHP);
+                sBalans.setPosition(SBAP);
+                conversiePerverssa(SAP);
+                sMClaw.setPosition(SCO);
+                epd.set_target(EMIN, RETT);
+                hput = false;
+                chput = true;
+                cput = false;
+            }
+
+            if (chput && ce.getCurrentPosition() < MIP) {
+                chput = false;
+                cput = true;
+                et.reset();
             }
 
             if (CLAW) {
@@ -131,9 +147,15 @@ public class Clown implements Runnable {
                 toPrepCone = false;
                 cprepCone = false;
                 cget = false;
+                rtg = false;
                 sp = sa.getPosition();
 
-                conversiePerverssa(SAP);
+                double cd = 0;
+                if (timt == 0) {
+                    cd = GDI;
+                }
+                conversiePerverssa(SAP + cd + hdif);
+                ext(EMIN);
                 //sHeading.setPosition(SHP);
                 sClaw.setPosition(SINCHIS);
                 sMClaw.setPosition(SCO);
@@ -145,7 +167,11 @@ public class Clown implements Runnable {
                 if (et.seconds() > TTT * DT) {
                     sHeading.setPosition(SHP);
                 } else {
-                    conversiePerverssa(SAP);
+                    double cd = 0;
+                    if (timt == 0) {
+                        cd = GDI;
+                    }
+                    conversiePerverssa(SAP + cd + hdif);
                     sClaw.setPosition(SINCHIS);
                     sMClaw.setPosition(SCO);
                     sBalans.setPosition(SBAP);
@@ -176,7 +202,9 @@ public class Clown implements Runnable {
             }
 
             if (toPrepCone) {
-                sClaw.setPosition(SINCHIS);
+                if (toPut) {
+                    sClaw.setPosition(SINCHIS);
+                }
                 toPrepCone = false;
                 cprepCone = true;
                 cget = false;
@@ -193,6 +221,11 @@ public class Clown implements Runnable {
                 tppc = true;
                 toPrepCone = true;
                 cget = false;
+            } else if (epd.target > MIP && !cprepCone && !toPrepCone && toPut) {
+                sHeading.setPosition(SHP);
+                sBalans.setPosition(SBAP);
+                conversiePerverssa(SAP);
+                ext(EMIN);
             }
 
             if (cprepCone && ct.seconds() > CIP) {
@@ -218,19 +251,20 @@ public class Clown implements Runnable {
 
             if (toGet) {
                 tppc = false;
-                cget = true;
                 toPut = false;
                 cput = false;
                 coneClaw = false;
                 armHolding = false;
+                toGet = false;
+                cget = true;
+                /*
                 if (UST > 0) {
                     conversiePerverssa(ST - SD * (UST - 1));
-                } else {
+                    sBalans.setPosition(SBT - SBD * (UST - 1));
+                } else {*/
                     conversiePerverssa(SAG);
-                }
-                sBalans.setPosition(SBAG);
-                sClaw.setPosition(SDESCHIS);
-                toGet = false;
+                    sBalans.setPosition(SBAG);
+                //}
                 rtg = true;
                 gtim.reset();
             }

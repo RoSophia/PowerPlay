@@ -7,11 +7,13 @@ import static org.firstinspires.ftc.teamcode.RobotVars.EBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EXTT;
 import static org.firstinspires.ftc.teamcode.RobotVars.IN_TESTING;
+import static org.firstinspires.ftc.teamcode.RobotVars.LEEW;
 import static org.firstinspires.ftc.teamcode.RobotVars.RAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
@@ -94,7 +96,7 @@ public class RobotFuncs {
                     rp(0);
                     return;
                 }
-                if (p > 0 && ridA.getCurrentPosition() > RTOP_POS) {
+                if (p > 0 && ridA.getCurrentPosition() > RTOP_POS + LEEW) {
                     rp(rpd.f * 1.1);
                     return;
                 }
@@ -126,14 +128,12 @@ public class RobotFuncs {
     static void ext(int pos) {
         TelemetryPacket cp = new TelemetryPacket();
         if (pos == EMAX) {
-            clo.cext = true;
             clo.toGet = true;
             coneReady = false;
             cp.put("GoToPos", pos);
             cp.put("GoToTim", EXTT);
             epd.set_target(pos, EXTT);
         } else {
-            clo.cext = false;
             cp.put("GoToPos", pos);
             cp.put("GoToTim", RETT);
             epd.set_target(pos, RETT);
@@ -229,7 +229,7 @@ public class RobotFuncs {
         pcoef = 12.0 / batteryVoltageSensor.getVoltage();
 
         if (im) {
-            conversiePerverssa(SAG);
+            conversiePerverssa(SAW);
             sHeading.setPosition(SHG);
             sClose.setPosition(SDESCHIS);
             sMCLaw.setPosition(SCO);

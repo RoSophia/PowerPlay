@@ -5,24 +5,25 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class RobotVars {
     public static double SDESCHIS = 0.95;
-    public static double SINCHIS = 0.83;
+    public static double SINCHIS = 0.8;
 
-    public static int EMIN = 0;
+    public static int EMIN = -3;
     public static int EMAX = 595;
+    public static int LEEW = 50;
 
-    public static int RTOP_POS = 531;
-    public static int RMIU_POS = 400;
-    public static int RMID_POS = 200;
-    public static int RBOT_POS = 4;
+    public static int RTOP_POS = 537;
+    public static int RMIU_POS = 336;
+    public static int RMID_POS = 122;
+    public static int RBOT_POS = 0;
 
-    public static double SAG = 0.4705;
+    public static double SAG = 0.4735;
     public static double SAH = 0.415;
     public static double SAP = 0.385;
     public static double SAW = 0.4;
 
-    public static double SBAG = 0.43;
-    public static double SBAH = 0.45;
-    public static double SBAP = 0.0;
+    public static double SBAG = 1.00;
+    public static double SBAH = 1.00;
+    public static double SBAP = 0.60;
 
     public static double SDIF = 0.276;
     public static double SDIP = 0.01;
@@ -31,12 +32,12 @@ public class RobotVars {
     public static double SHP = 0.76;
 
     public static double SCO = 0.0;
-    public static double SCC = 0.32;
+    public static double SCC = 0.44;
 
-    public static double DOT = 0.0;
+    public static double DOT = 2.1;
     public static double UPT = 0.0;
     public static double EXTT = 0.5;
-    public static double RETT = 0.7;
+    public static double RETT = 0.6;
 
     public static boolean USE_PHOTON = true;
 
@@ -57,7 +58,7 @@ public class RobotVars {
 
     public static double rp = 0.01;
     public static double rd = 0.0;
-    public static double ri = 0.0;
+    public static double ri = 0.000001;
     public static double rf = 0.0008;
     public static double rbp = 0;
 

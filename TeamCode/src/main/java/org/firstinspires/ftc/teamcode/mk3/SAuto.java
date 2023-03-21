@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
-import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.EXTT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
@@ -9,10 +8,8 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
-import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
-import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
@@ -20,11 +17,6 @@ import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.mk3.AutoVortex.PAH;
-import static org.firstinspires.ftc.teamcode.mk3.AutoVortex.PAX;
-import static org.firstinspires.ftc.teamcode.mk3.AutoVortex.PAY6;
-import static org.firstinspires.ftc.teamcode.mk3.AutoVortex.PAY7;
-import static org.firstinspires.ftc.teamcode.mk3.AutoVortex.PAY8;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.batteryVoltageSensor;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
@@ -63,7 +55,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -75,17 +66,15 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSeg
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.time.chrono.ThaiBuddhistEra;
 import java.util.ArrayList;
 import java.util.Vector;
 
-@Config
-@Autonomous(group = "drive")
+//@Config
+//@Autonomous(group = "drive")
 @SuppressLint("DefaultLocale")
-public class Auto extends LinearOpMode {
+public class SAuto extends LinearOpMode {
     OpenCvCamera webcam;
     AprilTagDetectionPipeline pipeline;
     SampleMecanumDrive drive;
@@ -113,34 +102,9 @@ public class Auto extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static double HEAD1 = 1.45;
-    public static double PX1 = -136.0;
-    public static double PY1 = -34;
-    public static double HEAD2 = 2.2;
-    public static double PX2 = -118;
-    public static double PY2 = -45;
-    public static double HEAD3 = 2.72;
-    public static double PX3 = -87;
-    public static double PY3 = -70;
-    public static double HEAD4 = 2.1;
-    public static double PX4 = -117;
-    public static double PY4 = -40;
-    public static double HEADC = 0.03;
-    public static double HEADCC = 0.11;
-    public static double PXC = 2;
-    public static double PXXC = 0.2;
-    public static double PYC = 2.8;
-    public static double PYYC = 0.7;
-
-    public static double P1X = 30;
-    public static double P1Y = 0.7;
-    public static double P2X = 30;
-    public static double P2Y = 0;
-
-    public static double J1X = 30;
-    public static double J1Y = 4;
-    public static double J2X = 20;
-    public static double J2Y = 3;
+    public static double HEAD1 = 4.31;
+    public static double PX1 = -154.5;
+    public static double PY1 = 41;
 
     public static boolean AAAAAAAAAAAAAA = false;
     public static boolean BBBBBBBBBBBBBB = true;
@@ -151,13 +115,13 @@ public class Auto extends LinearOpMode {
     public static double MAL = 130;
     public static double MDL = 100;
 
-    public double WD = 0.02;
+    public static double WD = 0.6;
     public static double WD2 = 0.9;
 
-    public static double R1X = 30;
-    public static double R1Y = 2.5;
-    public static double R2X = 40;
-    public static double R2Y = 1.5;
+    public static double R1X = 20;
+    public static double R1Y = -2.5;
+    public static double R2X = 30;
+    public static double R2Y = -1.5;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -217,10 +181,9 @@ public class Auto extends LinearOpMode {
         }
     }
 
-    public static double RD = -0.7;
-    public static double RD2 = -0.4;
     public static double TPT = 0.4;
-    public static double GW = 0.5;
+    public static double BTT = 1.0;
+    public static double GW = 0.3;
     public static double ET = 0.6;
 
     int lp = 1;
@@ -228,6 +191,7 @@ public class Auto extends LinearOpMode {
     public static double SD = -0.004;
     public static double SBT = 0.72;
     public static double SBD = 0.01;
+    public static int EMM = 440;
 
     public static double AHDIF = 0.00;
 
@@ -243,7 +207,7 @@ public class Auto extends LinearOpMode {
         clo.toPrepCone = false;
         clo.timt = 1;
         clo.hdif = AHDIF;
-        sClose.setPosition(SDESCHIS);
+        sClose.setPosition(SINCHIS);
         clo.toPut = true;
     }
 
@@ -260,81 +224,48 @@ public class Auto extends LinearOpMode {
     public static int NUMC = 4;
 
     TrajectorySequence mktraj() {
-        Vector2d P1 = new Vector2d(P1X, P1Y);
-        Vector2d P2 = new Vector2d(P2X, P2Y);
         Vector2d R1 = new Vector2d(R1X, R1Y);
         Vector2d R2 = new Vector2d(R2X, R2Y);
-        Vector2d J1 = new Vector2d(J1X, J1Y);
-        Vector2d J2 = new Vector2d(J2X, J2Y);
         TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
         lp = 1;
         TrajectorySequenceBuilder t = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
                 .funnyRaikuCurveLinear(new Pose2d(PX1, PY1, HEAD1), R1, R2, vc, ac, dc)
-                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RTOP_POS))
-                .UNSTABLE_addTemporalMarkerOffset(0.0, this::ltime) ///////////////////////////// PRELOAD 1
+                .addTemporalMarker(() -> rid(RTOP_POS))
+                .addTemporalMarker(this::ltime) ///////////////////////////// PRELOAD 1
                 .waitSeconds(WD)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                .addTemporalMarker(() -> {
                     rid(RBOT_POS);
-                })
-                .funnyRaikuCurveLinear(new Pose2d(PX2, PY2, HEAD2), P1, P2)
-                .addTemporalMarker(this::ltime)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    epd.set_target(EMAX, EXTT);
-                    upd_grab_pos();
-                    getpos();
-                })
-                .waitSeconds(ET)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    sClose.setPosition(SINCHIS);
-                })
-                .waitSeconds(0.11)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    conversiePerverssa(SAH);
-                })
-                .waitSeconds(TPT)
-                .UNSTABLE_addTemporalMarkerOffset(0, this::ret);/// GET CONE
-        for (int i = 0; i < NUMC; ++i) {
-            t.funnyRaikuCurveLinear(new Pose2d(PX3 + PXXC * i, PY3 + PYYC * i, HEAD3 + HEADCC * i), J1, J2)
+                });
+        for (int i = 1; i <= NUMC; ++i) {
+            t.funnyRaikuCurveLinear(new Pose2d(PX1 + 0.0001 * i, PY1, HEAD1), new Vector2d(0.00001, 0), new Vector2d(0.00001, 0))
                     .waitSeconds(GW)
-                    .UNSTABLE_addTemporalMarkerOffset(RD2, () -> {
-                        rid(RTOP_POS);
-                    })
-                    .waitSeconds(WD2)
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                    .addTemporalMarker(() -> {
                         getpos();
-                        rid(RBOT_POS);
-                    }) /// PUT CONE
-                    .funnyRaikuCurveLinear(new Pose2d(PX4 + PXC * i, PY4 + PYC * i, HEAD4 + HEADC * i), J2, J1)
-                    .addTemporalMarker(this::ltime)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        epd.set_target(EMAX, EXTT);
+                        epd.set_target(EMM, EXTT);
                         upd_grab_pos();
-                        getpos();
                     })
                     .waitSeconds(ET)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    .addTemporalMarker(() -> {
                         sClose.setPosition(SINCHIS);
                     })
                     .waitSeconds(0.11)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    .addTemporalMarker(() -> {
                         conversiePerverssa(SAH);
                     })
                     .waitSeconds(TPT)
-                    .UNSTABLE_addTemporalMarkerOffset(0, this::ret);/// GET CONE
+                    .addTemporalMarker(this::ret)/// GET CONE
+                    .waitSeconds(BTT)
+                    .addTemporalMarker(() -> {
+                        rid(RTOP_POS);
+                    })
+                    .waitSeconds(WD2)
+                    .addTemporalMarker(() -> {
+                        getpos();
+                        rid(RBOT_POS);
+                    }); /// PUT CONE
         }
-        t.addTemporalMarker(this::ltime)
-                .UNSTABLE_addTemporalMarkerOffset(0, this::getpos)
-                .waitSeconds(GW)
-                .UNSTABLE_addTemporalMarkerOffset(RD2, () -> {
-                    rid(RTOP_POS);
-                })
-                .waitSeconds(WD2)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                    getpos();
-                    rid(RBOT_POS);
-                }); /// PUT CONE
         return t.waitSeconds(0.2)
                 .build();
     }
@@ -388,12 +319,11 @@ public class Auto extends LinearOpMode {
                     epd.set_target(EMIN, RETT);
                     rpd.set_target(RBOT_POS, DOT);
                     conversiePerverssa(SAH);
-                    sMCLaw.setPosition(SCO);
                 }
                 TA = gamepad1.b;
 
                 if (gamepad1.y && !TB) {
-                    epd.set_target(EMAX, EXTT);
+                    epd.set_target(EMM, EXTT);
                 }
                 TB = gamepad1.y;
 
@@ -416,6 +346,7 @@ public class Auto extends LinearOpMode {
         sBalans.setPosition(SBAG);
         sHeading.setPosition(SHG);
 
+        /*
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         pipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
@@ -435,7 +366,7 @@ public class Auto extends LinearOpMode {
             public void onError(int errorCode) {
                 sError(errorCode);
             }
-        });
+        });*/
 
         {
             TelemetryPacket packet = new TelemetryPacket();
@@ -505,14 +436,10 @@ public class Auto extends LinearOpMode {
             epd.shouldClose = true;
             telemetry.addLine("Start");
             telemetry.update();
-            double P11X = 0, P11Y = 0, P12X = 0, P12Y = 0;
             double R11X = 0, R11Y = 0, R12X = 0, R12Y = 0;
-            double J11X = 0, J11Y = 0, J12X = 0, J12Y = 0;
 
             while (!isStopRequested()) {
-                if (P11X != PX1 || P12X != PX2 || P11Y != PY1 || P12Y != PY2 ||
-                        R11X != R1X || R12X != R2X || R11Y != R1Y || R12Y != R2Y ||
-                        J11X != P1X || J12X != P2X || J11Y != J1Y || J12Y != J2Y) {
+                if (R11X != R1X || R12X != R2X || R11Y != R1Y || R12Y != R2Y) {
                     traj = mktraj();
                     if (traj == null) {
                         continue;
@@ -528,10 +455,6 @@ public class Auto extends LinearOpMode {
                     p.put("EndY", traj.start().getY());
                     p.put("EndH", traj.start().getY());
                     dashboard.sendTelemetryPacket(p);
-                    P11X = P1X;
-                    P11Y = P1Y;
-                    P12X = P2X;
-                    P12Y = P2Y;
                 }
 
                 sleep(100);
@@ -566,76 +489,46 @@ public class Auto extends LinearOpMode {
                 it = getRuntime();
                 follow_traj(traj);
 
-                if (!isStopRequested()) {
-                    switch (LAST_ID) {
-                        default:
-                            telemetry.addLine("DEFAULT");
-                        case 7:
-                            telemetry.addLine("7");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, 0, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .addTemporalMarker(() -> {
-                                        conversiePerverssa(SAW);
-                                        sClose.setPosition(SDESCHIS);
-                                        sHeading.setPosition(SHG);
-                                        sBalans.setPosition(SBAG);
-                                        ext(EMIN);
-                                        getpos();
-                                    })
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
-                                    .addTemporalMarker(this::ltime)
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                        case 6:
-                            telemetry.addLine("6");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .addTemporalMarker(() -> {
-                                        conversiePerverssa(SAW);
-                                        sClose.setPosition(SDESCHIS);
-                                        sHeading.setPosition(SHG);
-                                        sBalans.setPosition(SBAG);
-                                        ext(EMIN);
-                                        getpos();
-                                    })
-                                    /*
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
-                                    .addTemporalMarker(this::getpos)
-                                    .waitSeconds(0.1)*/
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY6, PAH))
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> ext(EMIN))
-                                    .addTemporalMarker(this::ltime)
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                        case 8:
-                            telemetry.addLine("8");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, -F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .addTemporalMarker(() -> {
-                                        conversiePerverssa(SAW);
-                                        sClose.setPosition(SDESCHIS);
-                                        sHeading.setPosition(SHG);
-                                        sBalans.setPosition(SBAG);
-                                        ext(EMIN);
-                                        getpos();
-                                    })
-                                    /*
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
-                                    .addTemporalMarker(this::getpos)
-                                    .waitSeconds(0.1)*/
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY8, PAH))
-                                    .addTemporalMarker(this::ltime)
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> ext(EMIN))
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
+                if (false) {
+                    if (!isStopRequested()) {
+                        switch (LAST_ID) {
+                            default:
+                                telemetry.addLine("DEFAULT");
+                            case 7:
+                                telemetry.addLine("6");
+                                traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                        //.funnyRaikuCurve(new Pose2d(F * 2.15, 0, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
+                                        .lineToLinearHeading(new Pose2d(F * 2, -10, 0))
+                                        .addTemporalMarker(this::ltime)
+                                        .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
+                                        .waitSeconds(1)
+                                        .build();
+                                break;
+                            case 6:
+                                telemetry.addLine("7");
+                                traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                        //.funnyRaikuCurve(new Pose2d(F * 2.15, F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
+                                        .lineToLinearHeading(new Pose2d(F * 2, F * 0.95, 0))
+                                        .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> ext(EMIN))
+                                        .addTemporalMarker(this::ltime)
+                                        .waitSeconds(1)
+                                        .build();
+                                break;
+                            case 8:
+                                telemetry.addLine("8");
+                                traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                                        //.funnyRaikuCurve(new Pose2d(F * 2.15, -F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
+                                        .lineToLinearHeading(new Pose2d(F * 2, -F * 1.2, 0))
+                                        .addTemporalMarker(this::ltime)
+                                        .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> ext(EMIN))
+                                        .waitSeconds(1)
+                                        .build();
+                                break;
+                        }
                     }
+                    telemetry.update();
+                    follow_traj(traj);
                 }
-                telemetry.update();
-                follow_traj(traj);
             }
 
             if (GPOS) {
@@ -658,8 +551,7 @@ public class Auto extends LinearOpMode {
         leftFront.setPower(0);
         rightFront.setPower(0);
 
-        for (
-                int i = 0; i < v.size(); ++i) {
+        for (int i = 0; i < v.size(); ++i) {
             packet = new TelemetryPacket();
             packet.put("id", i);
             packet.put("t", v.get(i));

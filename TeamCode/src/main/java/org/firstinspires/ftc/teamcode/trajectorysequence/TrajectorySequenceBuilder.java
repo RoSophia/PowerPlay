@@ -250,7 +250,10 @@ public class TrajectorySequenceBuilder {
 
     public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition, Vector2d p1, Vector2d p2, double h1, double h2) {
         return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, h1, h2, currentVelConstraint, currentAccelConstraint, currentDecelConstraint));
-        //return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint));
+    }
+
+    public TrajectorySequenceBuilder funnyRaikuCurveLinear(Pose2d endPosition, Vector2d p1, Vector2d p2) {
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurveLinear(endPosition, p1, p2, currentVelConstraint, currentAccelConstraint, currentDecelConstraint));
     }
 
     public TrajectorySequenceBuilder funnyRaikuCurve(Pose2d endPosition,
@@ -263,7 +266,16 @@ public class TrajectorySequenceBuilder {
                                                      TrajectoryAccelerationConstraint decelConstraint
     ) {
         return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, h1, h2, velConstraint, accelConstraint, decelConstraint));
-        //return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurve(endPosition, p1, p2, velConstraint, accelConstraint));
+    }
+
+    public TrajectorySequenceBuilder funnyRaikuCurveLinear(Pose2d endPosition,
+                                                     Vector2d p1,
+                                                     Vector2d p2,
+                                                     TrajectoryVelocityConstraint velConstraint,
+                                                     TrajectoryAccelerationConstraint accelConstraint,
+                                                     TrajectoryAccelerationConstraint decelConstraint
+    ) {
+        return addPath(() -> currentTrajectoryBuilder.funnyRaikuCurveLinear(endPosition, p1, p2, velConstraint, accelConstraint, decelConstraint));
     }
 
     public TrajectorySequenceBuilder splineToConstantHeading(Vector2d endPosition, double endHeading) {
