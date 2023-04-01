@@ -60,7 +60,7 @@ class PIDF implements Runnable {
     double DUR = 1;
 
     ElapsedTime ttim = new ElapsedTime(0);
-    public void set_target(int targ, double tim) {
+    public void set_target(int targ, double tim) { /// Start a new movement from `target` to `targ` in `tim` time. The actual calculations are done in `updt()`
         TelemetryPacket cp = new TelemetryPacket();
         cp.put(name + "GoToLpos", target);
         cp.put(name + "GoToCpos", targ);
@@ -73,15 +73,15 @@ class PIDF implements Runnable {
     }
 
     void updt() {
-        double x = ttim.seconds() * (1 / DUR);
+        double x = ttim.seconds() * (1 / DUR); /// Rescale the elapsed time to [0, 1]
         TelemetryPacket cp = new TelemetryPacket();
         cp.put(name + "CurX", x);
         dashboard.sendTelemetryPacket(cp);
 
-        if (x <= 1) {
+        if (x <= 1) { /// If we have not yet reached the end of the movement, set the current target as `a*x*(1-x)^3 + b*(1-x)*x + x^3` from `ltarg` to `targ`
             //ctarg = ltarg + (int)(x * (target - ltarg));
             ctarg = ltarg + (int)((A * x * (1 - x) * (1 - x) * (1 - x) + B * (1 - x) * x + x * x * x) * (target - ltarg));
-        } else {
+        } else { /// We have already reached the destination and need not update any further
             ctarg = target;
         }
     }
@@ -132,7 +132,7 @@ class PIDF implements Runnable {
                 integralSum = integralSum + (error * timer.seconds());
 
                 outp = (p * error) + (d * derivate) + (i * integralSum) + f;
-                if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) {
+                if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) { /// `lom` here is used to prevent powering the motor after the OpMode stopped.
                     motA.setPower(outp * pcoef);
 
                     if (motB != null) {

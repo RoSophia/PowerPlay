@@ -113,34 +113,23 @@ public class Clown implements Runnable {
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
             }
 
-            if (hput) {
-                sHeading.setPosition(SHP);
-                sBalans.setPosition(SBAP);
-                conversiePerverssa(SAP);
-                sMClaw.setPosition(SCO);
-                epd.set_target(EMIN, RETT);
-                hput = false;
-                chput = true;
-                cput = false;
-            }
+            /* 
+             * This whole class works by the principle of saying what you want to do, 
+             * and it trying to get the internal state of the robot to the appropriate one to do what you need.
+             */
 
-            if (chput && ce.getCurrentPosition() < MIP) {
-                chput = false;
-                cput = true;
-                et.reset();
-            }
-
-            if (CLAW) {
+            if (CLAW) { // Used only in testing
                 sClaw.setPosition(SINCHIS);
                 CLAW = false;
                 coneReady = true;
             }
 
-            if (cput && toPut) {
+            if (cput && toPut) { // If you want to put but are already putting, cancel the request
                 toPut = false;
             }
 
-            if (coneClaw && toPut && ce.getCurrentPosition() < MIP) {
+            if (coneClaw && toPut && ce.getCurrentPosition() < MIP) { // If you want to put, you have a cone in your claw and are not extended too far out
+                                                                      // Start the putting sequence
                 tppc = false;
                 toPut = false;
                 cput = true;
@@ -163,8 +152,8 @@ public class Clown implements Runnable {
                 et.reset();
             }
 
-            if (cput) {
-                if (et.seconds() > TTT * DT) {
+            if (cput) { // Currently putting
+                if (et.seconds() > TTT * DT) { /// Start rotating the claw after TTT time to avoid bumping the cone into the whole arm
                     sHeading.setPosition(SHP);
                 } else {
                     double cd = 0;
@@ -177,14 +166,14 @@ public class Clown implements Runnable {
                     sBalans.setPosition(SBAP);
                 }
 
-                if (et.seconds() > tims.get(timt) * DT) {
+                if (et.seconds() > tims.get(timt) * DT) { /// Open the claw after it has reached the holding bay
                     sClaw.setPosition(SDESCHIS);
                     conversiePerverssa(SAW);
                 }
-                if (et.seconds() > (tims.get(timt) + CD) * DT) {
+                if (et.seconds() > (tims.get(timt) + CD) * DT) { /// Close the mini servo to keep the cone in the holding bay
                     sMClaw.setPosition(SCC);
                 }
-                if (et.seconds() > (tims.get(timt) + ED) * DT) {
+                if (et.seconds() > (tims.get(timt) + ED) * DT) { /// Reset everything to normal
                     sBalans.setPosition(SBAG);
                     sClaw.setPosition(SDESCHIS);
                     sHeading.setPosition(SHG);
@@ -201,7 +190,19 @@ public class Clown implements Runnable {
 
             }
 
-            if (toPrepCone) {
+            if (!coneClaw && !cprepCone && !toPrepCone && toPut) { // If you want to put but do not have a cone in your claw, try to get one
+                tppc = true;
+                toPrepCone = true;
+                cget = false;
+            } else if (epd.target > MIP && !cprepCone && !toPrepCone && toPut) { // If you want to put but are too far extended, retract
+                sHeading.setPosition(SHP);
+                sBalans.setPosition(SBAP);
+                conversiePerverssa(SAP);
+                ext(EMIN);
+            }
+
+
+            if (toPrepCone) { // Tries to grab the cone and set the robot in the holding state
                 if (toPut) {
                     sClaw.setPosition(SINCHIS);
                 }
@@ -217,18 +218,7 @@ public class Clown implements Runnable {
                 ct.reset();
             }
 
-            if (!coneClaw && !cprepCone && !toPrepCone && toPut) {
-                tppc = true;
-                toPrepCone = true;
-                cget = false;
-            } else if (epd.target > MIP && !cprepCone && !toPrepCone && toPut) {
-                sHeading.setPosition(SHP);
-                sBalans.setPosition(SBAP);
-                conversiePerverssa(SAP);
-                ext(EMIN);
-            }
-
-            if (cprepCone && ct.seconds() > CIP) {
+            if (cprepCone && ct.seconds() > CIP) { /// Currently getting the cone
                 cprepCone = false;
                 conversiePerverssa(SAH);
                 sBalans.setPosition(SBAH);
@@ -240,7 +230,7 @@ public class Clown implements Runnable {
                 } else{
                     timt = 0;
                 }
-                if (epd.target > MIP && toPut) {
+                if (epd.target > MIP && toPut) { /// Shortcut: to save on time when putting a cone while extended, start retracting immediatly
                     sHeading.setPosition(SHP);
                     sBalans.setPosition(SBAP);
                     conversiePerverssa(SAP);
@@ -249,7 +239,7 @@ public class Clown implements Runnable {
                 }
             }
 
-            if (toGet) {
+            if (toGet) { /// Setting the robot in the getting position
                 tppc = false;
                 toPut = false;
                 cput = false;
@@ -269,13 +259,13 @@ public class Clown implements Runnable {
                 gtim.reset();
             }
 
-            if (cget && gtim.seconds() > GHT * DT) {
+            if (cget && gtim.seconds() > GHT * DT) { /// Currently Getting
                 sHeading.setPosition(SHG);
                 cget = false;
             }
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(10); /// Avoid burning cycles, apparently this is not necessary on some CHubs
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

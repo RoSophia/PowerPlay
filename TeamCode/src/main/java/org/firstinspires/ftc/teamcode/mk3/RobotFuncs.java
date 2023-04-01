@@ -61,27 +61,28 @@ public class RobotFuncs {
     public static FtcDashboard dashboard;
     public static HardwareMap hardwareMap;
 
-    static void ep(double p) {
+    static void ep(double p) { /// Set power in the extension motors
         extA.setPower(p * EAP);
         extB.setPower(p * EBP);
     }
 
-    static void rp(double p) {
+    static void rp(double p) { /// Set power in the lift motors
         ridA.setPower(p * RAP);
         //ridB.setPower(p * RBP);
     }
 
-    static void spe(boolean er, double p) {
+    static void spe(boolean er, double p) { /// Set power in motors (used for both sets of motors)
+                                            /// power the extension motors if `er` is 0, otherwise power the lift ones
         if (!er) {
-            if (p == 0) {
+            if (p == 0) { /// If we do not manually power the motor let their PID keep them there
                 epd.use = true;
             } else {
-                epd.use = false;
-                if (p < 0 && extA.getCurrentPosition() < -2) {
+                epd.use = false; /// Turn off the PID so we can power tham manually
+                if (p < 0 && extA.getCurrentPosition() < -2) { /// Prevent the extension mechanism from going beyond its bounds
                     ep(0);
                     return;
                 }
-                if (p > 0 && extA.getCurrentPosition() > EMAX) {
+                if (p > 0 && extA.getCurrentPosition() > EMAX) { /// Prevent the extension mechanism from going beyond its bounds
                     ep(0);
                     return;
                 }
@@ -105,10 +106,10 @@ public class RobotFuncs {
         }
     }
 
-    static void rid(int pos) {
+    static void rid(int pos) { /// Move the lift to a set position
         if (coneReady || pos == RBOT_POS || CU_TESTING) {
-            if (pos == RBOT_POS) {
-                sMCLaw.setPosition(SCO);
+            if (pos == RBOT_POS) { /// Retract the lift (lets the cone that was being held fall)
+                sMCLaw.setPosition(SCO); 
                 coneReady = false;
                 rpd.set_target(pos, DOT);
             } else {
@@ -119,13 +120,13 @@ public class RobotFuncs {
         }
     }
 
-    static public void conversiePerverssa(double p) {
+    static public void conversiePerverssa(double p) { /// Handle moving both grabber arm servos
         // MidFunnyRaikuStabilizer
         sextA.setPosition(p);
         sextB.setPosition(1 - p + SDIF + (1 - p) * SDIP);
     }
 
-    static void ext(int pos) {
+    static void ext(int pos) { /// Extend to a set position
         TelemetryPacket cp = new TelemetryPacket();
         if (pos == EMAX) {
             clo.toGet = true;
@@ -142,7 +143,7 @@ public class RobotFuncs {
         rid(RBOT_POS);
     }
 
-    static DcMotorEx initm(String s, boolean e, boolean r) {
+    static DcMotorEx initm(String s, boolean e, boolean r) { /// Init a motor
         DcMotorEx m = hardwareMap.get(DcMotorEx.class, s);
         if (e) {
             m.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -157,8 +158,8 @@ public class RobotFuncs {
 
     static Thread extT, ridT, cloT;
 
-    public static void initma(HardwareMap ch) {
-        if (USE_PHOTON) {
+    public static void initma(HardwareMap ch) { /// Init all hardware info
+        if (USE_PHOTON) { 
             PhotonCore.enable();
             PhotonCore.experimental.setSinglethreadedOptimized(false);
         }
@@ -225,10 +226,10 @@ public class RobotFuncs {
         cloT = new Thread(clo);
     }
 
-    public static void startma(LinearOpMode lom, boolean im) {
+    public static void startma(LinearOpMode lom, boolean im) { /// Set all values to their starting ones and start the PID threads
         pcoef = 12.0 / batteryVoltageSensor.getVoltage();
 
-        if (im) {
+        if (im) { /// Set these positions only if called by a teleop class
             conversiePerverssa(SAW);
             sHeading.setPosition(SHG);
             sClose.setPosition(SDESCHIS);
@@ -252,7 +253,7 @@ public class RobotFuncs {
         cloT.start();
     }
 
-    public static void endma() {
+    public static void endma() { /// Shut down the robot
         epd.shouldClose = true;
         rpd.shouldClose = true;
         clo.shouldClose = true;
