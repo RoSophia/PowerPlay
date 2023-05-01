@@ -82,6 +82,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightFront;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rpd;
@@ -95,10 +96,13 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.outoftheboxrobotics.photoncore.Neutrino.Rev2MSensor.Rev2mDistanceSensorEx;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.util.Encoder;
@@ -250,7 +254,9 @@ public class OP_Mode_mk3 extends LinearOpMode {
             final double DPC = 1 - 0.6 * gamepad2.right_trigger;
             if (Math.abs(gamepad2.right_stick_y) > 0.001) {
                 spe(false, -gamepad2.right_stick_y * DPC);
-                epd.set_target(extA.getCurrentPosition(), 0);
+                if (extA != null) {
+                    epd.set_target(extA.getCurrentPosition(), 0);
+                }
             } else {
                 spe(false, 0);
             }
@@ -274,10 +280,12 @@ public class OP_Mode_mk3 extends LinearOpMode {
             G2X = gamepad2.x;
 
             if (!G2LT && gamepad2.left_trigger > 0.9) {
-                extA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                extA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                extB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                extB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                if (extA != null) {
+                    extA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    extA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    extB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    extB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
                 ridA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 ridA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 clo.toPrepCone = clo.cprepCone = clo.cput = clo.toPut = clo.chput = clo.cget = false;
@@ -297,9 +305,12 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put("CycleTime", timer.milliseconds());
                 pack.put("Orient", imu.getAngularOrientation());
-                pack.put("extA", extA.getCurrentPosition());
-                pack.put("extB", extB.getCurrentPosition());
+                if (extA != null) {
+                    pack.put("extA", extA.getCurrentPosition());
+                    pack.put("extB", extB.getCurrentPosition());
+                }
                 pack.put("ridA", ridA.getCurrentPosition());
+                pack.put("ridB", ridB.getCurrentPosition());
                 pack.put("vel", leftEncoder.getCorrectedVelocity());
                 pack.put("ver", rightEncoder.getCorrectedVelocity());
                 pack.put("vef", frontEncoder.getCorrectedVelocity());

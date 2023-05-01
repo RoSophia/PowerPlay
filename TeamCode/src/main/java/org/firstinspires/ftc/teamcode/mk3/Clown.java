@@ -27,6 +27,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -39,7 +40,7 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.88;
+    public static double CPT = 0.45;
     public static double CET = 0.5;
     public static double CHT = 0.75;
     public static double TTT = 0.0;
@@ -49,8 +50,9 @@ public class Clown implements Runnable {
     public static double CIP = 0.11;
     public static double GB = 0.20;
     public static double GHT = 0.1;
+    public static double WT = 0.1;
     public static double CD = 0.0;
-    public static double ED = 0.2;
+    public static double ED = 0.3;
     public static double GDI = -0.002;
 
     private Servo sa, sb, sHeading, sClaw, sBalans, sMClaw;
@@ -68,6 +70,8 @@ public class Clown implements Runnable {
     public boolean hput = false;
     public boolean chput = false;
     public double hdif = 0.000;
+
+    public DistanceSensor csensor;
     ElapsedTime ht = new ElapsedTime(0);
 
     List<Double> tims = Arrays.asList(CPT, CET, CHT);
@@ -76,7 +80,7 @@ public class Clown implements Runnable {
     ElapsedTime et = new ElapsedTime(0);
     ElapsedTime ct = new ElapsedTime(0);
 
-    public Clown(Servo sa, Servo sb, Servo sHeading, Servo sClaw, Servo sMClaw, Servo sBalans, DcMotorEx ce) {
+    public Clown(Servo sa, Servo sb, Servo sHeading, Servo sClaw, Servo sMClaw, Servo sBalans, DcMotorEx ce, DistanceSensor csensor) {
         this.sa = sa;
         this.sb = sa;
         this.sHeading = sHeading;
@@ -84,6 +88,7 @@ public class Clown implements Runnable {
         this.sMClaw = sMClaw;
         this.sBalans = sBalans;
         this.ce = ce;
+        this.csensor = csensor;
     }
 
     double sp;
@@ -118,6 +123,11 @@ public class Clown implements Runnable {
              * and it trying to get the internal state of the robot to the appropriate one to do what you need.
              */
 
+            /*
+            if (csensor.distance() < CDIST && !coneClaw && !coneReady) {
+                toPrepCone = true;
+            }*/
+
             if (CLAW) { // Used only in testing
                 sClaw.setPosition(SINCHIS);
                 CLAW = false;
@@ -128,8 +138,8 @@ public class Clown implements Runnable {
                 toPut = false;
             }
 
-            if (coneClaw && toPut && ce.getCurrentPosition() < MIP) { // If you want to put, you have a cone in your claw and are not extended too far out
-                                                                      // Start the putting sequence
+            if (coneClaw && toPut && (ce == null || ce.getCurrentPosition() < MIP)) { // If you want to put, you have a cone in your claw and are not extended too far out
+                                                                                      // Start the putting sequence
                 tppc = false;
                 toPut = false;
                 cput = true;
@@ -168,6 +178,8 @@ public class Clown implements Runnable {
 
                 if (et.seconds() > tims.get(timt) * DT) { /// Open the claw after it has reached the holding bay
                     sClaw.setPosition(SDESCHIS);
+                }
+                if (et.seconds() > (tims.get(timt) + WT) * DT) { /// Move the claw to the waiting position
                     conversiePerverssa(SAW);
                 }
                 if (et.seconds() > (tims.get(timt) + CD) * DT) { /// Close the mini servo to keep the cone in the holding bay

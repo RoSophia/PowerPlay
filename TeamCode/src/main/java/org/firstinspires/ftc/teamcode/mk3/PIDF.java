@@ -27,6 +27,9 @@ class PIDF implements Runnable {
     public double b;
 
     public PIDF(DcMotorEx motA, DcMotorEx motB, String n, double p, double d, double i, double f, double b) {
+        if (motA == null) {
+            return;
+        }
         this.motA = motA;
         motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -44,6 +47,9 @@ class PIDF implements Runnable {
     }
 
     public void update_pid(double p, double d, double i, double f, double b) {
+        if (motA == null) {
+            return;
+        }
         this.p = p;
         this.d = d;
         this.i = i;
@@ -61,6 +67,9 @@ class PIDF implements Runnable {
 
     ElapsedTime ttim = new ElapsedTime(0);
     public void set_target(int targ, double tim) { /// Start a new movement from `target` to `targ` in `tim` time. The actual calculations are done in `updt()`
+        if (motA == null) {
+            return;
+        }
         TelemetryPacket cp = new TelemetryPacket();
         cp.put(name + "GoToLpos", target);
         cp.put(name + "GoToCpos", targ);
@@ -73,6 +82,9 @@ class PIDF implements Runnable {
     }
 
     void updt() {
+        if (motA == null) {
+            return;
+        }
         double x = ttim.seconds() * (1 / DUR); /// Rescale the elapsed time to [0, 1]
         TelemetryPacket cp = new TelemetryPacket();
         cp.put(name + "CurX", x);
@@ -94,6 +106,9 @@ class PIDF implements Runnable {
 
     @SuppressWarnings("BusyWait")
     public void run() {
+        if (motA == null) {
+            return;
+        }
         ElapsedTime timer2 = new ElapsedTime(0);
         lastTarget = target;
         ctarg = target;

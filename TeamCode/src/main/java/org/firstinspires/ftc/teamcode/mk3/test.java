@@ -14,8 +14,8 @@ public class test extends LinearOpMode {
     public Servo ccs, ccs2 = null;
     public static int CT = 1;
     public static boolean CC = false;
-    public static double OFF = 0.27;
-    public static double OFP = 0.01;
+    public static double OFF = 0.089;
+    public static double OFP = 0.00;
     public void runOpMode() {
         if ((CT & 1) != 0) {
             ccs = hardwareMap.get(Servo.class, "sClose");
@@ -41,11 +41,11 @@ public class test extends LinearOpMode {
         while (opModeIsActive()) {
             ccs.setPosition(ccp);
             if (ccs2 != null) {
-                ccs2.setPosition(1 - ccp + OFF + (1 - ccp) * OFP);
+                ccs2.setPosition(ccp + OFF + ccp * OFP);
             }
             TelemetryPacket pack = new TelemetryPacket();
             pack.put("ccp", ccp);
-            pack.put("csp", 1 - ccp + OFF);
+            pack.put("csp", ccp + OFF + ccp * OFP);
             FtcDashboard.getInstance().sendTelemetryPacket(pack);
         }
 
