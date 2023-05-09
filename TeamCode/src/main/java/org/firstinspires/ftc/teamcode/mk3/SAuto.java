@@ -193,7 +193,6 @@ public class SAuto extends LinearOpMode {
     public static double SBD = 0.01;
     public static int EMM = 440;
 
-    public static double AHDIF = 0.00;
 
     void ret() {
         armHolding = false;
@@ -206,7 +205,6 @@ public class SAuto extends LinearOpMode {
         clo.tppc = false;
         clo.toPrepCone = false;
         clo.timt = 1;
-        clo.hdif = AHDIF;
         sClose.setPosition(SINCHIS);
         clo.toPut = true;
     }

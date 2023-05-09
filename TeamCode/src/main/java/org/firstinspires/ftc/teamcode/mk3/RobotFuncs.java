@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.AUTO_CLOW;
 import static org.firstinspires.ftc.teamcode.RobotVars.CU_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EAP;
@@ -12,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
@@ -19,8 +21,10 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIF;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
+import static org.firstinspires.ftc.teamcode.RobotVars.STARTW;
 import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
+import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
 import static org.firstinspires.ftc.teamcode.RobotVars.ed;
@@ -33,6 +37,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rf;
 import static org.firstinspires.ftc.teamcode.RobotVars.ri;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
+import static org.firstinspires.ftc.teamcode.RobotVars.useExt;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -124,7 +129,9 @@ public class RobotFuncs {
                 rpd.set_target(pos, UPT);
             }
         } else {
-            clo.toGet = true;
+            if (!coneClaw) {
+                clo.toGet = true;
+            }
         }
     }
 
@@ -180,10 +187,15 @@ public class RobotFuncs {
         rightFront = initm("RF", false, true);  // P2
         leftBack = initm("LB", false, false);   // P3
         leftFront = initm("LF", false, false);  // P1
-        extA = null;//initm("extA", true, false);
-        extB = null;//initm("extB", true, true);
+        if (useExt) {
+            extA = initm("extA", true, false);
+            extB = initm("extB", true, true);
+        } else {
+            extA = null;
+            extB = null;
+        }
         ridA = initm("ridA", true, false);
-        ridB = initm("ridB", true, true);
+        ridB = initm("ridB", false, true);
         //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
         sClose = sHeading = sBalans = sMCLaw = hardwareMap.get(Servo.class, "Toate");
         sextA = sextB = (ServoImplEx) sClose;
@@ -208,7 +220,11 @@ public class RobotFuncs {
         parameters.gyroBandwidth = BNO055IMU.GyroBandwidth.HZ523; /// TODO ???????
         parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;*/
         imu.initialize(parameters);
-        //sensorRange = hardwareMap.get(DistanceSensor.class, "csensor");
+        if (AUTO_CLOW) {
+            sensorRange = hardwareMap.get(DistanceSensor.class, "csensor");
+        } else {
+            sensorRange = null;
+        }
 
         epd = new PIDF(extA, extB, "Ex", ep, ed, ei, ef, ebp);
         rpd = new PIDF(ridA, ridB, "Ri", rp, rd, ri, rf, rbp);
@@ -223,7 +239,11 @@ public class RobotFuncs {
         pcoef = 12.0 / batteryVoltageSensor.getVoltage();
 
         if (im) { /// Set these positions only if called by a teleop class
-            conversiePerverssa(SAW);
+            if (STARTW) {
+                conversiePerverssa(SAW);
+            } else {
+                conversiePerverssa(SAG);
+            }
             sHeading.setPosition(SHG);
             sClose.setPosition(SDESCHIS);
             sMCLaw.setPosition(SCO);
@@ -235,7 +255,6 @@ public class RobotFuncs {
         epd.target = 0;
         epd.lom = lom;
         extT.start();
-
 
         rpd.shouldClose = false;
         rpd.use = true;
@@ -256,12 +275,13 @@ public class RobotFuncs {
         leftBack.setPower(0);
         rightBack.setPower(0);
         ridA.setPower(0);
-        //ridB.setPower(0);
+        ridB.setPower(0);
         if (extA != null) {
             extA.setPower(0);
             extB.setPower(0);
         }
         imu.close();
+        sensorRange.close();
         batteryVoltageSensor.close();
         try {
             extT.join();

@@ -156,8 +156,6 @@ public class AutoVortex extends LinearOpMode {
     public static double PAY8 = 82.00;
     public static double PAH = 5.51;
 
-    public static double AHDIF = 0.00;
-
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
     double it;
@@ -202,7 +200,6 @@ public class AutoVortex extends LinearOpMode {
         clo.tppc = false;
         clo.toPrepCone = false;
         clo.timt = 1;
-        clo.hdif = AHDIF;
         sClose.setPosition(SDESCHIS);
         sHeading.setPosition(SHP);
         clo.toPut = true;

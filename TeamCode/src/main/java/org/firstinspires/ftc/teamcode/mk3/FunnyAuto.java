@@ -152,8 +152,6 @@ public class FunnyAuto extends LinearOpMode {
     public static double SBT = 0.75;
     public static double SBD = 0.00;
 
-    public static double AHDIF = 0.00;
-
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
     double it;
@@ -192,7 +190,6 @@ public class FunnyAuto extends LinearOpMode {
         clo.tppc = false;
         clo.toPrepCone = false;
         clo.timt = 1;
-        clo.hdif = AHDIF;
         sClose.setPosition(SDESCHIS);
         clo.toPut = true;
     }

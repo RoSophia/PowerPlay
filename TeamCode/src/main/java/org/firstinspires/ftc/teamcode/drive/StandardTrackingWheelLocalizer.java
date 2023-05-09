@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.FER;
+import static org.firstinspires.ftc.teamcode.RobotVars.FES;
+import static org.firstinspires.ftc.teamcode.RobotVars.LER;
+import static org.firstinspires.ftc.teamcode.RobotVars.LES;
+import static org.firstinspires.ftc.teamcode.RobotVars.RER;
+import static org.firstinspires.ftc.teamcode.RobotVars.RES;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -43,13 +50,12 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 new Pose2d(-FORWARD_OFFSET / 2, LATERAL_DISTANCE / 2, Math.toRadians(90)) // front
         ));
 
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RB"));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "RF"));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "LF"));
-
-        frontEncoder.setDirection(Encoder.Direction.REVERSE);
-        leftEncoder.setDirection(Encoder.Direction.REVERSE);
-        //rightEncoder.setDirection(Encoder.Direction.REVERSE);
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LES));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RES));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, FES));
+        leftEncoder.setDirection(LER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
+        rightEncoder.setDirection(RER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
+        frontEncoder.setDirection(FER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
     }
