@@ -43,7 +43,7 @@ public class RobotVars {
     public static boolean USE_PHOTON = true;
 
     public static boolean USE_TELE = true; // Use Telemetry
-    public static boolean CU_TESTING = false;
+    public static int CU_TESTING = 0;
     public static double pcoef = 1.0; // Voltage Normalising Term (set during runtime)
 
     public static boolean coneClaw = false;
@@ -67,12 +67,12 @@ public class RobotVars {
     public static double RAP = 0.5; // Lift A Scale Term
     public static double RBP = 0.5;
 
-    public static boolean useExt = false;
-    public static boolean STARTW = false;
+    public static boolean useExt = true;
+    public static boolean STARTW = true;
 
-    public static String LES = "LF";
+    public static String LES = "RF";
     public static String RES = "RB";
-    public static String FES = "RF";
+    public static String FES = "LF";
     public static boolean LER = true;
     public static boolean RER = false;
     public static boolean FER = true;

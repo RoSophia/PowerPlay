@@ -21,6 +21,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epsEq;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 
@@ -83,11 +84,16 @@ public class Clown implements Runnable {
     private boolean _csp = false;
     private boolean _csw = false;
 
+    public static double OPP = 0.0;
+    public static double OEP = 0.003;
+    public static double OHP = 0.0;
+
     public DistanceSensor csensor;
     ElapsedTime ht = new ElapsedTime(0);
 
     List<Double> tims = Arrays.asList(WPT + CPT, WET + CET, WHT + CHT);
     List<Double> wtim = Arrays.asList(WPT, WET, WHT);
+    List<Double> poff = Arrays.asList(OPP, OEP, OHP);
     int timt = 0;
 
     ElapsedTime et = new ElapsedTime(0);
@@ -135,6 +141,7 @@ public class Clown implements Runnable {
                 TelemetryPacket packet = new TelemetryPacket();
                 tims = Arrays.asList(WPT + CPT, WET + CET, WHT + CHT);
                 wtim = Arrays.asList(WPT, WET, WHT);
+                poff = Arrays.asList(OPP, OEP, OHP);
 
                 packet.put("cput", cput);
                 packet.put("cget", cget);
@@ -186,7 +193,7 @@ public class Clown implements Runnable {
 
                 et.reset();
                 if (et.seconds() >= wtim.get(timt) * DT) {
-                    conversiePerverssa(SAP);
+                    conversiePerverssa(SAP + poff.get(timt));
                 }
                 ext(EMIN);
                 //sHeading.setPosition(SHP);
@@ -206,7 +213,7 @@ public class Clown implements Runnable {
                     _chead = true;
                 }
                 if (et.seconds() >= wtim.get(timt) * DT && !_csp) {
-                    conversiePerverssa(SAP);
+                    conversiePerverssa(SAP + poff.get(timt));
                     _csp = true;
                 }
                 if (et.seconds() > (tims.get(timt) + CD) * DT && !_cmc) { /// Close the mini servo to keep the cone in the holding bay
@@ -245,7 +252,7 @@ public class Clown implements Runnable {
             } else if (epd.target > MIP && !cprepCone && !toPrepCone && toPut) { // If you want to put but are too far extended, retract
                 sHeading.setPosition(SHP);
                 sBalans.setPosition(SBAP);
-                conversiePerverssa(SAP);
+                conversiePerverssa(SAP + poff.get(2));
                 ext(EMIN);
             }
 
@@ -254,7 +261,7 @@ public class Clown implements Runnable {
                 if (toPut) {
                     sClaw.setPosition(SINCHIS);
                 }
-                if (sClaw.getPosition() == SMEDIU) {
+                if (epsEq(sClaw.getPosition(), SMEDIU)) {
                     sClaw.setPosition(SDESCHIS);
                 }
                 toPrepCone = false;
@@ -284,7 +291,7 @@ public class Clown implements Runnable {
                 if (epd.target > MIP && toPut) { /// Shortcut: to save on time when putting a cone while extended, start retracting immediatly
                     sHeading.setPosition(SHP);
                     sBalans.setPosition(SBAP);
-                    conversiePerverssa(SAP);
+                    conversiePerverssa(SAP + poff.get(2));
                     ext(EMIN);
                     timt = 1;
                 }
@@ -300,7 +307,7 @@ public class Clown implements Runnable {
                 cget = true;
                 conversiePerverssa(SAG);
                 sBalans.setPosition(SBAG);
-                if (sClose.getPosition() == SMEDIU) {
+                if (epsEq(sClose.getPosition(), SMEDIU)) {
                     sClose.setPosition(SDESCHIS);
                 }
                 rtg = true;

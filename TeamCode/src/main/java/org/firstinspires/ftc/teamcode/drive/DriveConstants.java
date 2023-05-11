@@ -30,7 +30,7 @@ public class DriveConstants {
      * method is in use (e.g., tracking wheels).
      *
      * If using the built-in motor velocity PID, update MOTOR_VELO_PID with the tuned coefficients
-     * from DriveVelocityPIDTuner.
+     * from DriveVelocityPIDTunerg
      */
     public static final boolean RUN_USING_ENCODER = false;
     //public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(20, 0, 3, 13);
@@ -45,9 +45,9 @@ public class DriveConstants {
      * angular distances although most angular parameters are wrapped in Math.toRadians() for
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
-    public static double WHEEL_RADIUS = 5; // cm
+    public static double WHEEL_RADIUS = 1.75; // cm
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 32.81; // cm
+    public static double TRACK_WIDTH = 33.05; // cm
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -55,9 +55,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.005;
-    public static double kA = 0.001;
-    public static double kStatic = 0.03;
+    public static double kV = 0.0042;
+    public static double kA = 0.0013;
+    public static double kStatic = 0.001;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -66,15 +66,15 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 140;//140;// True max: 170
+    public static double MAX_VEL = 170;// 254
     public static double MAX_ACCEL = 100;//100;
     public static double MAX_DECEL = 70;//70;
 
     //public static double MAX_VEL = 110;// True max: 170
     //public static double MAX_ACCEL = 110;
     //public static double MAX_DECEL = 60;
-    public static double MAX_ANG_VEL = Math.toRadians(260);
-    public static double MAX_ANG_ACCEL = Math.toRadians(200);
+    public static double MAX_ANG_VEL = 6.832;
+    public static double MAX_ANG_ACCEL = 6.832;
 
 
     public static double encoderTicksToInches(double ticks) {

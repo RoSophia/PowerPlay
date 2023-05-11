@@ -53,9 +53,12 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
+import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SMEDIU;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
@@ -78,6 +81,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.endma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epsEq;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extB;
@@ -204,11 +208,17 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 rebp = rbp;
             }
 
-            if (CU_TESTING) {
+            if (CU_TESTING == 1) {
                 conversiePerverssa(SAP);
-                sClose.setPosition(SINCHIS);
-                sHeading.setPosition(SHG);
+                sClose.setPosition(SDESCHIS);
+                sHeading.setPosition(SHP);
                 sMCLaw.setPosition(SCC);
+                sBalans.setPosition(SBAP);
+            } else if (CU_TESTING == 2) {
+                conversiePerverssa(SAG);
+                sClose.setPosition(SDESCHIS);
+                sHeading.setPosition(SHG);
+                sMCLaw.setPosition(SCO);
                 sBalans.setPosition(SBAG);
             }
 
@@ -258,7 +268,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
             L2Y = gamepad2.y;
 
             if (!R2LB && gamepad2.left_bumper) {
-                if (sClose.getPosition() == SMEDIU) {
+                if (epsEq(sClose.getPosition(), SMEDIU)) {
                     sClose.setPosition(SDESCHIS);
                 }
                 if (!clo.rtg) {
@@ -317,8 +327,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
                     extB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     extB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
-                ridA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                ridA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                if (ridA != null) {
+                    ridA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    ridA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
                 clo.toPrepCone = clo.cprepCone = clo.cput = clo.toPut = clo.chput = clo.cget = false;
                 epd.set_target(0, 0);
                 rpd.set_target(0, 0);

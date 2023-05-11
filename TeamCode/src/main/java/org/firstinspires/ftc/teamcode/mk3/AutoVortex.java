@@ -4,7 +4,13 @@ import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.EXTT;
+import static org.firstinspires.ftc.teamcode.RobotVars.FER;
+import static org.firstinspires.ftc.teamcode.RobotVars.FES;
+import static org.firstinspires.ftc.teamcode.RobotVars.LER;
+import static org.firstinspires.ftc.teamcode.RobotVars.LES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.RER;
+import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
@@ -15,9 +21,9 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
+import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
+import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
@@ -29,6 +35,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.endma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
@@ -44,9 +51,6 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_TRAJECTORY;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_TURN;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_WAIT;
-import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
-import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
-import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 
 import android.annotation.SuppressLint;
 
@@ -59,18 +63,19 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.SequenceSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TrajectorySegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -105,56 +110,47 @@ public class AutoVortex extends LinearOpMode {
     @SuppressWarnings("unused")
     ThaiBuddhistEra thaiBuddhistEra; // 777hz tibetan healing sounds
 
-    public int F = 65;
-
     public static double SPOSX = 0;
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static int HMAX = 420;
+    // -38.7 -57.7 117.2
+    // 206.6 8.318 28.337
 
-    public static double HEAD1 = 4.310;
-    public static double PX1 = -151;
-    public static double PY1 = 42;
+    public static double HEAD1 = 0.0;
+    public static double PX1 = -204;
+    public static double PY1 = -36;
+    public static double HEAD2 = 0.0;
+    public static double PX2 = -196;
+    public static double PY2 = -36;
 
-    public static boolean AAAAAAAAAAAAAA = false;
+    public static double PAX = -193;
+    public static double PAH = 0;
+    public static double PAY6 = -40;
+    public static double PAY7 = 0;
+    public static double PAY8 = 40;
+
+
+    public static double P1X = 30;
+    public static double P1Y = 0.7;
+    public static double P2X = 30;
+    public static double P2Y = 0;
+
     public static boolean BBBBBBBBBBBBBB = true;
-    public static boolean RECURRING_SINGULARITY = false;
-    public static boolean GPOS = false;
+    public static boolean RECURRING_SINGULARITY = true;
+    public static boolean GPOS = true;
 
     public static double MVEL = 170;
     public static double MAL = 130;
     public static double MDL = 100;
 
-    public static double WD = 0.2;
-    public static double AAA = 0;
-    public static double WD2 = 1.3;
+    public double WD = 0.02;
+    public static double WD2 = 0.9;
 
     public static double R1X = 30;
-    public static double R1Y = 4;
+    public static double R1Y = 3.0;
     public static double R2X = 30;
-    public static double R2Y = -2;
-
-    public static double RD = -0.7;
-    public static double RD2 = 0.0;
-    public static double TPT = 0.4;
-    public static double GW = 0.9;
-    public static double DW = 0.4;
-    public static double ET = 0.4;
-
-    int lp = 1;
-    public static double ST = 0.452;
-    public static double SD = -0.004;
-    public static double SBT = 0.75;
-    public static double SBD = 0.00;
-    public static double SHT = 0.0;
-    public static double SHD = 0.00;
-
-    public static double PAX = -130.00;
-    public static double PAY6 = -130.00;
-    public static double PAY7 = 19.00;
-    public static double PAY8 = 82.00;
-    public static double PAH = 5.51;
+    public static double R2Y = 1.5;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -176,18 +172,58 @@ public class AutoVortex extends LinearOpMode {
             pack.put("Ex", drive.getLastError().getX());
             pack.put("Ey", drive.getLastError().getY());
             pack.put("Eh", drive.getLastError().getHeading());
-            pack.put("Trajex", traj.end().getX());
-            pack.put("Trajey", traj.end().getY());
-            pack.put("Trajeh", traj.end().getHeading());
-            pack.put("Trajsx", traj.start().getX());
-            pack.put("Trajsy", traj.start().getY());
-            pack.put("Trajsh", traj.start().getHeading());
             pack.put("CycleTime", timer.milliseconds());
+            pack.put("vel", leftEncoder.getCorrectedVelocity());
+            pack.put("ver", rightEncoder.getCorrectedVelocity());
+            pack.put("vef", frontEncoder.getCorrectedVelocity());
             timer.reset();
             dashboard.sendTelemetryPacket(pack);
         }
     }
 
+    final double ITC = 1 / 2.54;
+
+    private void draw(
+            Canvas fieldOverlay,
+            TrajectorySequence sequence
+    ) {
+        if (sequence != null) {
+            for (int i = 0; i < sequence.size(); i++) {
+                SequenceSegment segment = sequence.get(i);
+
+                if (segment instanceof TrajectorySegment) {
+                    fieldOverlay.setStrokeWidth(1);
+                    fieldOverlay.setStroke(COLOR_INACTIVE_TRAJECTORY);
+
+
+                    DashboardUtil.drawSampledPath(fieldOverlay, ((TrajectorySegment) segment).getTrajectory().getPath());
+                } else if (segment instanceof TurnSegment) {
+                    Pose2d pose = segment.getStartPose();
+
+                    fieldOverlay.setFill(COLOR_INACTIVE_TURN);
+                    fieldOverlay.fillCircle(pose.getX() * ITC, pose.getY() * ITC, 2);
+                } else if (segment instanceof WaitSegment) {
+                    Pose2d pose = segment.getStartPose();
+
+                    fieldOverlay.setStrokeWidth(1);
+                    fieldOverlay.setStroke(COLOR_INACTIVE_WAIT);
+                    fieldOverlay.strokeCircle(pose.getX() * ITC, pose.getY() * ITC, 3);
+                }
+            }
+        }
+    }
+
+    public static double RD = -0.7;
+    public static double RD2 = -0.4;
+    public static double GW = 0.5;
+    public static double ET = 0.6;
+
+    int lp = 1;
+    public static double ST = 0.452;
+    public static double SD = -0.004;
+
+    public static int EX = 300;
+    public static double EXT = 1.0;
 
     void ret() {
         armHolding = false;
@@ -201,14 +237,11 @@ public class AutoVortex extends LinearOpMode {
         clo.toPrepCone = false;
         clo.timt = 1;
         sClose.setPosition(SDESCHIS);
-        sHeading.setPosition(SHP);
         clo.toPut = true;
     }
 
     void set_grab_pos(int p) {
         conversiePerverssa(ST - SD * (p - 1));
-        sBalans.setPosition(SBT - SBD * (p - 1));
-        sHeading.setPosition(SHT - SHD * (p - 1));
     }
 
     void upd_grab_pos() {
@@ -216,66 +249,107 @@ public class AutoVortex extends LinearOpMode {
         ++lp;
     }
 
-    public static int NUMC = 0;
+    public static int NUMC = 4;
 
-    TrajectorySequence mktraj() {
+    TrajectorySequence goToStalp;
+    TrajectorySequence extend;
+    TrajectorySequence intend;
+    TrajectorySequence goToPark;
+
+    void mktraj() {
+        Vector2d P1 = new Vector2d(P1X, P1Y);
+        Vector2d P2 = new Vector2d(P2X, P2Y);
         Vector2d R1 = new Vector2d(R1X, R1Y);
         Vector2d R2 = new Vector2d(R2X, R2Y);
         TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
         lp = 1;
-        TrajectorySequenceBuilder t = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
+
+        goToStalp = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
+                .UNSTABLE_addTemporalMarkerOffset(0.0, this::getpos)
+                .waitSeconds(0.1)
                 .funnyRaikuCurveLinear(new Pose2d(PX1, PY1, HEAD1), R1, R2, vc, ac, dc)
-                .UNSTABLE_addTemporalMarkerOffset(RD, () -> {
-                    rid(RTOP_POS);
-                    set_grab_pos(lp + 1);
-                })
+                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RTOP_POS))
+                .UNSTABLE_addTemporalMarkerOffset(0.0, this::ltime)
                 .waitSeconds(WD)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                     rid(RBOT_POS);
-                    set_grab_pos(lp + 1);
-                });
-        for (int i = 0; i < NUMC; ++i) {
-            t.funnyRaikuCurveLinear(new Pose2d(PX1 + 0.00001 * (i + 1), PY1, HEAD1), new Vector2d(0.00001, 0), new Vector2d(0.000001, 0))
-                    .waitSeconds(AAA)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        getpos();
-                        epd.set_target(HMAX, EXTT);
-                        upd_grab_pos();
-                        getpos();
-                    })
-                    .waitSeconds(ET)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        sClose.setPosition(SINCHIS);
-                    })
-                    .waitSeconds(0.11)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        conversiePerverssa(SAH);
-                    })
-                    .waitSeconds(TPT)
-                    .UNSTABLE_addTemporalMarkerOffset(0, this::ret)/// GET CONE
-                    .waitSeconds(GW)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        clo.toGet = true;
-                        sClose.setPosition(SDESCHIS);
-                        sMCLaw.setPosition(SCC);
-                        conversiePerverssa(SAH);
-                    })
-                    .waitSeconds(DW)
-                    .UNSTABLE_addTemporalMarkerOffset(RD2, () -> {
-                        rpd.set_target(RTOP_POS, UPT);
-                        set_grab_pos(lp + 1);
-                    })
-                    .waitSeconds(WD2)
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                        getpos();
-                        rid(RBOT_POS);
-                        set_grab_pos(lp + 1);
-                    }); /// PUT CONE
-        }
-        return t.waitSeconds(0.2)
+                    ret();
+                })
+                .funnyRaikuCurveLinear(new Pose2d(PX2, PY2, HEAD2), P1, P2)
                 .build();
+
+        extend = drive.trajectorySequenceBuilder(new Pose2d(PX2 + 0.00001, PY2, HEAD2))
+                .lineToLinearHeading(new Pose2d(PX2, PY2, HEAD2))
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    epd.set_target(EX, EXT);
+                    upd_grab_pos();
+                })
+                .waitSeconds(ET)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> sClose.setPosition(SINCHIS))
+                .waitSeconds(0.11)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> conversiePerverssa(SAH))
+                .build();
+
+        intend = drive.trajectorySequenceBuilder(new Pose2d(PX2, PY2, HEAD2))
+                .waitSeconds(GW)
+                .UNSTABLE_addTemporalMarkerOffset(RD2, () -> rid(RTOP_POS))
+                .waitSeconds(WD2)
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                    rid(RBOT_POS);
+                    ret();
+                })
+                .build();
+
+        switch (LAST_ID) {
+            default:
+            case 7:
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(PX2, PY2, HEAD2))
+                        .addTemporalMarker(() -> {
+                            conversiePerverssa(SAW);
+                            sClose.setPosition(SDESCHIS);
+                            sHeading.setPosition(SHG);
+                            sBalans.setPosition(SBAG);
+                            ext(EMIN);
+                        })
+                        .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
+                        .addTemporalMarker(this::ltime)
+                        .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
+                        .waitSeconds(1)
+                        .build();
+                break;
+            case 6:
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(PX2, PY2, HEAD2))
+                        .addTemporalMarker(() -> {
+                            conversiePerverssa(SAW);
+                            sClose.setPosition(SDESCHIS);
+                            sHeading.setPosition(SHG);
+                            sBalans.setPosition(SBAG);
+                            ext(EMIN);
+                        })
+                        .lineToLinearHeading(new Pose2d(PAX, PAY6, PAH))
+                        .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> ext(EMIN))
+                        .addTemporalMarker(this::ltime)
+                        .waitSeconds(1)
+                        .build();
+                break;
+            case 8:
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(PX2, PY2, HEAD2))
+                        .addTemporalMarker(() -> {
+                            conversiePerverssa(SAW);
+                            sClose.setPosition(SDESCHIS);
+                            sHeading.setPosition(SHG);
+                            sBalans.setPosition(SBAG);
+                            ext(EMIN);
+                        })
+                        .lineToLinearHeading(new Pose2d(PAX, PAY8, PAH))
+                        .addTemporalMarker(this::ltime)
+                        .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> ext(EMIN))
+                        .waitSeconds(1)
+                        .build();
+                break;
+        }
     }
 
     boolean OPENED = false;
@@ -326,13 +400,13 @@ public class AutoVortex extends LinearOpMode {
                 if (gamepad1.b && !TA) {
                     epd.set_target(EMIN, RETT);
                     rpd.set_target(RBOT_POS, DOT);
-                    conversiePerverssa(SAW);
+                    conversiePerverssa(SAH);
                     sMCLaw.setPosition(SCO);
                 }
                 TA = gamepad1.b;
 
                 if (gamepad1.y && !TB) {
-                    epd.set_target(HMAX, EXTT);
+                    epd.set_target(EX, EXT);
                 }
                 TB = gamepad1.y;
 
@@ -344,6 +418,26 @@ public class AutoVortex extends LinearOpMode {
         }
     }
 
+    public static double TARGET_ANGLE = 2.3;
+    void align() {
+        double sangle = imu.getAngularOrientation().firstAngle;
+        double cdif = TARGET_ANGLE - sangle;
+        TelemetryPacket tp;
+        drive.turnAsync(cdif);
+        while (drive.isBusy() && !isStopRequested() && !gamepad1.right_bumper) {
+            tp = new TelemetryPacket();
+            tp.put("AlignCDIF", cdif);
+            tp.put("AlignSangle", sangle);
+            tp.put("AlignCangle", imu.getAngularOrientation().firstAngle);
+            dashboard.sendTelemetryPacket(tp);
+            drive.update();
+        }
+        Pose2d cp = drive.getPoseEstimate();
+        drive.setPoseEstimate(new Pose2d(cp.getX(), cp.getY(), HEAD2));
+    }
+
+    Encoder leftEncoder, rightEncoder, frontEncoder;
+
     @Override
     public void runOpMode() throws InterruptedException {
         initma(hardwareMap);
@@ -354,6 +448,25 @@ public class AutoVortex extends LinearOpMode {
         sClose.setPosition(SDESCHIS);
         sBalans.setPosition(SBAG);
         sHeading.setPosition(SHG);
+
+        {
+            TelemetryPacket pack = new TelemetryPacket();
+            pack.put("Ex", 0);
+            pack.put("Ey", 0);
+            pack.put("Eh", 0);
+            pack.put("CycleTime", 0);
+            pack.put("vel", 0);
+            pack.put("ver", 0);
+            pack.put("vef", 0);
+            dashboard.sendTelemetryPacket(pack);
+        }
+
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LES));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RES));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, FES));
+        leftEncoder.setDirection(LER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
+        rightEncoder.setDirection(RER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
+        frontEncoder.setDirection(FER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -388,11 +501,7 @@ public class AutoVortex extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
         }
 
-
-        TrajectorySequence traj = null;
-
         if (BBBBBBBBBBBBBB) {
-            traj = mktraj();
             clo.shouldClose = true;
             rpd.shouldClose = true;
             epd.shouldClose = true;
@@ -422,6 +531,8 @@ public class AutoVortex extends LinearOpMode {
             sleep(10);
         }
 
+        mktraj();
+
         packet = new TelemetryPacket();
         packet.put("bat", batteryVoltageSensor.getVoltage());
         dashboard.sendTelemetryPacket(packet);
@@ -438,135 +549,80 @@ public class AutoVortex extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(SPOSX, SPOSY, SPOSH));
         //drive.setPoseEstimate(new Pose2d(0, 0, 0));
 
-        {
-            if (AAAAAAAAAAAAAA) {
-                while (!isStopRequested()) {
-                    if (!drive.isBusy()) {
-                        traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(0, -F, 0))
-                                .lineToLinearHeading(new Pose2d(0, F, 0))
-                                .build();
-                        drive.followTrajectorySequenceAsync(traj);
+        if (!BBBBBBBBBBBBBB) {
+            clo.shouldClose = true;
+            rpd.shouldClose = true;
+            epd.shouldClose = true;
+            telemetry.addLine("Start");
+            telemetry.update();
+            double P11X = 0, P11Y = 0, P12X = 0, P12Y = 0;
+            double R11X = 0, R11Y = 0, R12X = 0, R12Y = 0;
+
+            while (!isStopRequested()) {
+                if (P11X != PX1 || P12X != PX2 || P11Y != PY1 || P12Y != PY2 ||
+                        R11X != R1X || R12X != R2X || R11Y != R1Y || R12Y != R2Y) {
+                    mktraj();
+                    if (goToStalp == null) {
+                        continue;
                     }
-                    drive.update();
+                    TelemetryPacket p = new TelemetryPacket();
+                    Canvas fieldOverlay = p.fieldOverlay();
+                    draw(fieldOverlay, goToStalp);
+                    draw(fieldOverlay, extend);
+                    draw(fieldOverlay, intend);
+                    p.put("Updated!", 0);
+                    dashboard.sendTelemetryPacket(p);
+                    P11X = P1X;
+                    P11Y = P1Y;
+                    P12X = P2X;
+                    P12Y = P2Y;
                 }
 
-                //telemetry stuff vezi unde esti
-                while (!isStopRequested()) {
-                    drive.updatePoseEstimate();
-                    packet = new TelemetryPacket();
-                    packet.put("px", drive.getPoseEstimate().getX());
-                    packet.put("py", drive.getPoseEstimate().getY());
-                    packet.put("ph", drive.getPoseEstimate().getHeading());
-                    dashboard.sendTelemetryPacket(packet);
-                }
-            } else {
-                packet = new TelemetryPacket();
-                packet.put("LID", LAST_ID);
-                dashboard.sendTelemetryPacket(packet);
-
-                it = getRuntime();
-                follow_traj(traj);
-
-                if (!isStopRequested()) {
-                    switch (LAST_ID) {
-                        default:
-                            telemetry.addLine("DEFAULT");
-                        case 7:
-                            telemetry.addLine("7");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, 0, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .addTemporalMarker(() -> {
-                                        conversiePerverssa(SAW);
-                                        sClose.setPosition(SDESCHIS);
-                                        sHeading.setPosition(SHG);
-                                        sBalans.setPosition(SBAG);
-                                        ext(EMIN);
-                                        getpos();
-                                    })
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
-                                    .addTemporalMarker(this::ltime)
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                        case 6:
-                            telemetry.addLine("6");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .addTemporalMarker(() -> {
-                                        conversiePerverssa(SAW);
-                                        sClose.setPosition(SDESCHIS);
-                                        sHeading.setPosition(SHG);
-                                        sBalans.setPosition(SBAG);
-                                        ext(EMIN);
-                                        getpos();
-                                    })
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
-                                    .addTemporalMarker(this::getpos)
-                                    .waitSeconds(0.1)
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY6, PAH))
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> ext(EMIN))
-                                    .addTemporalMarker(this::ltime)
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                        case 8:
-                            telemetry.addLine("8");
-                            traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                                    //.funnyRaikuCurve(new Pose2d(F * 2.15, -F * 1, 0), new Vector2d(20, Math.PI), new Vector2d(0.00001, 0.0), vc, ac)
-                                    .addTemporalMarker(() -> {
-                                        conversiePerverssa(SAW);
-                                        sClose.setPosition(SDESCHIS);
-                                        sHeading.setPosition(SHG);
-                                        sBalans.setPosition(SBAG);
-                                        ext(EMIN);
-                                        getpos();
-                                    })
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY7, PAH))
-                                    .addTemporalMarker(this::getpos)
-                                    .waitSeconds(0.1)
-                                    .lineToLinearHeading(new Pose2d(PAX, PAY8, PAH))
-                                    .addTemporalMarker(this::ltime)
-                                    .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> ext(EMIN))
-                                    .waitSeconds(1)
-                                    .build();
-                            break;
-                    }
-                    telemetry.update();
-                    follow_traj(traj);
-                }
+                sleep(100);
             }
+        } else {
+            packet = new TelemetryPacket();
+            packet.put("LID", LAST_ID);
+            dashboard.sendTelemetryPacket(packet);
 
-            if (GPOS) {
-                getpos();
-            }
+            it = getRuntime();
+
+            getpos();
+            follow_traj(goToStalp);
+            /*
+            for (int i = 0; i < NUMC; ++i) {
+                align();
+                follow_traj(extend);
+                follow_traj(intend);
+            }*/
+            getpos();
+            follow_traj(goToPark);
 
             if (RECURRING_SINGULARITY && !isStopRequested()) {
-                traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                TrajectorySequence traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                         .addDisplacementMarker(() -> ext(EMIN))
                         .lineToLinearHeading(new Pose2d(0, 0, 0))
                         .build();
                 follow_traj(traj);
             }
+
+            endma();
+
+            leftBack.setPower(0);
+            rightBack.setPower(0);
+            leftFront.setPower(0);
+            rightFront.setPower(0);
+
+            for (int i = 0; i < v.size(); ++i) {
+                packet = new TelemetryPacket();
+                packet.put("id", i);
+                packet.put("t", v.get(i));
+                packet.put("xe", e.get(i).getX());
+                packet.put("ye", e.get(i).getY());
+                packet.put("he", Math.toDegrees(e.get(i).getHeading()));
+                dashboard.sendTelemetryPacket(packet);
+            }
+
         }
-
-        endma();
-
-        leftBack.setPower(0);
-        rightBack.setPower(0);
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-
-        for (int i = 0; i < v.size(); ++i) {
-            packet = new TelemetryPacket();
-            packet.put("id", i);
-            packet.put("t", v.get(i));
-            packet.put("xe", e.get(i).getX());
-            packet.put("ye", e.get(i).getY());
-            packet.put("he", Math.toDegrees(e.get(i).getHeading()));
-            dashboard.sendTelemetryPacket(packet);
-        }
-
     }
 }

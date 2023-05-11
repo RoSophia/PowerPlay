@@ -68,6 +68,15 @@ public class RobotFuncs {
     public static HardwareMap hardwareMap;
     public static DistanceSensor sensorRange;
 
+    static double eps = 0.00001;
+
+    static boolean epsEq(double o1, double o2) {
+        if (Math.abs(o1 - o2) < eps) {
+            return true;
+        }
+        return false;
+    }
+
     static void ep(double p) { /// Set power in the extension motors
         if (extA == null) {
             return;
@@ -120,7 +129,7 @@ public class RobotFuncs {
     }
 
     static void rid(int pos) { /// Move the lift to a set position
-        if (coneReady || pos == RBOT_POS || CU_TESTING) {
+        if (coneReady || pos == RBOT_POS || (CU_TESTING > 0)) {
             if (pos == RBOT_POS) { /// Retract the lift (lets the cone that was being held fall)
                 sMCLaw.setPosition(SCO);
                 coneReady = false;
@@ -267,6 +276,7 @@ public class RobotFuncs {
     }
 
     public static void endma() { /// Shut down the robot
+        pcoef = 0;
         epd.shouldClose = true;
         rpd.shouldClose = true;
         clo.shouldClose = true;
@@ -281,7 +291,9 @@ public class RobotFuncs {
             extB.setPower(0);
         }
         imu.close();
-        sensorRange.close();
+        if (sensorRange != null) {
+            sensorRange.close();
+        }
         batteryVoltageSensor.close();
         try {
             extT.join();
