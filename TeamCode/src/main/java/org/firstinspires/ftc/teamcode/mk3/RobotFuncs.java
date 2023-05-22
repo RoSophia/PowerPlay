@@ -30,12 +30,14 @@ import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
 import static org.firstinspires.ftc.teamcode.RobotVars.ed;
 import static org.firstinspires.ftc.teamcode.RobotVars.ef;
 import static org.firstinspires.ftc.teamcode.RobotVars.ei;
+import static org.firstinspires.ftc.teamcode.RobotVars.emd;
 import static org.firstinspires.ftc.teamcode.RobotVars.ep;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.RobotVars.rbp;
 import static org.firstinspires.ftc.teamcode.RobotVars.rd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rf;
 import static org.firstinspires.ftc.teamcode.RobotVars.ri;
+import static org.firstinspires.ftc.teamcode.RobotVars.rmd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
 import static org.firstinspires.ftc.teamcode.RobotVars.useExt;
 
@@ -235,8 +237,8 @@ public class RobotFuncs {
             sensorRange = null;
         }
 
-        epd = new PIDF(extA, extB, "Ex", ep, ed, ei, ef, ebp);
-        rpd = new PIDF(ridA, ridB, "Ri", rp, rd, ri, rf, rbp);
+        epd = new PIDF(extA, extB, "Ex", ep, ed, ei, ef, ebp, emd);
+        rpd = new PIDF(ridA, ridB, "Ri", rp, rd, ri, rf, rbp, rmd);
         clo = new Clown(sextA, sextB, sHeading, sClose, sMCLaw, sBalans, extA, sensorRange);
 
         extT = new Thread(epd);

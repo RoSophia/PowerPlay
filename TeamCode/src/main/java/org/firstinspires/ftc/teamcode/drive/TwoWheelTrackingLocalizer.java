@@ -34,10 +34,10 @@ import java.util.Vector;
  *    \--------------/
  *
  */
-//@Config
+@Config
 public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
-    public static double WHEEL_RADIUS = 2.477; // in
+    public static double WHEEL_RADIUS = 1.785; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
     public static double PARALLEL_X = -11; // X is the up and down direction

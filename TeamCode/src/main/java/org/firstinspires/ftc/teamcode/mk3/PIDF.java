@@ -25,8 +25,9 @@ class PIDF implements Runnable {
     public double i;
     public double f;
     public double b;
+    public double md;
 
-    public PIDF(DcMotorEx motA, DcMotorEx motB, String n, double p, double d, double i, double f, double b) {
+    public PIDF(DcMotorEx motA, DcMotorEx motB, String n, double p, double d, double i, double f, double b, double md) {
         if (motA == null) {
             return;
         }
@@ -43,6 +44,7 @@ class PIDF implements Runnable {
         this.i = i;
         this.f = f;
         this.b = b;
+        this.md = md;
         this.name = n;
     }
 
@@ -109,6 +111,8 @@ class PIDF implements Runnable {
         if (motA == null) {
             return;
         }
+        int cp = 0;
+        int cpb = 0;
         ElapsedTime timer2 = new ElapsedTime(0);
         lastTarget = target;
         ctarg = target;
@@ -121,6 +125,10 @@ class PIDF implements Runnable {
             motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
         while (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) {
+            cp = motA.getCurrentPosition();
+            if (motB != null) {
+                cpb = motB.getCurrentPosition();
+            }
             if (useTele) {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put(name + "CycleTimeArm", timer2.milliseconds());
@@ -130,9 +138,9 @@ class PIDF implements Runnable {
                 pack.put(name + "cTarg", ctarg);
                 pack.put(name + "ttim", ttim.seconds());
                 pack.put(name + "Dur", DUR);
-                pack.put(name + "CA", motA.getCurrentPosition());
+                pack.put(name + "CA", cp);
                 if (motB != null) {
-                    pack.put(name + "CB", motB.getCurrentPosition());
+                    pack.put(name + "CB", cpb);
                 }
                 pack.put(name + "Power", outp);
                 dashboard.sendTelemetryPacket(pack);
@@ -142,16 +150,19 @@ class PIDF implements Runnable {
                 if (lastTarget != target) {
                     lastTarget = target;
                 }
-                error = ctarg - motA.getCurrentPosition();
+                error = ctarg - cp;
                 derivate = (error - lastError) / timer.seconds();
                 integralSum = integralSum + (error * timer.seconds());
 
                 outp = (p * error) + (d * derivate) + (i * integralSum) + f;
+                if (ctarg == target && Math.abs(target - cp) < md) {
+                    outp = 0;
+                }
                 if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) { /// `lom` here is used to prevent powering the motor after the OpMode stopped.
                     motA.setPower(outp * pcoef);
 
                     if (motB != null) {
-                        double bdif = (motA.getCurrentPosition() - motB.getCurrentPosition()) * b;
+                        double bdif = (cp - cpb) * b;
                         motB.setPower((outp + bdif) * pcoef);
                     }
                 } else {

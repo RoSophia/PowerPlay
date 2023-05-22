@@ -17,20 +17,20 @@ public class RobotVars {
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
-    public static double SAG = 0.4074;     // Grabber Arm Get position
+    public static double SAG = 0.410;     // Grabber Arm Get position
     public static double SAH = 0.610;     // Grabber Arm Hold Position
-    public static double SAP = 0.741;     // Grabber Arm Put position
+    public static double SAP = 0.745;     // Grabber Arm Put position
     public static double SAW = 0.680;     // Grabber Arm Wait position
 
-    public static double SBAG = 0.60;     // 4bar Get position
-    public static double SBAH = 0.85;     // 4bar Hold position
-    public static double SBAP = 0.41;     // 4bar Put position
+    public static double SBAG = 0.59;     // 4bar Get position
+    public static double SBAH = 0.50;     // 4bar Hold position
+    public static double SBAP = 0.75;     // 4bar Put position
 
     public static double SDIF = 0.095;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
     public static double SHG = 0.065;     // Grabber Get Heading
-    public static double SHP = 0.60;      // Grabber Put Heading
+    public static double SHP = 0.82;      // Grabber Put Heading
 
     public static double SCO = 0.6;       // Cone Securing Mini Servo Open Position
     public static double SCC = 1.0;       // Cone Securing Mini Servo Close Position
@@ -54,12 +54,14 @@ public class RobotVars {
     public static double ed = 0;
     public static double ei = 0.0005;
     public static double ef = 0;
+    public static double emd = 8;
     public static double ebp = 0;
 
     public static double rp = 0.003;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.0008;
+    public static double rmd = 8;
     public static double rbp = 0;
 
     public static double EAP = 1.0; // Extension A Scale Term
@@ -70,6 +72,36 @@ public class RobotVars {
     public static boolean useExt = true;
     public static boolean STARTW = true;
 
+    /**
+     * Expansion:
+     *     Motors:
+     *         0: RB
+     *         1: RF
+     *         2: LF
+     *         3: LB
+     *     Servos:
+     *         0: sBalans
+     *         1:
+     *         2: sClose
+     *         3:
+     *         4: sHeading
+     *         5:
+     * Control:
+     *     Motors:
+     *         0: ridB
+     *         1: extA
+     *         2: extB
+     *         3: ridA
+     *     Servos:
+     *         0: Toate
+     *         1: sMCLaw
+     *         2:
+     *         3: sextA
+     *         4:
+     *         5: sextB
+     *     I2C:
+     *         3: csensor
+     */
     public static String LES = "RF";
     public static String RES = "RB";
     public static String FES = "LF";
