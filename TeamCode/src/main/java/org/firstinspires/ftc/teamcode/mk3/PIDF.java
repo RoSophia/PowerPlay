@@ -32,13 +32,14 @@ class PIDF implements Runnable {
             return;
         }
         this.motA = motA;
+        /*
         motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if (motB != null) {
             this.motB = motB;
             motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
+        }*/
         this.p = p;
         this.d = d;
         this.i = i;
@@ -156,7 +157,7 @@ class PIDF implements Runnable {
 
                 outp = (p * error) + (d * derivate) + (i * integralSum) + f;
                 if (ctarg == target && Math.abs(target - cp) < md) {
-                    outp = 0;
+                    outp = f;
                 }
                 if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) { /// `lom` here is used to prevent powering the motor after the OpMode stopped.
                     motA.setPower(outp * pcoef);

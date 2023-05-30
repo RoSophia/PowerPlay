@@ -53,6 +53,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 @SuppressWarnings("ALL")
 public class RobotFuncs {
@@ -171,6 +172,11 @@ public class RobotFuncs {
 
     static DcMotorEx initm(String s, boolean e, boolean r) { /// Init a motor
         DcMotorEx m = hardwareMap.get(DcMotorEx.class, s);
+
+        MotorConfigurationType mconf = m.getMotorType().clone();
+        mconf.setAchieveableMaxRPMFraction(1.0);
+        m.setMotorType(mconf);
+
         if (e) {
             m.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             m.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -205,8 +211,8 @@ public class RobotFuncs {
             extA = null;
             extB = null;
         }
-        ridA = initm("ridA", true, false);
-        ridB = initm("ridB", false, true);
+        ridA = initm("ridA", true, true);
+        ridB = initm("ridB", false, false);
         //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
         sClose = sHeading = sBalans = sMCLaw = hardwareMap.get(Servo.class, "Toate");
         sextA = sextB = (ServoImplEx) sClose;

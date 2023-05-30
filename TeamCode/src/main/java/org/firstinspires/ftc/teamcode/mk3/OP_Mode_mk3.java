@@ -53,7 +53,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAPG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
@@ -108,8 +108,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -152,7 +150,9 @@ public class OP_Mode_mk3 extends LinearOpMode {
 
     ElapsedTime etimer = new ElapsedTime(1000);
     ElapsedTime rtimer = new ElapsedTime(1000);
-    public static double EXTL = 0.1;
+    ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
+    boolean SHITTY_WORKAROUND_TIMED = false;
+    public static double EXTL = 0.2;
     public static double RIDL = 0.2;
 
     Encoder leftEncoder, rightEncoder, frontEncoder;
@@ -188,7 +188,19 @@ public class OP_Mode_mk3 extends LinearOpMode {
         ref = rf;
         rebp = rbp;
         timer.reset();
+        SHITTY_WORKAROUND_TIMER.reset();
         while (opModeIsActive()) {
+            if (extA != null) {
+                if (SHITTY_WORKAROUND_TIMER.seconds() < 0.1) {
+                    spe(false, -0.6);
+                } else if (!SHITTY_WORKAROUND_TIMED) {
+                    SHITTY_WORKAROUND_TIMED = true;
+                    extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                    extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                }
+            }
             if (oldpos != RID_POS) {
                 rpd.set_target(RID_POS, 0);
                 oldpos = RID_POS;
@@ -210,13 +222,11 @@ public class OP_Mode_mk3 extends LinearOpMode {
 
             if (CU_TESTING == 1) {
                 conversiePerverssa(SAP);
-                sClose.setPosition(SDESCHIS);
                 sHeading.setPosition(SHP);
                 sMCLaw.setPosition(SCC);
-                sBalans.setPosition(SBAP);
+                sBalans.setPosition(SBAPG);
             } else if (CU_TESTING == 2) {
                 conversiePerverssa(SAG);
-                sClose.setPosition(SDESCHIS);
                 sHeading.setPosition(SHG);
                 sMCLaw.setPosition(SCO);
                 sBalans.setPosition(SBAG);
@@ -285,8 +295,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
             R2RB = gamepad2.right_bumper;
 
             final double DPC = 1 - 0.6 * gamepad2.right_trigger;
-            if (Math.abs(gamepad2.right_stick_y) > 0.001) {
-                spe(false, -gamepad2.right_stick_y * DPC);
+            if (Math.abs(gamepad2.left_stick_y) > 0.001) {
+                if (!clo.cput) {
+                    spe(false, -gamepad2.left_stick_y * DPC);
+                }
                 etimer.reset();
             } else {
                 spe(false, 0);
@@ -296,8 +308,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 epd.set_target(extA.getCurrentPosition(), 0);
             }
 
-            if (Math.abs(gamepad2.left_stick_y) > 0.001) {
-                spe(true, -gamepad2.left_stick_y * DPC);
+            if (Math.abs(gamepad2.right_stick_y) > 0.001) {
+                if (!clo.cput) {
+                    spe(true, -gamepad2.right_stick_y * DPC);
+                }
                 rtimer.reset();
             } else {
                 spe(true, 0);
@@ -372,7 +386,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
 
             pcoef = 12.0 / batteryVoltageSensor.getVoltage();
-            final double spcoef = 1 - 0.4 * gamepad1.right_trigger;
+            final double spcoef = 1 - 0.65 * gamepad1.right_trigger;
             final double fcoef = pcoef * spcoef;
             leftFront.setPower(lfPower * fcoef * P1);
             rightFront.setPower(rfPower * fcoef * P2);

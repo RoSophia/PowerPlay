@@ -17,25 +17,27 @@ public class RobotVars {
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
-    public static double SAG = 0.410;     // Grabber Arm Get position
+    public static double SAG = 0.400;     // Grabber Arm Get position
     public static double SAH = 0.610;     // Grabber Arm Hold Position
-    public static double SAP = 0.745;     // Grabber Arm Put position
+    public static double SAP = 0.74;     // Grabber Arm Put position
     public static double SAW = 0.680;     // Grabber Arm Wait position
 
-    public static double SBAG = 0.59;     // 4bar Get position
-    public static double SBAH = 0.50;     // 4bar Hold position
-    public static double SBAP = 0.75;     // 4bar Put position
+    public static double SBAG = 0.57;     // 4bar Get position
+    public static double SBAH = 0.36;     // 4bar Hold position
+    public static double SBAPG = 0.70;     // 4bar Put position
+    public static double SBAPH = 0.74;     // 4bar Put position
+    public static double SBAPE = 0.70;     // 4bar Put position
 
-    public static double SDIF = 0.095;      // Grabber Arm Servo Diff Term
+    public static double SDIF = 0.1;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
     public static double SHG = 0.065;     // Grabber Get Heading
-    public static double SHP = 0.82;      // Grabber Put Heading
+    public static double SHP = 0.50;      // Grabber Put Heading
 
     public static double SCO = 0.6;       // Cone Securing Mini Servo Open Position
     public static double SCC = 1.0;       // Cone Securing Mini Servo Close Position
 
-    public static double DOT = 1.0;       // Time To Lower The Lift
+    public static double DOT = 0.0;       // Time To Lower The Lift
     public static double UPT = 0.0;       // Time To Hoist The Lift
     public static double EXTT = 0.5;      // Time To Fully Extend
     public static double RETT = 0.6;      // Time To Retract
@@ -57,7 +59,7 @@ public class RobotVars {
     public static double emd = 8;
     public static double ebp = 0;
 
-    public static double rp = 0.003;  // Lift pidf and correction term between the motors
+    public static double rp = 0.006;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.0008;
@@ -66,10 +68,10 @@ public class RobotVars {
 
     public static double EAP = 1.0; // Extension A Scale Term
     public static double EBP = 1.0; // Extension B Scale Term
-    public static double RAP = 0.5; // Lift A Scale Term
-    public static double RBP = 0.5;
+    public static double RAP = 1.0; // Lift A Scale Term
+    public static double RBP = 1.0;
 
-    public static boolean useExt = true;
+    public static boolean useExt = false;
     public static boolean STARTW = true;
 
     /**
