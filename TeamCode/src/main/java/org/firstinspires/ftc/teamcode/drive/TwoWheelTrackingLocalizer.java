@@ -34,7 +34,7 @@ import java.util.Vector;
  *    \--------------/
  *
  */
-@Config
+//@Config
 public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;
     public static double WHEEL_RADIUS = 1.785; // in

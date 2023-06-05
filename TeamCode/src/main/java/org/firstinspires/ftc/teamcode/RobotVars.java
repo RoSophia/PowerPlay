@@ -9,7 +9,7 @@ public class RobotVars {
     public static double SINCHIS = 0.915;   // Claw Close
 
     public static int EMIN = -3;          // Minimum Extension
-    public static int EMAX = 595;         // Maximum Extension
+    public static int EMAX = 560;         // Maximum Extension
 
     public static int RTOP_POS = 570;     // Maximum Lift Position
     public static int RMIU_POS = 342;     // Medium Lift Position
@@ -59,7 +59,7 @@ public class RobotVars {
     public static double emd = 8;
     public static double ebp = 0;
 
-    public static double rp = 0.006;  // Lift pidf and correction term between the motors
+    public static double rp = 0.01;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.0008;
@@ -71,10 +71,20 @@ public class RobotVars {
     public static double RAP = 1.0; // Lift A Scale Term
     public static double RBP = 1.0;
 
-    public static boolean useExt = false;
-    public static boolean STARTW = true;
+    public static boolean useExt = true;
+    public static boolean useRid = true;
 
-    /**
+    public static boolean STARTW = true;
+    public static String LES = "RF";
+    public static String RES = "RB";
+    public static String FES = "LF";
+    public static boolean LER = true;
+    public static boolean RER = true;
+    public static boolean FER = true;
+
+    public static boolean AUTO_CLOW = false;
+
+    /*
      * Expansion:
      *     Motors:
      *         0: RB
@@ -104,12 +114,4 @@ public class RobotVars {
      *     I2C:
      *         3: csensor
      */
-    public static String LES = "RF";
-    public static String RES = "RB";
-    public static String FES = "LF";
-    public static boolean LER = true;
-    public static boolean RER = false;
-    public static boolean FER = true;
-
-    public static boolean AUTO_CLOW = false;
 }

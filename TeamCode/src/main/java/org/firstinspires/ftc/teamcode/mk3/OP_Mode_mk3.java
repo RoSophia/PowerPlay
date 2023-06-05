@@ -156,6 +156,8 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double RIDL = 0.2;
 
     Encoder leftEncoder, rightEncoder, frontEncoder;
+    public static double SHITTY_WORKAROUND_TIME = 0.2;
+    public static double SHITTY_WORKAROUND_POWER = 1;
 
     public void runOpMode() {
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = coneReady = false;
@@ -190,17 +192,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
         timer.reset();
         SHITTY_WORKAROUND_TIMER.reset();
         while (opModeIsActive()) {
-            if (extA != null) {
-                if (SHITTY_WORKAROUND_TIMER.seconds() < 0.1) {
-                    spe(false, -0.6);
-                } else if (!SHITTY_WORKAROUND_TIMED) {
-                    SHITTY_WORKAROUND_TIMED = true;
-                    extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                    extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                    extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                    extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                }
-            }
             if (oldpos != RID_POS) {
                 rpd.set_target(RID_POS, 0);
                 oldpos = RID_POS;
@@ -301,7 +292,9 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 }
                 etimer.reset();
             } else {
-                spe(false, 0);
+                if (SHITTY_WORKAROUND_TIMER.seconds() >= SHITTY_WORKAROUND_TIME) {
+                    spe(false, 0);
+                }
             }
 
             if (extA != null && etimer.seconds() < EXTL) {
@@ -314,7 +307,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 }
                 rtimer.reset();
             } else {
-                spe(true, 0);
+                    spe(true, 0);
             }
 
             if (ridA != null && rtimer.seconds() < RIDL) {
@@ -363,26 +356,42 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 pack.put("CycleTime", timer.milliseconds());
                 pack.put("Orient", imu.getAngularOrientation());
                 if (extA != null) {
+                    pack.put("CUR_extA", extA.getCurrent(CurrentUnit.MILLIAMPS));
+                    pack.put("CUR_extB", extB.getCurrent(CurrentUnit.MILLIAMPS));
+                    pack.put("POW_extA", extA.getPower());
+                    pack.put("POW_extB", extB.getPower());
                     pack.put("extA", extA.getCurrentPosition());
                     pack.put("extB", extB.getCurrentPosition());
-                    pack.put("POW_extA", extA.getCurrent(CurrentUnit.MILLIAMPS));
-                    pack.put("POW_extB", extB.getCurrent(CurrentUnit.MILLIAMPS));
                 }
-                pack.put("ridA", ridA.getCurrentPosition());
-                pack.put("ridB", ridB.getCurrentPosition());
+                if (ridA != null) {
+                    pack.put("CUR_ridA", ridA.getCurrent(CurrentUnit.MILLIAMPS));
+                    pack.put("CUR_ridB", ridB.getCurrent(CurrentUnit.MILLIAMPS));
+                    pack.put("POW_ridA", ridA.getPower());
+                    pack.put("POW_ridB", ridB.getPower());
+                    pack.put("ridA", ridA.getCurrentPosition());
+                    pack.put("ridB", ridB.getCurrentPosition());
+                }
+
                 pack.put("vel", leftEncoder.getCorrectedVelocity());
                 pack.put("ver", rightEncoder.getCorrectedVelocity());
                 pack.put("vef", frontEncoder.getCorrectedVelocity());
-                pack.put("POW_ridA", ridA.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_ridB", ridB.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_LF", leftFront.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_LB", leftBack.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_RF", rightFront.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_RB", rightBack.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_RB", rightBack.getCurrent(CurrentUnit.MILLIAMPS));
                 dashboard.sendTelemetryPacket(pack);
                 timer.reset();
 
+                if (extA != null) {
+                    if (SHITTY_WORKAROUND_TIMER.seconds() < SHITTY_WORKAROUND_TIME) {
+                        epd.use = false;
+                        extA.setPower(-SHITTY_WORKAROUND_POWER);
+                        extB.setPower(-SHITTY_WORKAROUND_POWER);
+                    } else if (!SHITTY_WORKAROUND_TIMED) {
+                        SHITTY_WORKAROUND_TIMED = true;
+                        epd.use = true;
+                        extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                        extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                        extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                        extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                    }
+                }
             }
 
             pcoef = 12.0 / batteryVoltageSensor.getVoltage();

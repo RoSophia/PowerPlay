@@ -40,6 +40,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.ri;
 import static org.firstinspires.ftc.teamcode.RobotVars.rmd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
 import static org.firstinspires.ftc.teamcode.RobotVars.useExt;
+import static org.firstinspires.ftc.teamcode.RobotVars.useRid;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -99,7 +100,7 @@ public class RobotFuncs {
             if (extA == null) {
                 return;
             }
-            if (p == 0) { /// If we do not manually power the motor let their PID keep them there
+            if (Math.abs(p) < 0.0001) { /// If we do not manually power the motor let their PID keep them there
                 epd.use = true;
             } else {
                 epd.use = false; /// Turn off the PID so we can power tham manually
@@ -114,7 +115,7 @@ public class RobotFuncs {
                 ep(p);
             }
         } else {
-            if (p == 0) {
+            if (Math.abs(p) < 0.0001) {
                 rpd.use = true;
             } else {
                 rpd.use = false;
@@ -204,18 +205,19 @@ public class RobotFuncs {
         rightFront = initm("RF", false, true);  // P2
         leftBack = initm("LB", false, false);   // P3
         leftFront = initm("LF", false, false);  // P1
-        if (useExt) {
-            extA = initm("extA", true, false);
-            extB = initm("extB", true, true);
-        } else {
-            extA = null;
-            extB = null;
-        }
+        extA = initm("extA", true, false);
+        extB = initm("extB", true, true);
         ridA = initm("ridA", true, true);
         ridB = initm("ridB", false, false);
+        if (!useExt) {
+            extA.setMotorDisable();
+            extB.setMotorDisable();
+        }
+        if (!useRid) {
+            ridA.setMotorDisable();
+            ridB.setMotorDisable();
+        }
         //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
-        sClose = sHeading = sBalans = sMCLaw = hardwareMap.get(Servo.class, "Toate");
-        sextA = sextB = (ServoImplEx) sClose;
 
         sClose = hardwareMap.get(Servo.class, "sClose");
         sHeading = hardwareMap.get(Servo.class, "sHeading");
@@ -242,6 +244,40 @@ public class RobotFuncs {
         } else {
             sensorRange = null;
         }
+
+        /*
+        TelemetryPacket pack = new TelemetryPacket();
+        pack.put("ID_rightFront", rightFront.getPortNumber());
+        pack.put("ID_rightFrontCinfo", rightFront.getConnectionInfo());
+        pack.put("ID_leftFront", leftFront.getPortNumber());
+        pack.put("ID_leftFrontCinfo", leftFront.getConnectionInfo());
+        pack.put("ID_rightBack", rightBack.getPortNumber());
+        pack.put("ID_rightBackCinfo", rightBack.getConnectionInfo());
+        pack.put("ID_leftBack", leftBack.getPortNumber());
+        pack.put("ID_leftBackCinfo", leftBack.getConnectionInfo());
+        pack.put("ID_ridA", ridA.getPortNumber());
+        pack.put("ID_ridACinfo", ridA.getConnectionInfo());
+        pack.put("ID_ridB", ridB.getPortNumber());
+        pack.put("ID_ridBCinfo", ridB.getConnectionInfo());
+        pack.put("ID_extA", extA.getPortNumber());
+        pack.put("ID_extACinfo", extA.getConnectionInfo());
+        pack.put("ID_extB", extB.getPortNumber());
+        pack.put("ID_extBCinfo", extB.getConnectionInfo());
+        pack.put("ID_sClose", sClose.getPortNumber());
+        pack.put("ID_sCloseCinfo", sClose.getConnectionInfo());
+        pack.put("ID_sHeading", sHeading.getPortNumber());
+        pack.put("ID_sHeadingCinfo", sHeading.getConnectionInfo());
+        pack.put("ID_sBalans", sBalans.getPortNumber());
+        pack.put("ID_sBalansCinfo", sBalans.getConnectionInfo());
+        pack.put("ID_sMCLaw", sMCLaw.getPortNumber());
+        pack.put("ID_sMCLawCinfo", sMCLaw.getConnectionInfo());
+        pack.put("ID_sextA", sextA.getPortNumber());
+        pack.put("ID_sextACinfo", sextA.getConnectionInfo());
+        pack.put("ID_sextB", sextB.getPortNumber());
+        pack.put("ID_sextBCinfo", sextB.getConnectionInfo());
+        dashboard.sendTelemetryPacket(pack);
+         */
+
 
         epd = new PIDF(extA, extB, "Ex", ep, ed, ei, ef, ebp, emd);
         rpd = new PIDF(ridA, ridB, "Ri", rp, rd, ri, rf, rbp, rmd);

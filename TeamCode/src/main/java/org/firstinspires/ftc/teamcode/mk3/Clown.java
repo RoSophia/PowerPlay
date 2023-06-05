@@ -212,7 +212,7 @@ public class Clown implements Runnable {
             }
 
             if (cput) { // Currently putting
-                spe(false, -0.6);
+                spe(false, -0.02);
                 if (et.seconds() > TTT * DT && !_chead) { /// Start rotating the claw after TTT time to avoid bumping the cone into the whole arm
                     sHeading.setPosition(SHP);
                     _chead = true;
@@ -234,7 +234,7 @@ public class Clown implements Runnable {
                     _csw = true;
                 }
                 if (et.seconds() > (tims.get(timt) + ED) * DT) { /// Reset everything to normal
-                    sBalans.setPosition(grabs.get(timt));
+                    sBalans.setPosition(SBAG);
                     sClaw.setPosition(SMEDIU);
                     sHeading.setPosition(SHG);
                     conversiePerverssa(SAW);
@@ -247,6 +247,7 @@ public class Clown implements Runnable {
                     waiting = true;
                     timt = 0;
                     et.reset();
+                    spe(false, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
                 }
             }
 
@@ -295,7 +296,7 @@ public class Clown implements Runnable {
                 }
                 if (epd.target > MIP && toPut) { /// Shortcut: to save on time when putting a cone while extended, start retracting immediatly
                     sHeading.setPosition(SHP);
-                    sBalans.setPosition(tims.get(timt));
+                    sBalans.setPosition(grabs.get(2));
                     conversiePerverssa(SAP + poff.get(2));
                     ext(EMIN);
                     timt = 1;
