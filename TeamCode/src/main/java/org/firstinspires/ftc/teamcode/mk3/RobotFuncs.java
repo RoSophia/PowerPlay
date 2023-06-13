@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.EBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
+import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.EXTT;
 import static org.firstinspires.ftc.teamcode.RobotVars.LEEW;
 import static org.firstinspires.ftc.teamcode.RobotVars.RAP;
@@ -115,6 +116,9 @@ public class RobotFuncs {
                 ep(p);
             }
         } else {
+            if (ridA == null) {
+                return;
+            }
             if (Math.abs(p) < 0.0001) {
                 rpd.use = true;
             } else {
@@ -205,17 +209,19 @@ public class RobotFuncs {
         rightFront = initm("RF", false, true);  // P2
         leftBack = initm("LB", false, false);   // P3
         leftFront = initm("LF", false, false);  // P1
-        extA = initm("extA", true, false);
-        extB = initm("extB", true, true);
-        ridA = initm("ridA", true, true);
-        ridB = initm("ridB", false, false);
-        if (!useExt) {
-            extA.setMotorDisable();
-            extB.setMotorDisable();
+        if (useExt) {
+            extA = initm("extA", true, false);
+            extB = initm("extB", true, true);
+        } else {
+            extA = null;
+            extB = null;
         }
-        if (!useRid) {
-            ridA.setMotorDisable();
-            ridB.setMotorDisable();
+        if (useRid) {
+            ridA = initm("ridA", true, true);
+            ridB = initm("ridB", false, false);
+        } else {
+            ridA = null;
+            ridB = null;
         }
         //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
 
@@ -305,13 +311,13 @@ public class RobotFuncs {
 
         epd.shouldClose = false;
         epd.use = true;
-        epd.target = 0;
+        epd.target = EMIN;
         epd.lom = lom;
         extT.start();
 
         rpd.shouldClose = false;
         rpd.use = true;
-        rpd.target = 0;
+        rpd.target = RBOT_POS;
         rpd.lom = lom;
         ridT.start();
 
@@ -328,8 +334,10 @@ public class RobotFuncs {
         rightFront.setPower(0);
         leftBack.setPower(0);
         rightBack.setPower(0);
-        ridA.setPower(0);
-        ridB.setPower(0);
+        if (ridA != null) {
+            ridA.setPower(0);
+            ridB.setPower(0);
+        }
         if (extA != null) {
             extA.setPower(0);
             extB.setPower(0);

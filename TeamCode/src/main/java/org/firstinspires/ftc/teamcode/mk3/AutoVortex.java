@@ -16,11 +16,17 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
@@ -126,13 +132,13 @@ public class AutoVortex extends LinearOpMode {
     public static double P1Y = -13;
     public static double P2H = 1.431;
     public static double P2X = -123;
-    public static double P2Y = -20;
-    public static double P3H = 1.97;
-    public static double P3X = -118;
-    public static double P3Y = -68;
+    public static double P2Y = -22;
+    public static double P3H = 1.92;
+    public static double P3X = -112;
+    public static double P3Y = -71;
     public static double P4H = 1.41;
     public static double P4X = -122;
-    public static double P4Y = -18;
+    public static double P4Y = -20;
 
     public static double P678X = -118;
     public static double P678H = 1.431;
@@ -169,7 +175,7 @@ public class AutoVortex extends LinearOpMode {
     public static double R1X = 40;
     public static double R1Y = 2.4;
     public static double R2X = 40;
-    public static double R2Y = 1.6;
+    public static double R2Y = 1.2;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -184,6 +190,7 @@ public class AutoVortex extends LinearOpMode {
         double time;
         String name;
         double val;
+
         public Spike(double v, String n) {
             this.time = getRuntime();
             this.val = v;
@@ -194,6 +201,7 @@ public class AutoVortex extends LinearOpMode {
     Vector<Spike> spv = new Vector<>();
 
     public static double SPIKE_THRESHOLD = 20000;
+
     void chenc(double ol, double ne, String name) {
         if ((ne < 0 && ol < 0) && ((ne - ol) > SPIKE_THRESHOLD)) {
             spv.add(new Spike(ne - ol, name));
@@ -251,6 +259,25 @@ public class AutoVortex extends LinearOpMode {
             }
             timer.reset();
             dashboard.sendTelemetryPacket(pack);
+
+            if (!SHITTY_WORKAROUND_TIMED && SHITTY_WORKAROUND_TIMER.seconds() < SHITTY_WORKAROUND_TIME) {
+                if (extA != null) {
+                    epd.use = false;
+                    epd.curRet = true;
+                    extA.setPower(-SHITTY_WORKAROUND_POWER);
+                    extB.setPower(-SHITTY_WORKAROUND_POWER);
+                }
+            } else if (!SHITTY_WORKAROUND_TIMED) {
+                SHITTY_WORKAROUND_TIMED = true;
+                if (extA != null) {
+                    extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                    extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                }
+                epd.use = true;
+                epd.curRet = false;
+            }
         }
     }
 
@@ -287,15 +314,15 @@ public class AutoVortex extends LinearOpMode {
     }
 
     public static double RD = -0.7;
-    public static double RD2 = -0.4;
-    public static double GW = 0.4;
+    public static double RD2 = 0.0;
     public static double ET = 0.6;
-    public static double HT = 0.1;
+    public static double HT = 0.13;
+    public static double HHT = 0.12;
 
     int lp = 1;
     public static double SGS = 0.495;
     public static double SGD = 0.024;
-    public static double SBAS = 0.57;
+    public static double SBAS = 0.60;
     public static double SBAD = 0.0;
 
     public static int EX = EMAX;
@@ -325,14 +352,12 @@ public class AutoVortex extends LinearOpMode {
         ++lp;
     }
 
-    public static int NUMC = 4;
+    public static int NUMC = 5;
 
     TrajectorySequence goToPreload;
     TrajectorySequence preloadToGet;
-    TrajectorySequence putStalp;
-    TrajectorySequence putCone;
-    TrajectorySequence stalpToGet;
     TrajectorySequence goToPark;
+    Vector<Vector<TrajectorySequence>> trss = new Vector<>();
 
     void mktraj() {
         Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
@@ -356,6 +381,7 @@ public class AutoVortex extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                     rid(RBOT_POS);
                     ret();
+                    set_grab_pos(1);
                 })
                 .build();
 
@@ -368,39 +394,51 @@ public class AutoVortex extends LinearOpMode {
                 .waitSeconds(ET)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> sClose.setPosition(SINCHIS))
                 .waitSeconds(0.11)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> conversiePerverssa(SAH))
-                .waitSeconds(HT)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> clo.toPut = true)
-                .build();
-
-        putStalp = drive.trajectorySequenceBuilder(new Pose2d(P2X, P2Y, P2H))
-                .funnyRaikuCurveLinear(new Pose2d(P3X, P3Y, P3H), RAI1, RAI2)
-                .build();
-
-
-        putCone = drive.trajectorySequenceBuilder(new Pose2d(P3X + 0.000001, P3Y, P3H))
-                .funnyRaikuCurveLinear(new Pose2d(P3X, P3Y, P3H), RAI1, RAI2)
-                .UNSTABLE_addTemporalMarkerOffset(RD2, () -> rid(RTOP_POS))
-                .waitSeconds(WD2)
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                    rid(RBOT_POS);
-                    ret();
-                })
-                .build();
-
-        stalpToGet = drive.trajectorySequenceBuilder(new Pose2d(P3X, P3Y, P3H))
-                .funnyRaikuCurveLinear(new Pose2d(P4X, P4Y, P4H), RBI1, RBI2)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    epd.set_target(EX, 0);
-                    upd_grab_pos();
+                    conversiePerverssa(SAH);
+                    sBalans.setPosition(SBAH);
                 })
-                .waitSeconds(ET)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> sClose.setPosition(SINCHIS))
-                .waitSeconds(0.11)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> conversiePerverssa(SAH))
                 .waitSeconds(HT)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    sHeading.setPosition(SHP);
+                    sBalans.setPosition(SBAP);
+                    conversiePerverssa(SAP);
+                })
+                .waitSeconds(HHT)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> clo.toPut = true)
                 .build();
+
+        for (int i = 0; i < NUMC; ++i) {
+            Vector<TrajectorySequence> trs = new Vector<>();
+            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P2X + XOFF * i, P2Y + YOFF * i, P2H + HOFF * i))
+                    .funnyRaikuCurveLinear(new Pose2d(P3X, P3Y, P3H), RAI1, RAI2)
+                    .build());
+
+            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + XOFF * i + 0.0001, P3Y + YOFF * i, P3H + HOFF * i))
+                    .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
+                    .UNSTABLE_addTemporalMarkerOffset(RD2, () -> rpd.set_target(RTOP_POS, UPT))
+                    .waitSeconds(WD2)
+                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                        rid(RBOT_POS);
+                        ret();
+                    })
+                    .build());
+
+            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + XOFF * i, P3Y + YOFF * i, P3H + HOFF * i))
+                    .funnyRaikuCurveLinear(new Pose2d(P4X, P4Y, P4H), RBI1, RBI2)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        epd.set_target(EX, 0);
+                        upd_grab_pos();
+                    })
+                    .waitSeconds(ET)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> sClose.setPosition(SINCHIS))
+                    .waitSeconds(0.11)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> conversiePerverssa(SAH))
+                    .waitSeconds(HT)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> clo.toPut = true)
+                    .build());
+            trss.add(trs);
+        }
 
         switch (LAST_ID) {
             default:
@@ -462,6 +500,9 @@ public class AutoVortex extends LinearOpMode {
     void getpos() {
         TA = TB = TX = false;
         boolean SGP = false;
+        boolean DL = false;
+        boolean DR = false;
+        boolean DU = false;
         if (GPOS) {
             while (!isStopRequested() && !gamepad1.right_bumper) {
                 drive.updatePoseEstimate();
@@ -532,11 +573,50 @@ public class AutoVortex extends LinearOpMode {
                     set_grab_pos(PUST);
                 }
 
+                if (gamepad1.dpad_left && !DL) {
+                    conversiePerverssa(SAH);
+                    sBalans.setPosition(SBAH);
+                }
+                DL = gamepad1.dpad_left;
+
+                if (gamepad1.dpad_right && !DR) {
+                    if (sClose.getPosition() != SINCHIS) {
+                        sClose.setPosition(SINCHIS);
+                    } else {
+                        sClose.setPosition(SDESCHIS);
+                    }
+                }
+                DR = gamepad1.dpad_right;
+
+                if (gamepad1.dpad_up && !DU) {
+                    clo.toPut = true;
+                }
+                DU = gamepad1.dpad_up;
+
+                if (!SHITTY_WORKAROUND_TIMED && SHITTY_WORKAROUND_TIMER.seconds() < SHITTY_WORKAROUND_TIME) {
+                    if (extA != null) {
+                        epd.use = false;
+                        epd.curRet = true;
+                        extA.setPower(-SHITTY_WORKAROUND_POWER);
+                        extB.setPower(-SHITTY_WORKAROUND_POWER);
+                    }
+                } else if (!SHITTY_WORKAROUND_TIMED) {
+                    SHITTY_WORKAROUND_TIMED = true;
+                    if (extA != null) {
+                        extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                        extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                        extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                        extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                    }
+                    epd.use = true;
+                    epd.curRet = false;
+                }
             }
         }
     }
 
     public static double TARGET_ANGLE = 2.3;
+
     void align() {
         double sangle = imu.getAngularOrientation().firstAngle;
         double cdif = TARGET_ANGLE - sangle;
@@ -554,7 +634,28 @@ public class AutoVortex extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(cp.getX(), cp.getY(), P2H));
     }
 
+    void fix_head() {
+
+    }
+
+    void unfix_head() {
+
+    }
+
     Encoder leftEncoder, rightEncoder, frontEncoder;
+    ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
+    boolean SHITTY_WORKAROUND_TIMED = false;
+
+    public static double XOFF = 3;
+    public static double YOFF = 0;
+    public static double HOFF = 0;
+
+    void apply_correction() {
+        drive.updatePoseEstimate();
+        Pose2d cp = drive.getPoseEstimate();
+        Pose2d np = new Pose2d(cp.getX() + XOFF, cp.getX() + YOFF, cp.getHeading() + HOFF);
+        drive.setPoseEstimate(np);
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -685,8 +786,9 @@ public class AutoVortex extends LinearOpMode {
                     Canvas fieldOverlay = p.fieldOverlay();
                     draw(fieldOverlay, goToPreload);
                     draw(fieldOverlay, preloadToGet);
-                    draw(fieldOverlay, putStalp);
-                    draw(fieldOverlay, stalpToGet);
+                    draw(fieldOverlay, trss.get(0).get(0));
+                    draw(fieldOverlay, trss.get(0).get(1));
+                    draw(fieldOverlay, trss.get(0).get(2));
                     p.put("Updated!", 0);
                     dashboard.sendTelemetryPacket(p);
                     P11X = RAI1X;
@@ -696,6 +798,14 @@ public class AutoVortex extends LinearOpMode {
                 }
 
                 sleep(100);
+                telemetry.addLine("THIS IS BBBBBBBBBBBBBBBBBBBBBB");
+                telemetry.addLine("____  ____  ____  ____  ____  ____  ____");
+                telemetry.addLine("| __ )| __ )| __ )| __ )| __ )| __ )| __ ) ");
+                telemetry.addLine("|  _ \\|  _ \\|  _ \\|  _ \\|  _ \\|  _ \\|  _ \\ ");
+                telemetry.addLine("| |_) | |_) | |_) | |_) | |_) | |_) | |_) |");
+                telemetry.addLine("|____/|____/|____/|____/|____/|____/|____/");
+                telemetry.update();
+
             }
         } else {
             packet = new TelemetryPacket();
@@ -704,6 +814,8 @@ public class AutoVortex extends LinearOpMode {
 
             it = getRuntime();
 
+            SHITTY_WORKAROUND_TIMER.reset();
+            SHITTY_WORKAROUND_TIMED = false;
             getpos();
             follow_traj(goToPreload);
             getpos();
@@ -711,12 +823,25 @@ public class AutoVortex extends LinearOpMode {
             getpos();
             for (int i = 0; i < NUMC - 1; ++i) {
                 //align();
-                follow_traj(putStalp);
+                follow_traj(trss.get(i).get(0)); // Go to stalp
+                while (!coneReady && !isStopRequested()) {
+                    sleep(2);
+                }
+                follow_traj(trss.get(i).get(1)); // Put cone
                 getpos();
-                follow_traj(stalpToGet);
+                fix_head();
+                follow_traj(trss.get(i).get(2)); // Stalp to get
+                unfix_head();
                 getpos();
+                //apply_correction();
             }
-            follow_traj(putStalp);
+            if (NUMC >= 1) {
+                follow_traj(trss.get(NUMC - 1).get(0)); // Go to stalp
+                while (!coneReady && !isStopRequested()) {
+                    sleep(2);
+                }
+                follow_traj(trss.get(NUMC - 1).get(1)); // Put cone
+            }
             getpos();
 
             if (RECURRING_SINGULARITY && !isStopRequested()) {

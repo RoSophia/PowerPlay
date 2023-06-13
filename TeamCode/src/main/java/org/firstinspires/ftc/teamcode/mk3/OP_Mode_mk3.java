@@ -53,11 +53,13 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SBAPG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
+import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SMEDIU;
@@ -156,8 +158,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double RIDL = 0.2;
 
     Encoder leftEncoder, rightEncoder, frontEncoder;
-    public static double SHITTY_WORKAROUND_TIME = 0.2;
-    public static double SHITTY_WORKAROUND_POWER = 1;
 
     public void runOpMode() {
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = coneReady = false;
@@ -215,7 +215,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 conversiePerverssa(SAP);
                 sHeading.setPosition(SHP);
                 sMCLaw.setPosition(SCC);
-                sBalans.setPosition(SBAPG);
+                sBalans.setPosition(SBAP);
             } else if (CU_TESTING == 2) {
                 conversiePerverssa(SAG);
                 sHeading.setPosition(SHG);
@@ -378,19 +378,22 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 dashboard.sendTelemetryPacket(pack);
                 timer.reset();
 
-                if (extA != null) {
-                    if (SHITTY_WORKAROUND_TIMER.seconds() < SHITTY_WORKAROUND_TIME) {
-                        epd.use = false;
-                        extA.setPower(-SHITTY_WORKAROUND_POWER);
-                        extB.setPower(-SHITTY_WORKAROUND_POWER);
-                    } else if (!SHITTY_WORKAROUND_TIMED) {
-                        SHITTY_WORKAROUND_TIMED = true;
-                        epd.use = true;
-                        extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                        extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                        extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                        extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                    }
+            }
+
+            if (extA != null) {
+                if (SHITTY_WORKAROUND_TIMER.seconds() < SHITTY_WORKAROUND_TIME) {
+                    epd.curRet = true;
+                    epd.use = false;
+                    extA.setPower(-SHITTY_WORKAROUND_POWER);
+                    extB.setPower(-SHITTY_WORKAROUND_POWER);
+                } else if (!SHITTY_WORKAROUND_TIMED) {
+                    SHITTY_WORKAROUND_TIMED = true;
+                    epd.use = true;
+                    epd.curRet = false;
+                    extA.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extA.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                    extB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
                 }
             }
 
