@@ -26,7 +26,6 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
@@ -57,6 +56,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sHeading;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.wtfor;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_TRAJECTORY;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_TURN;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_WAIT;
@@ -66,6 +66,7 @@ import android.annotation.SuppressLint;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
@@ -80,6 +81,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.SequenceSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TrajectorySegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
@@ -129,16 +131,24 @@ public class AutoVortex extends LinearOpMode {
 
     public static double P1H = 0.541;
     public static double P1X = -138;
-    public static double P1Y = -13;
+    public static double P1Y = -11;
     public static double P2H = 1.431;
     public static double P2X = -123;
-    public static double P2Y = -22;
+    public static double P2Y = -14;
     public static double P3H = 1.92;
     public static double P3X = -112;
     public static double P3Y = -71;
-    public static double P4H = 1.41;
-    public static double P4X = -122;
-    public static double P4Y = -20;
+    public static double P4H = 1.40;
+    public static double P4X = -120;
+    public static double P4Y = -15;
+
+    public static double OFFX = 2;
+    public static double OFFY = 2;
+    public static double OFFH = -0.01;
+
+    public static double OFFX1 = 2;
+    public static double OFFY1 = 0.2;
+    public static double OFFH1 = -0.002;
 
     public static double P678X = -118;
     public static double P678H = 1.431;
@@ -162,12 +172,15 @@ public class AutoVortex extends LinearOpMode {
     public static double RBI2Y = 3.2;
 
     public static boolean BBBBBBBBBBBBBB = true;
-    public static boolean RECURRING_SINGULARITY = true;
-    public static boolean GPOS = true;
+    public static boolean RECURRING_SINGULARITY = false;
+    public static boolean GPOS = false;
 
-    public static double MVEL = 250;
+    /*public static double MVEL = 250;
     public static double MAL = 250;
-    public static double MDL = 100;
+    public static double MDL = 100;*/
+    public static double MVEL = 999; // THE ONLY TYPE OF
+    public static double MAL = 999;  // BREAKING I KNOW IS
+    public static double MDL = 999;  // BREAKING BAD
 
     public double WD = 0.02;
     public static double WD2 = 0.3;
@@ -196,6 +209,11 @@ public class AutoVortex extends LinearOpMode {
             this.val = v;
             this.name = n;
         }
+    }
+
+    void set_wait_time(double t) {
+        drive.follower = new HolonomicPIDVAFollower(SampleMecanumDrive.AXIAL_PID, SampleMecanumDrive.LATERAL_PID, SampleMecanumDrive.HEADING_PID, new Pose2d(2, 2, Math.toRadians(2)), t);
+        drive.trajectorySequenceRunner = new TrajectorySequenceRunner(drive.follower, SampleMecanumDrive.HEADING_PID);
     }
 
     Vector<Spike> spv = new Vector<>();
@@ -314,18 +332,17 @@ public class AutoVortex extends LinearOpMode {
     }
 
     public static double RD = -0.7;
-    public static double RD2 = 0.0;
-    public static double ET = 0.6;
     public static double HT = 0.13;
     public static double HHT = 0.12;
+
+    public static double WHO = 0.8;
+    public static double WEX = 0.8;
 
     int lp = 1;
     public static double SGS = 0.495;
     public static double SGD = 0.024;
     public static double SBAS = 0.60;
     public static double SBAD = 0.0;
-
-    public static int EX = EMAX;
 
     void ret() {
         armHolding = false;
@@ -356,8 +373,13 @@ public class AutoVortex extends LinearOpMode {
 
     TrajectorySequence goToPreload;
     TrajectorySequence preloadToGet;
+    TrajectorySequence startGrab;
     TrajectorySequence goToPark;
+    TrajectorySequence ender;
     Vector<Vector<TrajectorySequence>> trss = new Vector<>();
+
+    IchHasseKinder ihk;
+    Thread ihkT;
 
     void mktraj() {
         Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
@@ -388,10 +410,13 @@ public class AutoVortex extends LinearOpMode {
         preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
                 .funnyRaikuCurveLinear(new Pose2d(P2X, P2Y, P2H), PTG1, PTG2)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    epd.set_target(EX, 0);
+                    epd.set_target(EMAX, 0);
                     upd_grab_pos();
                 })
-                .waitSeconds(ET)
+                .build();
+
+        startGrab = drive.trajectorySequenceBuilder(new Pose2d(P2X + 0.0001, P2Y, P2H))
+                .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> sClose.setPosition(SINCHIS))
                 .waitSeconds(0.11)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -405,40 +430,51 @@ public class AutoVortex extends LinearOpMode {
                     conversiePerverssa(SAP);
                 })
                 .waitSeconds(HHT)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> clo.toPut = true)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> ihk.stage = 1)
                 .build();
 
         for (int i = 0; i < NUMC; ++i) {
             Vector<TrajectorySequence> trs = new Vector<>();
-            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P2X + XOFF * i, P2Y + YOFF * i, P2H + HOFF * i))
-                    .funnyRaikuCurveLinear(new Pose2d(P3X, P3Y, P3H), RAI1, RAI2)
+            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i)) /// From Get cone to stalp
+                    .funnyRaikuCurveLinear(new Pose2d(P3X + OFFX1 * i, P3Y + OFFY1 * i, P3H + OFFH1 * i), RAI1, RAI2)
                     .build());
 
-            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + XOFF * i + 0.0001, P3Y + YOFF * i, P3H + HOFF * i))
-                    .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
-                    .UNSTABLE_addTemporalMarkerOffset(RD2, () -> rpd.set_target(RTOP_POS, UPT))
-                    .waitSeconds(WD2)
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + OFFX1 * i, P3Y + OFFY1 * i, P3H + OFFH1 * i)) // Retract, extend and go to ext
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         rid(RBOT_POS);
                         ret();
-                    })
-                    .build());
-
-            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + XOFF * i, P3Y + YOFF * i, P3H + HOFF * i))
-                    .funnyRaikuCurveLinear(new Pose2d(P4X, P4Y, P4H), RBI1, RBI2)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        epd.set_target(EX, 0);
+                        epd.set_target(EMAX, 0);
                         upd_grab_pos();
                     })
-                    .waitSeconds(ET)
+                    .funnyRaikuCurveLinear(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2)
+                    .build());
+
+            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P4X + OFFX * i + 0.0001, P4Y + OFFY * i, P4H + OFFH * i)) // At get retract
+                    .lineToLinearHeading(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i))
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> sClose.setPosition(SINCHIS))
                     .waitSeconds(0.11)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> conversiePerverssa(SAH))
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        conversiePerverssa(SAH);
+                        sBalans.setPosition(SBAH);
+                    })
                     .waitSeconds(HT)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> clo.toPut = true)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        sHeading.setPosition(SHP);
+                        sBalans.setPosition(SBAP);
+                        conversiePerverssa(SAP);
+                    })
+                    .waitSeconds(HHT)
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> ihk.stage = 1)
                     .build());
+
             trss.add(trs);
         }
+
+        ender = drive.trajectorySequenceBuilder(new Pose2d(P3X + OFFX1 * NUMC + 0.0001, P3Y + OFFY1 * NUMC, P3H + OFFH1 * NUMC))
+                .lineToLinearHeading(new Pose2d(P3X + OFFX1 * NUMC, P3Y + OFFY1 * NUMC, P3H + OFFH1 * NUMC))
+                .addTemporalMarker(this::ret)
+                .waitSeconds(1)
+                .build();
 
         switch (LAST_ID) {
             default:
@@ -561,7 +597,7 @@ public class AutoVortex extends LinearOpMode {
 
                 if (gamepad1.y && !TB) {
                     sClose.setPosition(SDESCHIS);
-                    epd.set_target(EX, 0);
+                    epd.set_target(EMAX, 0);
                 }
                 TB = gamepad1.y;
 
@@ -634,32 +670,17 @@ public class AutoVortex extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(cp.getX(), cp.getY(), P2H));
     }
 
-    void fix_head() {
-
-    }
-
-    void unfix_head() {
-
-    }
-
     Encoder leftEncoder, rightEncoder, frontEncoder;
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
 
-    public static double XOFF = 3;
-    public static double YOFF = 0;
-    public static double HOFF = 0;
-
-    void apply_correction() {
-        drive.updatePoseEstimate();
-        Pose2d cp = drive.getPoseEstimate();
-        Pose2d np = new Pose2d(cp.getX() + XOFF, cp.getX() + YOFF, cp.getHeading() + HOFF);
-        drive.setPoseEstimate(np);
-    }
+    public static double WAT = 0.4;
 
     @Override
     public void runOpMode() throws InterruptedException {
         initma(hardwareMap);
+        ihk = new IchHasseKinder();
+        ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         coneReady = true;
         sMCLaw.setPosition(SCC);
@@ -764,6 +785,9 @@ public class AutoVortex extends LinearOpMode {
             });
         }
         startma(this, false);
+        ihk.shouldClose = false;
+        ihk.lom = this;
+        ihkT.start();
 
         drive.setPoseEstimate(new Pose2d(SPOSX, SPOSY, SPOSH));
         //drive.setPoseEstimate(new Pose2d(0, 0, 0));
@@ -817,30 +841,33 @@ public class AutoVortex extends LinearOpMode {
             SHITTY_WORKAROUND_TIMER.reset();
             SHITTY_WORKAROUND_TIMED = false;
             getpos();
+            set_wait_time(0);
             follow_traj(goToPreload);
             getpos();
+            set_wait_time(WAT);
             follow_traj(preloadToGet);
+            wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
+            set_wait_time(0);
+            follow_traj(startGrab);
             getpos();
             for (int i = 0; i < NUMC - 1; ++i) {
-                //align();
                 follow_traj(trss.get(i).get(0)); // Go to stalp
-                while (!coneReady && !isStopRequested()) {
-                    sleep(2);
-                }
-                follow_traj(trss.get(i).get(1)); // Put cone
+                wtfor(RobotFuncs.WAITS.HOISTER, WHO);
+                set_wait_time(WAT);
+                follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
+                wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
+                set_wait_time(0);
+                follow_traj(trss.get(i).get(2)); // At get (retract)
                 getpos();
-                fix_head();
-                follow_traj(trss.get(i).get(2)); // Stalp to get
-                unfix_head();
-                getpos();
-                //apply_correction();
             }
+
             if (NUMC >= 1) {
+                set_wait_time(0);
                 follow_traj(trss.get(NUMC - 1).get(0)); // Go to stalp
-                while (!coneReady && !isStopRequested()) {
-                    sleep(2);
-                }
-                follow_traj(trss.get(NUMC - 1).get(1)); // Put cone
+                wtfor(RobotFuncs.WAITS.HOISTER, WHO);
+                rid(RBOT_POS);
+                ret();
+                wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0);
             }
             getpos();
 
@@ -850,9 +877,12 @@ public class AutoVortex extends LinearOpMode {
                         .lineToLinearHeading(new Pose2d(0, 0, 0))
                         .build();
                 follow_traj(traj);
+            } else if (!isStopRequested()) {
+                follow_traj(ender);
             }
 
             endma();
+            ihk.shouldClose = true;
 
             leftBack.setPower(0);
             rightBack.setPower(0);

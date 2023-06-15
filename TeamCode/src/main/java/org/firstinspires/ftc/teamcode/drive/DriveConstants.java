@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
  * and op modes themselves.
  */
 
-//@Config
+@Config
 public class DriveConstants {
 
     /*
@@ -66,9 +66,13 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 200;// 254
-    public static double MAX_ACCEL = 150;//100;
-    public static double MAX_DECEL = 100;//70;
+    public static double MAX_VEL = 999;    // THE ONLY TYPE OF
+    public static double MAX_ACCEL = 999;  // BREAKING I KNOW IS
+    public static double MAX_DECEL = 999;  // BREAKING BAD
+
+    /*public static double MAX_VEL = 200;// 254
+    public static double MAX_ACCEL = 200;//100;
+    public static double MAX_DECEL = 180;//70;*/
 
     //public static double MAX_VEL = 110;// True max: 170
     //public static double MAX_ACCEL = 110;

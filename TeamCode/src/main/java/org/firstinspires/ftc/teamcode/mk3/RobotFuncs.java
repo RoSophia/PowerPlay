@@ -43,6 +43,8 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rp;
 import static org.firstinspires.ftc.teamcode.RobotVars.useExt;
 import static org.firstinspires.ftc.teamcode.RobotVars.useRid;
 
+import static java.lang.Thread.sleep;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
@@ -56,6 +58,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @SuppressWarnings("ALL")
 public class RobotFuncs {
@@ -72,6 +75,7 @@ public class RobotFuncs {
     public static FtcDashboard dashboard;
     public static HardwareMap hardwareMap;
     public static DistanceSensor sensorRange;
+    public static LinearOpMode lom;
 
     static double eps = 0.00001;
 
@@ -105,7 +109,7 @@ public class RobotFuncs {
                 epd.use = true;
             } else {
                 epd.use = false; /// Turn off the PID so we can power tham manually
-                if (p < 0 && extA.getCurrentPosition() < -2) { /// Prevent the extension mechanism from going beyond its bounds
+                if (p < 0 && extA.getCurrentPosition() < 6) { /// Prevent the extension mechanism from going beyond its bounds
                     ep(0);
                     return;
                 }
@@ -123,7 +127,7 @@ public class RobotFuncs {
                 rpd.use = true;
             } else {
                 rpd.use = false;
-                if (p < 0 && ridA.getCurrentPosition() < -2) {
+                if (p < 0 && ridA.getCurrentPosition() < 6) {
                     rp(0);
                     return;
                 }
@@ -151,6 +155,50 @@ public class RobotFuncs {
             }
         }
     }
+
+    public static int MAX_DIF_RID = 5;
+    public static int MAX_DIF_EXT = 5;
+
+    public static enum WAITS {TRANSFER, HOISTER, EXTENSION, HOISTER_FALL}
+
+    public static void wtfor(WAITS p, double extra) {
+        try {
+            if (p == WAITS.TRANSFER) { /// 0: Wait for transfer to finish
+                while (!lom.isStopRequested() && !coneReady) {
+                    sleep(2);
+                }
+            } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
+                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) < MAX_DIF_RID) {
+                    sleep(2);
+                }
+            } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
+                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) < MAX_DIF_EXT) {
+                    sleep(2);
+                }
+            } else if (p == WAITS.HOISTER_FALL) { /// 2: Wait for hoisster to not the thing
+                while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) < MAX_DIF_RID) {
+                    sleep(2);
+                }
+            }
+            ElapsedTime et = new ElapsedTime(0);
+            while (et.seconds() < extra && !lom.isStopRequested()) {
+                sleep(2);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    public static boolean wtfor_nonblocking(WAITS p) {
+        if (p == WAITS.TRANSFER) { /// 0: Wait for transfer to finish
+            return coneReady;
+        } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
+            return (RTOP_POS - ridA.getCurrentPosition()) < MAX_DIF_RID;
+        } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
+            return (EMAX - extA.getCurrentPosition()) < MAX_DIF_EXT;
+        }
+        return false;
+    }
+
 
     static public void conversiePerverssa(double p) { /// Handle moving both grabber arm servos
         // MidFunnyRaikuStabilizer

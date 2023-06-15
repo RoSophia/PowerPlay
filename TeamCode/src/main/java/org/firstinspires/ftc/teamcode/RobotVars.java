@@ -15,7 +15,7 @@ public class RobotVars {
     public static int RTOP_POS = 590;     // Maximum Lift Position
     public static int RMIU_POS = 342;     // Medium Lift Position
     public static int RMID_POS = 100;     // Low Lift Position
-    public static int RBOT_POS = 12;       // Bottom Lift position
+    public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
     public static double SAG = 0.400;     // Grabber Arm Get position
@@ -63,7 +63,7 @@ public class RobotVars {
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.0008;
-    public static double rmd = 20;
+    public static double rmd = 6;
     public static double rbp = 0;
 
     public static double EAP = 1.0; // Extension A Scale Term

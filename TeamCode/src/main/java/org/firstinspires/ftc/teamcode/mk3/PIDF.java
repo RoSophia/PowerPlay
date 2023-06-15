@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.RobotVars.rmd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
@@ -205,13 +206,13 @@ class PIDF implements Runnable {
                     // DO NOT ATTEMPT THIS AT HOME
                     if (Math.abs(ctarg - cp) < md) {
                         pack.addLine("Into the void");
-                        if (md == rmd && ctarg == 0) {
+                        if (md == rmd && ctarg <= RBOT_POS + 1) {
                             outp = 0;
                         } else {
                             if (Math.abs(ctarg - cp) < md / 4) {
                                 lf = true;
                             }
-                            if (!lf) {
+                            if (!lf) { // TODO: Only apply correction if overshooting
                                 outp = CORRECTION * sign(ctarg - cp);
                             } else {
                                 outp = f;

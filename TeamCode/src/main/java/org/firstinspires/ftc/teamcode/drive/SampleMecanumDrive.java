@@ -65,7 +65,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients AXIAL_PID = new PIDCoefficients(7, 0, 0);
     public static PIDCoefficients LATERAL_PID = new PIDCoefficients(7, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(13, 0, 0);
-    public static double CORT = 0.4;
+    public static double CORT = 0.3;
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -73,13 +73,13 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
-    private TrajectorySequenceRunner trajectorySequenceRunner;
+    public TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
     private static TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
     private static TrajectoryAccelerationConstraint DECEL_CONSTRAINT = getAccelerationConstraint(MAX_DECEL);
 
-    private TrajectoryFollower follower;
+    public TrajectoryFollower follower;
 
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
