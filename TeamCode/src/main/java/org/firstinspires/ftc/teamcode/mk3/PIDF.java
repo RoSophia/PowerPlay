@@ -178,6 +178,10 @@ class PIDF implements Runnable {
                 pack.put(name + "LF", lf);
                 pack.put(name + "use", use);
                 pack.put(name + "curRet", curRet);
+                pack.put(name + "PID_p", p);
+                pack.put(name + "PID_i", i);
+                pack.put(name + "PID_d", d);
+                pack.put(name + "PID_f", f);
                 dashboard.sendTelemetryPacket(pack);
             }
             updt();
@@ -201,7 +205,9 @@ class PIDF implements Runnable {
 
                 outp = (p * error) + (d * derivate) + (i * integralSum) + f;
                 TelemetryPacket pack = new TelemetryPacket();
-                if (ctarg == target && target < 100) {
+
+                //if (ctarg == target && (target < 100)) {
+                if (ctarg == target) {
                     // THIS IS A HACK ON TOP OF ANOTHER HACK
                     // DO NOT ATTEMPT THIS AT HOME
                     if (Math.abs(ctarg - cp) < md) {
@@ -212,7 +218,7 @@ class PIDF implements Runnable {
                             if (Math.abs(ctarg - cp) < md / 4) {
                                 lf = true;
                             }
-                            if (!lf) { // TODO: Only apply correction if overshooting
+                            if (!lf) {
                                 outp = CORRECTION * sign(ctarg - cp);
                             } else {
                                 outp = f;
@@ -231,6 +237,9 @@ class PIDF implements Runnable {
 
                     if (motB != null) {
                         double bdif = (cp - cpb) * b;
+                        if (Math.abs(cp - cpb) < 2) {
+                            bdif = 0;
+                        }
                         motB.setPower((outp + bdif) * pcoef);
                     }
                 } else {

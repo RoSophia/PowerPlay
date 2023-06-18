@@ -48,9 +48,9 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.6;
-    public static double CET = 0.5;
-    public static double CHT = 0.6;
+    public static double CPT = 0.4;
+    public static double CET = 0.1;
+    public static double CHT = 0.3;
     public static double WPT = 0.0;
     public static double WET = 0.0;
     public static double WHT = 0.25;

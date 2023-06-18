@@ -8,10 +8,16 @@ import static org.firstinspires.ftc.teamcode.RobotVars.EBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.EXTT;
+import static org.firstinspires.ftc.teamcode.RobotVars.FER;
+import static org.firstinspires.ftc.teamcode.RobotVars.FES;
 import static org.firstinspires.ftc.teamcode.RobotVars.LEEW;
+import static org.firstinspires.ftc.teamcode.RobotVars.LER;
+import static org.firstinspires.ftc.teamcode.RobotVars.LES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBP;
+import static org.firstinspires.ftc.teamcode.RobotVars.RER;
+import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
@@ -58,7 +64,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 @SuppressWarnings("ALL")
 public class RobotFuncs {
@@ -76,6 +88,7 @@ public class RobotFuncs {
     public static HardwareMap hardwareMap;
     public static DistanceSensor sensorRange;
     public static LinearOpMode lom;
+    public static Telemetry telemetry;
 
     static double eps = 0.00001;
 
@@ -109,7 +122,7 @@ public class RobotFuncs {
                 epd.use = true;
             } else {
                 epd.use = false; /// Turn off the PID so we can power tham manually
-                if (p < 0 && extA.getCurrentPosition() < 6) { /// Prevent the extension mechanism from going beyond its bounds
+                if (p < 0 && extA.getCurrentPosition() < 12) { /// Prevent the extension mechanism from going beyond its bounds
                     ep(0);
                     return;
                 }
@@ -127,7 +140,7 @@ public class RobotFuncs {
                 rpd.use = true;
             } else {
                 rpd.use = false;
-                if (p < 0 && ridA.getCurrentPosition() < 6) {
+                if (p < 0 && ridA.getCurrentPosition() < 12) {
                     rp(0);
                     return;
                 }
@@ -160,31 +173,105 @@ public class RobotFuncs {
     public static int MAX_DIF_EXT = 5;
 
     public static enum WAITS {TRANSFER, HOISTER, EXTENSION, HOISTER_FALL}
+    public static SampleMecanumDrive drive;
+    public static Encoder leftEncoder;
+    public static Encoder rightEncoder;
+    public static Encoder frontEncoder;
+
+    public static void log_state() {
+        TelemetryPacket pack = new TelemetryPacket();
+        if (drive != null) {
+            pack.put("Ex", drive.getLastError().getX());
+            pack.put("Ey", drive.getLastError().getY());
+            pack.put("Eh", drive.getLastError().getHeading());
+        }
+        pack.put("vel", leftEncoder.getCorrectedVelocity());
+        pack.put("ver", rightEncoder.getCorrectedVelocity());
+        pack.put("vef", frontEncoder.getCorrectedVelocity());
+        pack.put("voltage", batteryVoltageSensor.getVoltage());
+        if (extA != null) {
+            pack.put("CUR_extA", extA.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("CUR_extB", extB.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("POW_extA", extA.getPower());
+            pack.put("POW_extB", extB.getPower());
+        }
+        if (ridA != null) {
+            pack.put("CUR_ridA", ridA.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("CUR_ridB", ridB.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("POW_ridA", ridA.getPower());
+            pack.put("POW_ridB", ridB.getPower());
+        }
+        dashboard.sendTelemetryPacket(pack);
+    }
+
 
     public static void wtfor(WAITS p, double extra) {
+        TelemetryPacket pa = new TelemetryPacket();
+        pa.put("WAIT_FOR_P", p);
+        pa.put("WAIT_FOR_E", extra);
+        dashboard.sendTelemetryPacket(pa);
         try {
             if (p == WAITS.TRANSFER) { /// 0: Wait for transfer to finish
                 while (!lom.isStopRequested() && !coneReady) {
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", !coneReady);
+                    dashboard.sendTelemetryPacket(pa);
+                    telemetry.addLine("WRFOR TRANSFER");
+                    telemetry.update();
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
-                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) < MAX_DIF_RID) {
+                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) > MAX_DIF_RID) {
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", RTOP_POS - ridA.getCurrentPosition());
+                    dashboard.sendTelemetryPacket(pa);
+                    telemetry.addLine("WRFOR HOISTER");
+                    telemetry.addData("Hoister", RTOP_POS - ridA.getCurrentPosition());
+                    telemetry.update();
                     sleep(2);
                 }
             } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
-                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) < MAX_DIF_EXT) {
+                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) > MAX_DIF_EXT) {
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", EMAX - extA.getCurrentPosition());
+                    dashboard.sendTelemetryPacket(pa);
+                    telemetry.addLine("WRFOR EXTENSION");
+                    telemetry.addData("Extnesion", EMAX - extA.getCurrentPosition());
+                    telemetry.update();
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER_FALL) { /// 2: Wait for hoisster to not the thing
-                while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) < MAX_DIF_RID) {
+                while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) > MAX_DIF_RID) {
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", ridA.getCurrentPosition() - RBOT_POS);
+                    dashboard.sendTelemetryPacket(pa);
+                    telemetry.addLine("WRFOR HOISTER_FALL");
+                    telemetry.update();
                     sleep(2);
                 }
             }
             ElapsedTime et = new ElapsedTime(0);
+            et.reset();
+            pa = new TelemetryPacket();
+            pa.put("WAIT_FOR_WAIT", et.seconds());
+            dashboard.sendTelemetryPacket(pa);
             while (et.seconds() < extra && !lom.isStopRequested()) {
+                pa = new TelemetryPacket();
+                pa.put("WAIT_FOR_WAIT", et.seconds());
+                dashboard.sendTelemetryPacket(pa);
+                telemetry.addLine("WRFOR EXTRA");
+                telemetry.addData("Time", et.seconds());
+                telemetry.update();
                 sleep(2);
             }
         } catch (Exception e) {
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.put("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKkkk");
+            packet.put("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB", e.getStackTrace().toString());
+            packet.put("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC", e.toString());
+            dashboard.sendTelemetryPacket(packet);
+            telemetry.addData("Wtfor Error", e.toString());
+            telemetry.update();
         }
     }
 
@@ -266,7 +353,7 @@ public class RobotFuncs {
         }
         if (useRid) {
             ridA = initm("ridA", true, true);
-            ridB = initm("ridB", false, false);
+            ridB = initm("ridB", true, false);
         } else {
             ridA = null;
             ridB = null;
@@ -284,6 +371,13 @@ public class RobotFuncs {
         sextB.setPwmEnable();
         sextA.setPwmRange(new PwmControl.PwmRange(505, 2495));
         sextB.setPwmRange(new PwmControl.PwmRange(505, 2495));
+
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LES));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RES));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, FES));
+        leftEncoder.setDirection(LER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
+        rightEncoder.setDirection(RER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
+        frontEncoder.setDirection(FER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -342,8 +436,10 @@ public class RobotFuncs {
         cloT = new Thread(clo);
     }
 
-    public static void startma(LinearOpMode lom, boolean im) { /// Set all values to their starting ones and start the PID threads
+    public static void startma(LinearOpMode lom, Telemetry tele, boolean im) { /// Set all values to their starting ones and start the PID threads
         pcoef = 12.0 / batteryVoltageSensor.getVoltage();
+        RobotFuncs.lom = lom;
+        RobotFuncs.telemetry = tele;
 
         if (im) { /// Set these positions only if called by a teleop class
             if (STARTW) {

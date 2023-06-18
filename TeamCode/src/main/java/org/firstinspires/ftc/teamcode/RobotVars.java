@@ -57,14 +57,14 @@ public class RobotVars {
     public static double ei = 0.0;
     public static double ef = 0;
     public static double emd = 10;
-    public static double ebp = 0;
+    public static double ebp = 0.0001;
 
-    public static double rp = 0.01;  // Lift pidf and correction term between the motors
+    public static double rp = 0.015;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
-    public static double rf = 0.0008;
-    public static double rmd = 6;
-    public static double rbp = 0;
+    public static double rf = 0.001;
+    public static double rmd = 10;
+    public static double rbp = 0.0018;
 
     public static double EAP = 1.0; // Extension A Scale Term
     public static double EBP = 1.0; // Extension B Scale Term
@@ -72,7 +72,7 @@ public class RobotVars {
     public static double RBP = 1.0;
 
     public static boolean useExt = true;
-    public static boolean useRid = true;
+    public static boolean useRid = false;
 
     public static boolean STARTW = true;
     public static String LES = "RF";
@@ -105,8 +105,8 @@ public class RobotVars {
      *     Motors:
      *         0: ridB
      *         1: extA
-     *         2: extB
-     *         3: ridA
+     *         2: ridA
+     *         3: extB
      *     Servos:
      *         0: Toate
      *         1: sMCLaw

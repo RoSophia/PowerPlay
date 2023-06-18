@@ -3,13 +3,7 @@ package org.firstinspires.ftc.teamcode.mk3;
 import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
-import static org.firstinspires.ftc.teamcode.RobotVars.FER;
-import static org.firstinspires.ftc.teamcode.RobotVars.FES;
-import static org.firstinspires.ftc.teamcode.RobotVars.LER;
-import static org.firstinspires.ftc.teamcode.RobotVars.LES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
-import static org.firstinspires.ftc.teamcode.RobotVars.RER;
-import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
@@ -41,14 +35,16 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extB;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.frontEncoder;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.imu;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftEncoder;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.log_state;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridA;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightBack;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightEncoder;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightFront;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rpd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
@@ -77,7 +73,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -87,7 +82,6 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.Traject
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
-import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -130,21 +124,21 @@ public class AutoVortex extends LinearOpMode {
     // 206.6 8.318 28.337
 
     public static double P1H = 0.541;
-    public static double P1X = -138;
-    public static double P1Y = -11;
-    public static double P2H = 1.431;
+    public static double P1X = -139;
+    public static double P1Y = -13;
+    public static double P2H = 1.40;
     public static double P2X = -123;
-    public static double P2Y = -14;
-    public static double P3H = 1.92;
-    public static double P3X = -112;
+    public static double P2Y = -23;
+    public static double P3H = 1.96;
+    public static double P3X = -109;
     public static double P3Y = -71;
-    public static double P4H = 1.40;
+    public static double P4H = 1.37;
     public static double P4X = -120;
-    public static double P4Y = -15;
+    public static double P4Y = -24;
 
-    public static double OFFX = 2;
-    public static double OFFY = 2;
-    public static double OFFH = -0.01;
+    public static double OFFX = 4;
+    public static double OFFY = 0;
+    public static double OFFH = -0.002;
 
     public static double OFFX1 = 2;
     public static double OFFY1 = 0.2;
@@ -175,15 +169,14 @@ public class AutoVortex extends LinearOpMode {
     public static boolean RECURRING_SINGULARITY = false;
     public static boolean GPOS = false;
 
-    /*public static double MVEL = 250;
+    public static double MVEL = 250;
     public static double MAL = 250;
-    public static double MDL = 100;*/
+    public static double MDL = 100;
+    /*
     public static double MVEL = 999; // THE ONLY TYPE OF
     public static double MAL = 999;  // BREAKING I KNOW IS
     public static double MDL = 999;  // BREAKING BAD
-
-    public double WD = 0.02;
-    public static double WD2 = 0.3;
+     */
 
     public static double R1X = 40;
     public static double R1Y = 2.4;
@@ -231,7 +224,6 @@ public class AutoVortex extends LinearOpMode {
     void follow_traj(TrajectorySequence traj) {
         drive.followTrajectorySequenceAsync(traj);
         drive.update();
-        TelemetryPacket pack;
         ElapsedTime timer = new ElapsedTime(0);
         double lev = leftEncoder.getCorrectedVelocity();
         double rev = rightEncoder.getCorrectedVelocity();
@@ -255,26 +247,9 @@ public class AutoVortex extends LinearOpMode {
             }
             telemetry.update();
             leftEncoder.getCorrectedVelocity();
-            pack = new TelemetryPacket();
-            pack.put("Ex", drive.getLastError().getX());
-            pack.put("Ey", drive.getLastError().getY());
-            pack.put("Eh", drive.getLastError().getHeading());
+            log_state();
+            TelemetryPacket pack = new TelemetryPacket();
             pack.put("CycleTime", timer.milliseconds());
-            pack.put("vel", leftEncoder.getCorrectedVelocity());
-            pack.put("ver", rightEncoder.getCorrectedVelocity());
-            pack.put("vef", frontEncoder.getCorrectedVelocity());
-            if (extA != null) {
-                pack.put("CUR_extA", extA.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("CUR_extB", extB.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_extA", extA.getPower());
-                pack.put("POW_extB", extB.getPower());
-            }
-            if (ridA != null) {
-                pack.put("CUR_ridA", ridA.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("CUR_ridB", ridB.getCurrent(CurrentUnit.MILLIAMPS));
-                pack.put("POW_ridA", ridA.getPower());
-                pack.put("POW_ridB", ridB.getPower());
-            }
             timer.reset();
             dashboard.sendTelemetryPacket(pack);
 
@@ -331,16 +306,17 @@ public class AutoVortex extends LinearOpMode {
         }
     }
 
-    public static double RD = -0.7;
+    public static double RD = -1.0;
+    public static double RTT = -0.6;
     public static double HT = 0.13;
     public static double HHT = 0.12;
 
-    public static double WHO = 0.8;
-    public static double WEX = 0.8;
+    public static double WHO = 0.4;
+    public static double WEX = 0.0;
 
     int lp = 1;
     public static double SGS = 0.495;
-    public static double SGD = 0.024;
+    public static double SGD = 0.021;
     public static double SBAS = 0.60;
     public static double SBAD = 0.0;
 
@@ -360,8 +336,13 @@ public class AutoVortex extends LinearOpMode {
     }
 
     void set_grab_pos(int p) {
-        conversiePerverssa(SGS - SGD * (p - 1));
+        conversiePerverssa(SGS - SGD * (p - 1))
+        ;
         sBalans.setPosition(SBAS - SBAD * (p - 1));
+    }
+
+    void st_grab_pos() {
+        set_grab_pos(lp);
     }
 
     void upd_grab_pos() {
@@ -398,16 +379,14 @@ public class AutoVortex extends LinearOpMode {
         goToPreload = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
                 .funnyRaikuCurveLinear(new Pose2d(P1X, P1Y, P1H), R1, R2, vc, ac, dc)
                 .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RTOP_POS))
-                .UNSTABLE_addTemporalMarkerOffset(0.0, this::ltime)
-                .waitSeconds(WD)
+                .build();
+
+        preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                     rid(RBOT_POS);
                     ret();
                     set_grab_pos(1);
                 })
-                .build();
-
-        preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
                 .funnyRaikuCurveLinear(new Pose2d(P2X, P2Y, P2H), PTG1, PTG2)
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     epd.set_target(EMAX, 0);
@@ -441,12 +420,16 @@ public class AutoVortex extends LinearOpMode {
 
             trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + OFFX1 * i, P3Y + OFFY1 * i, P3H + OFFH1 * i)) // Retract, extend and go to ext
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        ihk.stage = 0;
                         rid(RBOT_POS);
                         ret();
+                        st_grab_pos();
+                    })
+                    .funnyRaikuCurveLinear(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2)
+                    .UNSTABLE_addTemporalMarkerOffset(RTT, () -> {
                         epd.set_target(EMAX, 0);
                         upd_grab_pos();
                     })
-                    .funnyRaikuCurveLinear(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2)
                     .build());
 
             trs.add(drive.trajectorySequenceBuilder(new Pose2d(P4X + OFFX * i + 0.0001, P4Y + OFFY * i, P4H + OFFH * i)) // At get retract
@@ -546,27 +529,7 @@ public class AutoVortex extends LinearOpMode {
                 telemetry.addData("PEH", drive.getPoseEstimate().getHeading() / 180 * Math.PI);
                 telemetry.addData("Pe", drive.getLastError());
                 telemetry.update();
-                TelemetryPacket p = new TelemetryPacket();
-                p.put("Rx", drive.getPoseEstimate().getX());
-                p.put("Ry", drive.getPoseEstimate().getY());
-                p.put("Rh", drive.getPoseEstimate().getHeading() * Math.PI / 180);
-                p.put("Ex", drive.getLastError().getX());
-                p.put("Ey", drive.getLastError().getY());
-                p.put("Eh", drive.getLastError().getHeading());
-                if (extA != null) {
-                    p.put("CUR_extA", extA.getCurrent(CurrentUnit.MILLIAMPS));
-                    p.put("CUR_extB", extB.getCurrent(CurrentUnit.MILLIAMPS));
-                    p.put("POW_extA", extA.getPower());
-                    p.put("POW_extB", extB.getPower());
-                }
-                if (ridA != null) {
-                    p.put("CUR_ridA", ridA.getCurrent(CurrentUnit.MILLIAMPS));
-                    p.put("CUR_ridB", ridB.getCurrent(CurrentUnit.MILLIAMPS));
-                    p.put("POW_ridA", ridA.getPower());
-                    p.put("POW_ridB", ridB.getPower());
-                }
-                dashboard.sendTelemetryPacket(p);
-
+                log_state();
                 final double speed = Math.hypot(-gamepad1.left_stick_x, -gamepad1.left_stick_y);
                 final double angle = Math.atan2(-gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
                 final double turn = gamepad1.right_stick_x;
@@ -670,11 +633,10 @@ public class AutoVortex extends LinearOpMode {
         drive.setPoseEstimate(new Pose2d(cp.getX(), cp.getY(), P2H));
     }
 
-    Encoder leftEncoder, rightEncoder, frontEncoder;
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
 
-    public static double WAT = 0.4;
+    public static double WAT = 0.6;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -682,6 +644,7 @@ public class AutoVortex extends LinearOpMode {
         ihk = new IchHasseKinder();
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
+        RobotFuncs.drive = drive;
         coneReady = true;
         sMCLaw.setPosition(SCC);
         conversiePerverssa(SAP);
@@ -700,13 +663,6 @@ public class AutoVortex extends LinearOpMode {
             pack.put("vef", 0);
             dashboard.sendTelemetryPacket(pack);
         }
-
-        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LES));
-        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RES));
-        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, FES));
-        leftEncoder.setDirection(LER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
-        rightEncoder.setDirection(RER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
-        frontEncoder.setDirection(FER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
 
         @SuppressLint("DiscouragedApi") int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -784,7 +740,7 @@ public class AutoVortex extends LinearOpMode {
             webcam.closeCameraDeviceAsync(() -> {
             });
         }
-        startma(this, false);
+        startma(this, telemetry, false);
         ihk.shouldClose = false;
         ihk.lom = this;
         ihkT.start();
@@ -844,6 +800,7 @@ public class AutoVortex extends LinearOpMode {
             set_wait_time(0);
             follow_traj(goToPreload);
             getpos();
+            wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(WAT);
             follow_traj(preloadToGet);
             wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
@@ -867,7 +824,7 @@ public class AutoVortex extends LinearOpMode {
                 wtfor(RobotFuncs.WAITS.HOISTER, WHO);
                 rid(RBOT_POS);
                 ret();
-                wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0);
+                wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0.001);
             }
             getpos();
 
