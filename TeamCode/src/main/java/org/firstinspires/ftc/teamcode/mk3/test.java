@@ -18,20 +18,20 @@ public class test extends LinearOpMode {
     public static double OFP = 0.00;
     public void runOpMode() {
         if ((CT & 1) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sClose");
+            ccs = hardwareMap.get(Servo.class, "sClose"); // sClose
         } else if ((CT & 2) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sHeading");
+            ccs = hardwareMap.get(Servo.class, "sHeading"); // sBalans
         } else if ((CT & 4) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sBalans");
+            ccs = hardwareMap.get(Servo.class, "sBalans"); // sHeading
         } else if ((CT & 8) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sMCLaw");
+            ccs = hardwareMap.get(Servo.class, "sMCLaw"); // sExtA
         } else if ((CT & 16) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sextA");
+            ccs = hardwareMap.get(Servo.class, "sextA"); //
             if (CC) {
                 ccs2 = hardwareMap.get(Servo.class, "sextB");
             }
         } else if ((CT & 32) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sextB");
+            ccs = hardwareMap.get(Servo.class, "sextB"); // sMCLaw
         } else {
             ccs = hardwareMap.get(Servo.class, "Toate");
         }

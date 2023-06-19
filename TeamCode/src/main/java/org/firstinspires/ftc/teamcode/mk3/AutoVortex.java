@@ -781,7 +781,7 @@ public class AutoVortex extends LinearOpMode {
         sHeading.setPosition(SHG);
 
         qtPipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
-        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline, true, true);
+        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline, true, false);
 
         /*
         conePipeline = new ConePipeline(ConeHeight, ConeWidth);

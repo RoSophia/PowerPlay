@@ -130,7 +130,7 @@ class PIDF implements Runnable {
     public static double CORRECTION = 0.13;
 
     public static int MAX_CURRENT_DRAW = 7000;
-    public static double MAX_OVERCURRENT_TIME = 2.5;
+    public static double MAX_OVERCURRENT_TIME = 2.0;
 
     @SuppressWarnings("BusyWait")
     public void run() {
@@ -235,11 +235,16 @@ class PIDF implements Runnable {
                 }
                 dashboard.sendTelemetryPacket(pack);
 
+                /// KILL MYSELF
+                if (md == rmd && target == RBOT_POS && cp > 15) {
+                    outp = -1;
+                }
 
                 if (motA.getCurrent(CurrentUnit.MILLIAMPS) < MAX_CURRENT_DRAW || motB.getCurrent(CurrentUnit.MILLIAMPS) < MAX_CURRENT_DRAW) {
                     MOTATIMER.reset();
                 } else if (MOTATIMER.seconds() > MAX_OVERCURRENT_TIME) {
                     outp = 0;
+                    target = ctarg = cp;
                 }
 
                 if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) { /// `lom` here is used to prevent powering the motor after the OpMode stopped.

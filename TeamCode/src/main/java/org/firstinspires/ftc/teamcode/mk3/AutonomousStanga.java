@@ -122,26 +122,26 @@ public class AutonomousStanga extends LinearOpMode {
     // -38.7 -57.7 117.2
     // 206.6 8.318 28.337
 
-    public static double P1H = -0.546;
-    public static double P1X = -129;
+    public static double P1H = -0.544;
+    public static double P1X = -131;
     public static double P1Y = 15;
-    public static double P2H = -1.464;
+    public static double P2H = -1.454;
     public static double P2X = -123;
     public static double P2Y = 16;
-    public static double P3H = -1.94;
+    public static double P3H = -1.941;
     public static double P3X = -100;
     public static double P3Y = 62;
-    public static double P4H = -1.437;
+    public static double P4H = -1.433;
     public static double P4X = -121;
     public static double P4Y = 20;
 
     public static double OFFX = -0.8;
     public static double OFFY = 0.0;
-    public static double OFFH = 0.013;
+    public static double OFFH = 0.009;
 
     public static double OFFX1 = 0;
     public static double OFFY1 = -0.2;
-    public static double OFFH1 = -0.002;
+    public static double OFFH1 = 0.008;
 
     public static double P678X = -85;
     public static double P678H = -0;
@@ -154,14 +154,14 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P72X = 30;
     public static double P72Y = 2.7;
 
-    public static double P81X = 50;
-    public static double P81Y = 3.14;
-    public static double P82X = 70;
-    public static double P82Y = 1.3;
+    public static double P81X = 80;
+    public static double P81Y = 3.5;
+    public static double P82X = 80;
+    public static double P82Y = 2;
 
     public static double P61X = 1;
     public static double P61Y = 3;
-    public static double P62X = 1;
+    public static double P62X = 20;
     public static double P62Y = 4;
 
     public static double PTG1X = 15.0;
@@ -185,7 +185,7 @@ public class AutonomousStanga extends LinearOpMode {
 
     public static double MVEL = 220;
     public static double MAL = 220;
-    public static double MDL = 100;
+    public static double MDL = 80;
     /*
     public static double MVEL = 999; // THE ONLY TYPE OF
     public static double MAL = 999;  // BREAKING I KNOW IS
@@ -569,6 +569,7 @@ public class AutonomousStanga extends LinearOpMode {
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
         switch (LAST_ID) {
+            default:
             case 7:
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
                         .addTemporalMarker(() -> {
@@ -599,7 +600,6 @@ public class AutonomousStanga extends LinearOpMode {
                         .waitSeconds(1)
                         .build();
                 break;
-            default:
             case 8:
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y, P4H))
                         .addTemporalMarker(() -> {
@@ -724,8 +724,8 @@ public class AutonomousStanga extends LinearOpMode {
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
 
-    public static double WAT = 0.3;
-    public static double WOT = 0.15;
+    public static double WAT = 0.2;
+    public static double WOT = 0.02;
 
     void runBBBBBBBBBBBBBB() {
         clo.shouldClose = true;
@@ -787,7 +787,7 @@ public class AutonomousStanga extends LinearOpMode {
         sHeading.setPosition(SHG);
 
         qtPipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
-        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline, true, true);
+        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline, true, false);
 
         /*
         conePipeline = new ConePipeline(ConeHeight, ConeWidth);
@@ -875,6 +875,7 @@ public class AutonomousStanga extends LinearOpMode {
             wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(WAT);
             follow_traj(preloadToGet);
+            /*
             epd.set_target(EMAX, 0);
             upd_grab_pos();
             CAMERA_UPDATE = false;
@@ -882,21 +883,22 @@ public class AutonomousStanga extends LinearOpMode {
             set_wait_time(0);
             follow_traj(startGrab);
             ihk.stage = 1;
-            getpos();
+            getpos();*/
             for (int i = 0; i < NUMC - 1; ++i) {
                 set_wait_time(WOT);
                 follow_traj(trss.get(i).get(0)); // Go to stalp
                 wtfor(RobotFuncs.WAITS.HOISTER, WHO);
                 set_wait_time(WAT);
-                follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
+                /*follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
                 CAMERA_UPDATE = false;
                 wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
                 set_wait_time(0);
                 follow_traj(trss.get(i).get(2)); // At get (retract)
                 ihk.stage = 1;
-                getpos();
+                getpos();*/
             }
 
+        /*
             if (NUMC >= 1) {
                 set_wait_time(WOT);
                 follow_traj(trss.get(NUMC - 1).get(0)); // Go to stalp
@@ -905,7 +907,7 @@ public class AutonomousStanga extends LinearOpMode {
                 ret();
                 //wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0.001);
             }
-            getpos();
+            getpos();*/
 
             if (RECURRING_SINGULARITY && !isStopRequested()) {
                 TrajectorySequence traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())

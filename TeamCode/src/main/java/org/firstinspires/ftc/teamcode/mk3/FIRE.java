@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
+import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
@@ -92,9 +93,9 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive", name = "Autonomous Mucegait bagamia-si pl")
+@Autonomous(group = "drive", name = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 @SuppressLint("DefaultLocale")
-public class AutonomMucegait extends LinearOpMode {
+public class FIRE extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
 
@@ -149,14 +150,14 @@ public class AutonomMucegait extends LinearOpMode {
     public static double P7Y = 4;
     public static double P8Y = 55;
 
-    public static double P71X = 40;
+    public static double P71X = 1;
     public static double P71Y = 3.14;
-    public static double P72X = 30;
+    public static double P72X = 1;
     public static double P72Y = 2.7;
 
-    public static double P81X = 50;
+    public static double P81X = 1;
     public static double P81Y = 3.14;
-    public static double P82X = 70;
+    public static double P82X = 1;
     public static double P82Y = 1.3;
 
     public static double P61X = 1;
@@ -169,10 +170,10 @@ public class AutonomMucegait extends LinearOpMode {
     public static double PTG2X = 15.0;
     public static double PTG2Y = -0.5;
 
-    public static double RAI1X = 20;
-    public static double RAI1Y = -4;
-    public static double RAI2X = 30;
-    public static double RAI2Y = -3.2;
+    public static double RAI1X = 40;
+    public static double RAI1Y = 1;
+    public static double RAI2X = 40;
+    public static double RAI2Y = -1;
 
     public static double RBI1X = 20;
     public static double RBI1Y = -4;
@@ -460,8 +461,17 @@ public class AutonomMucegait extends LinearOpMode {
     TrajectorySequence ender;
     Vector<Vector<TrajectorySequence>> trss = new Vector<>();
 
-    FloriDeMucegai ihk;
+    TrajectorySequence goToPosition;
+    TrajectorySequence stayPosition;
+    TrajectorySequence cycle;
+    TrajectorySequence goToSecondSide;
+    TrajectorySequence staySecondSide;
+
+    FireExtenguisher ihk;
     Thread ihkT;
+
+    public static double TIME_RID = -0.4;
+    public static double TIME_PREP_CLAW = -0.3;
 
     void mktraj() {
         Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
@@ -477,9 +487,28 @@ public class AutonomMucegait extends LinearOpMode {
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
         lp = 1;
 
-        goToPreload = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
+        goToPosition = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
                 .funnyRaikuCurveLinear(new Pose2d(P1X, P1Y, P1H), R1, R2, vc, ac, dc)
-                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RTOP_POS))
+                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RMID_POS))
+                .build();
+
+        stayPosition = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
+                .lineToLinearHeading(new Pose2d(P1X, P1Y, P1H))
+                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RMID_POS))
+                .build();
+
+        cycle = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.001, P1Y, P1H))
+                .lineToLinearHeading(new Pose2d(P1X, P1Y, P1H))
+                .build();
+
+        goToSecondSide = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.001, P1Y, P1H))
+                .funnyRaikuCurveLinear(new Pose2d(P2X, P2Y, P2H), RAI1, RAI2)
+                .UNSTABLE_addTemporalMarkerOffset(TIME_RID, () -> rid(RBOT_POS))
+                .UNSTABLE_addTemporalMarkerOffset(TIME_PREP_CLAW, () -> set_grab_pos(lp))
+                .build();
+
+        staySecondSide = drive.trajectorySequenceBuilder(new Pose2d(P2X + 0.001, P2Y, P2H))
+                .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H))
                 .build();
 
         preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
@@ -568,6 +597,58 @@ public class AutonomMucegait extends LinearOpMode {
         TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
+
+        switch (LAST_ID) {
+            case 6:
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P2X, P2Y, P2H))
+                        .addTemporalMarker(() -> {
+                            conversiePerverssa(SAW);
+                            sClose.setPosition(SDESCHIS);
+                            sHeading.setPosition(SHG);
+                            sBalans.setPosition(SBAG);
+                            ext(EMIN);
+                        })
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P6Y, P678H), new Vector2d(P61X, P61Y), new Vector2d(P62X, P62Y), vc, ac, dc)
+                        .addTemporalMarker(this::ltime)
+                        .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
+                        .waitSeconds(1)
+                        .build();
+                break;
+            default:
+            case 7:
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P2X, P2Y, P2H))
+                        .addTemporalMarker(() -> {
+                            conversiePerverssa(SAW);
+                            sClose.setPosition(SDESCHIS);
+                            sHeading.setPosition(SHG);
+                            sBalans.setPosition(SBAG);
+                            ext(EMIN);
+                        })
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P7Y, P678H), new Vector2d(P71X, P71Y), new Vector2d(P72X, P72Y), vc, ac, dc)
+                        .addTemporalMarker(this::ltime)
+                        .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
+                        .waitSeconds(1)
+                        .build();
+                break;
+            case 8:
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P2X, P2Y, P2H))
+                        .addTemporalMarker(() -> {
+                            conversiePerverssa(SAW);
+                            sClose.setPosition(SDESCHIS);
+                            sHeading.setPosition(SHG);
+                            sBalans.setPosition(SBAG);
+                            ext(EMIN);
+                        })
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P8Y, P678H), new Vector2d(P81X, P81Y), new Vector2d(P82X, P82Y), vc, ac, dc)
+                        .addTemporalMarker(this::ltime)
+                        .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
+                        .waitSeconds(1)
+                        .build();
+                break;
+
+        }
+
+        /*
         switch (LAST_ID) {
             case 7:
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
@@ -615,7 +696,7 @@ public class AutonomMucegait extends LinearOpMode {
                         .waitSeconds(1)
                         .build();
                 break;
-        }
+        }*/
     }
 
     boolean TA = false;
@@ -775,7 +856,7 @@ public class AutonomMucegait extends LinearOpMode {
 
     void init_auto() {
         initma(hardwareMap, true);
-        ihk = new FloriDeMucegai(this);
+        ihk = new FireExtenguisher(this);
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         RobotFuncs.drive = drive;
@@ -870,41 +951,36 @@ public class AutonomMucegait extends LinearOpMode {
             CAMERA_UPDATE = false;
             getpos();
             set_wait_time(WOT);
-            follow_traj(goToPreload);
+            follow_traj(goToPosition);
+
             getpos();
-            wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
-            set_wait_time(WAT);
-            follow_traj(preloadToGet);
-            epd.set_target(EMAX, 0);
-            upd_grab_pos();
-            CAMERA_UPDATE = false;
-            wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
-            set_wait_time(0);
-            follow_traj(startGrab);
-            ihk.stage = 1;
-            getpos();
+            wtfor(RobotFuncs.WAITS.HOISTERR, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
+            lp = 1;
             for (int i = 0; i < NUMC - 1; ++i) {
-                set_wait_time(WOT);
-                follow_traj(trss.get(i).get(0)); // Go to stalp
-                wtfor(RobotFuncs.WAITS.HOISTER, WHO);
-                set_wait_time(WAT);
-                follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
-                CAMERA_UPDATE = false;
-                wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
-                set_wait_time(0);
-                follow_traj(trss.get(i).get(2)); // At get (retract)
+                rid(RBOT_POS);
                 ihk.stage = 1;
-                getpos();
+                set_wait_time(0.1);
+                follow_traj(stayPosition);
+                wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
+                ++lp;
+            }
+            rid(RBOT_POS);
+
+            lp = 1;
+            set_wait_time(WOT);
+            follow_traj(goToSecondSide);
+            for (int i = 0; i < NUMC - 1; ++i) {
+                rid(RBOT_POS);
+                ihk.stage = 1;
+                set_wait_time(0.1);
+                follow_traj(staySecondSide);
+                wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
+                ++lp;
             }
 
-            if (NUMC >= 1) {
-                set_wait_time(WOT);
-                follow_traj(trss.get(NUMC - 1).get(0)); // Go to stalp
-                wtfor(RobotFuncs.WAITS.HOISTER, WHO);
-                rid(RBOT_POS);
-                ret();
-                //wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0.001);
-            }
+            follow_traj(goToPark);
+
+
             getpos();
 
             if (RECURRING_SINGULARITY && !isStopRequested()) {

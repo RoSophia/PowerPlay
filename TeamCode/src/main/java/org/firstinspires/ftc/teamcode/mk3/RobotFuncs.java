@@ -21,6 +21,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RER;
 import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
+import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
@@ -178,7 +179,7 @@ public class RobotFuncs {
         }
     }
 
-    public static enum WAITS {TRANSFER, HOISTER, EXTENSION, HOISTER_FALL}
+    public static enum WAITS {TRANSFER, HOISTER, HOISTERR, EXTENSION, HOISTER_FALL}
 
     public static SampleMecanumDrive drive;
     public static Encoder leftEncoder;
@@ -188,9 +189,12 @@ public class RobotFuncs {
     public static void log_state() {
         TelemetryPacket pack = new TelemetryPacket();
         if (drive != null) {
-            pack.put("Ex", drive.getLastError().getX());
-            pack.put("Ey", drive.getLastError().getY());
-            pack.put("Eh", drive.getLastError().getHeading());
+            pack.put("Ex", drive.getPoseEstimate().getX());
+            pack.put("Ey", drive.getPoseEstimate().getY());
+            pack.put("Eh", drive.getPoseEstimate().getHeading());
+            pack.put("EEh0", imu.getAngularOrientation().firstAngle / Math.PI * 180);
+            pack.put("EEh1", imu.getAngularOrientation().secondAngle / Math.PI * 180);
+            pack.put("EEh2", imu.getAngularOrientation().thirdAngle / Math.PI * 180);
         }
         pack.put("vel", leftEncoder.getCorrectedVelocity());
         pack.put("ver", rightEncoder.getCorrectedVelocity());
@@ -249,6 +253,25 @@ public class RobotFuncs {
                     log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", RTOP_POS - ridA.getCurrentPosition());
+                    dashboard.sendTelemetryPacket(pa);
+                    /*
+                    telemetry.addLine("WRFOR HOISTER");
+                    telemetry.addData("Hoister", RTOP_POS - ridA.getCurrentPosition());
+                    telemetry.update();
+
+                     */
+                    sleep(2);
+                }
+            } else if (p == WAITS.HOISTERR) { /// 1: Wait for hoister to the thing
+                while (!lom.isStopRequested() && (RMID_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
+                    leftBack.setPower(0);
+                    rightBack.setPower(0);
+                    leftFront.setPower(0);
+                    rightFront.setPower(0);
+                    drive.updatePoseEstimate();
+                    log_state();
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", RMID_POS - ridA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
                     /*
                     telemetry.addLine("WRFOR HOISTER");
@@ -337,6 +360,8 @@ public class RobotFuncs {
             return coneReady;
         } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
             return (RTOP_POS - ridA.getCurrentPosition()) < MAX_DIF_RID;
+        } else if (p == WAITS.HOISTERR) { /// 1: Wait for hoister to the thing
+            return (RMID_POS - ridA.getCurrentPosition()) < MAX_DIF_RID;
         } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
             return (EMAX - extA.getCurrentPosition()) < MAX_DIF_EXT;
         }

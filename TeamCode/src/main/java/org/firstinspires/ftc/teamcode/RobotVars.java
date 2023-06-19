@@ -27,7 +27,7 @@ public class RobotVars {
 
     public static double SBAG = 0.59;     // 4bar Get position
     public static double SBAH = 0.39;     // 4bar Hold position
-    public static double SBAP = 0.79;     // 4bar Put position
+    public static double SBAP = 0.78;     // 4bar Put position
     public static double SBAAP = 0.9;     // 4bar Put position
 
     public static double SDIF = 0.1;      // Grabber Arm Servo Diff Term
@@ -47,7 +47,7 @@ public class RobotVars {
 
     public static boolean USE_PHOTON = true;
 
-    public static boolean USE_TELE = false; // Use Telemetry
+    public static boolean USE_TELE = true; // Use Telemetry
     public static int CU_TESTING = 0;
     public static double pcoef = 1.0; // Voltage Normalising Term (set during runtime)
 
@@ -121,9 +121,9 @@ public class RobotVars {
      *         0: Toate
      *         1: sMCLaw
      *         2:
-     *         3: sextA
+     *         3: sextB
      *         4:
-     *         5: sextB
+     *         5: sextA
      *     I2C:
      *         3: csensor
      */
