@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mk3.camera;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 

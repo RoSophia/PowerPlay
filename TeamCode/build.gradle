@@ -15,6 +15,10 @@
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
 android {
     packagingOptions {
         jniLibs {
@@ -33,6 +37,8 @@ repositories {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
     implementation project(':FtcRobotController')
     implementation files('lib/road-runner-core.jar')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')

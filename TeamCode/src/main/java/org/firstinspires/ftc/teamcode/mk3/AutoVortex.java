@@ -72,9 +72,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.mk3.camera.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.mk3.camera.CamGirl;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.SequenceSegment;
@@ -84,7 +84,6 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSeg
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.time.chrono.ThaiBuddhistEra;
@@ -96,7 +95,7 @@ import java.util.Vector;
 @SuppressLint("DefaultLocale")
 public class AutoVortex extends LinearOpMode {
     OpenCvCamera webcam;
-    AprilTagDetectionPipeline pipeline;
+    AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
 
     int ERROR = 0;
@@ -509,8 +508,6 @@ public class AutoVortex extends LinearOpMode {
         }
     }
 
-    boolean OPENED = false;
-
     boolean TA = false;
     boolean TB = false;
     boolean TX = false;
@@ -638,8 +635,8 @@ public class AutoVortex extends LinearOpMode {
 
     public static double WAT = 0.6;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    CamGirl qtGirl, coneGirl;
+    void init_auto() {
         initma(hardwareMap);
         ihk = new IchHasseKinder();
         ihkT = new Thread(ihk);
@@ -652,50 +649,15 @@ public class AutoVortex extends LinearOpMode {
         sBalans.setPosition(SBAG);
         sHeading.setPosition(SHG);
 
-        {
-            TelemetryPacket pack = new TelemetryPacket();
-            pack.put("Ex", 0);
-            pack.put("Ey", 0);
-            pack.put("Eh", 0);
-            pack.put("CycleTime", 0);
-            pack.put("vel", 0);
-            pack.put("ver", 0);
-            pack.put("vef", 0);
-            dashboard.sendTelemetryPacket(pack);
-        }
+        qtPipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
+        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline);
 
-        @SuppressLint("DiscouragedApi") int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        pipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
-        webcam.setPipeline(pipeline);
+        /*
+        conePipeline = new ConePipeline();
+        coneGirl = new CamGirl(this, "coneGirl", OpenCvCameraRotation.UPRIGHT, 640, 480, );
+        coneGirl.onNewFrame();
+        */
 
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                if (!opModeIsActive()) {
-                    webcam.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
-                    dashboard.startCameraStream(webcam, 15);
-                    OPENED = true;
-                }
-            }
-
-            @Override
-            public void onError(int errorCode) {
-                sError(errorCode);
-            }
-        });
-
-        {
-            TelemetryPacket packet = new TelemetryPacket();
-            packet.put("x", 0);
-            packet.put("y", 0);
-            packet.put("heading (deg)", 0);
-
-            packet.put("xError", 0);
-            packet.put("yError", 0);
-            packet.put("headingError (deg)", 0);
-            dashboard.sendTelemetryPacket(packet);
-        }
 
         if (BBBBBBBBBBBBBB) {
             clo.shouldClose = true;
@@ -704,14 +666,13 @@ public class AutoVortex extends LinearOpMode {
         }
 
         TelemetryPacket packet;
-
         while (!isStarted() && !isStopRequested()) {
-            if (OPENED) {
+            if (qtGirl.getOpened()) {
                 if (LAST_ID == 0) {
                     telemetry.addLine("Cam opened");
                     telemetry.update();
                 }
-                ArrayList<AprilTagDetection> cd = pipeline.getLatestDetections();
+                ArrayList<AprilTagDetection> cd = qtPipeline.getLatestDetections();
                 if (cd.size() > 0) {
                     LAST_ID = cd.get(0).id;
                     packet = new TelemetryPacket();
@@ -729,17 +690,18 @@ public class AutoVortex extends LinearOpMode {
 
         mktraj();
 
-        packet = new TelemetryPacket();
-        packet.put("bat", batteryVoltageSensor.getVoltage());
-        dashboard.sendTelemetryPacket(packet);
-
         telemetry.addData("All done! Got ID: ", LAST_ID);
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        init_auto();
 
         waitForStart();
-        if (OPENED) {
-            webcam.closeCameraDeviceAsync(() -> {
-            });
+        if (qtGirl.getOpened()) {
+            qtGirl.stop();
         }
+
         startma(this, telemetry, false);
         ihk.shouldClose = false;
         ihk.lom = this;
@@ -788,7 +750,7 @@ public class AutoVortex extends LinearOpMode {
 
             }
         } else {
-            packet = new TelemetryPacket();
+            TelemetryPacket packet = new TelemetryPacket();
             packet.put("LID", LAST_ID);
             dashboard.sendTelemetryPacket(packet);
 
