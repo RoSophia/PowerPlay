@@ -13,6 +13,8 @@ import static org.firstinspires.ftc.teamcode.RobotVars.FES;
 import static org.firstinspires.ftc.teamcode.RobotVars.LEEW;
 import static org.firstinspires.ftc.teamcode.RobotVars.LER;
 import static org.firstinspires.ftc.teamcode.RobotVars.LES;
+import static org.firstinspires.ftc.teamcode.RobotVars.MAX_DIF_EXT;
+import static org.firstinspires.ftc.teamcode.RobotVars.MAX_DIF_RID;
 import static org.firstinspires.ftc.teamcode.RobotVars.RAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBP;
@@ -21,8 +23,10 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIF;
@@ -64,7 +68,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -169,9 +172,6 @@ public class RobotFuncs {
         }
     }
 
-    public static int MAX_DIF_RID = 5;
-    public static int MAX_DIF_EXT = 5;
-
     public static enum WAITS {TRANSFER, HOISTER, EXTENSION, HOISTER_FALL}
     public static SampleMecanumDrive drive;
     public static Encoder leftEncoder;
@@ -213,6 +213,8 @@ public class RobotFuncs {
         try {
             if (p == WAITS.TRANSFER) { /// 0: Wait for transfer to finish
                 while (!lom.isStopRequested() && !coneReady) {
+                    drive.updatePoseEstimate();
+                    log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", !coneReady);
                     dashboard.sendTelemetryPacket(pa);
@@ -222,6 +224,8 @@ public class RobotFuncs {
                 }
             } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
                 while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) > MAX_DIF_RID) {
+                    drive.updatePoseEstimate();
+                    log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", RTOP_POS - ridA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
@@ -232,6 +236,8 @@ public class RobotFuncs {
                 }
             } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
                 while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) > MAX_DIF_EXT) {
+                    drive.updatePoseEstimate();
+                    log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", EMAX - extA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
@@ -242,6 +248,8 @@ public class RobotFuncs {
                 }
             } else if (p == WAITS.HOISTER_FALL) { /// 2: Wait for hoisster to not the thing
                 while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) > MAX_DIF_RID) {
+                    drive.updatePoseEstimate();
+                    log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", ridA.getCurrentPosition() - RBOT_POS);
                     dashboard.sendTelemetryPacket(pa);
@@ -256,6 +264,8 @@ public class RobotFuncs {
             pa.put("WAIT_FOR_WAIT", et.seconds());
             dashboard.sendTelemetryPacket(pa);
             while (et.seconds() < extra && !lom.isStopRequested()) {
+                drive.updatePoseEstimate();
+                log_state();
                 pa = new TelemetryPacket();
                 pa.put("WAIT_FOR_WAIT", et.seconds());
                 dashboard.sendTelemetryPacket(pa);
@@ -330,7 +340,7 @@ public class RobotFuncs {
 
     static Thread extT, ridT, cloT;
 
-    public static void initma(HardwareMap ch) { /// Init all hardware info
+    public static void initma(HardwareMap ch, boolean AUTONOMUS) { /// Init all hardware info
         if (USE_PHOTON) {
             PhotonCore.enable();
             PhotonCore.experimental.setSinglethreadedOptimized(false);
@@ -371,6 +381,14 @@ public class RobotFuncs {
         sextB.setPwmEnable();
         sextA.setPwmRange(new PwmControl.PwmRange(505, 2495));
         sextB.setPwmRange(new PwmControl.PwmRange(505, 2495));
+
+        if (AUTONOMUS) {
+            sMCLaw.setPosition(SCC);
+            conversiePerverssa(SAP);
+            sClose.setPosition(SDESCHIS);
+            sBalans.setPosition(SBAG);
+            sHeading.setPosition(SHG);
+        }
 
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LES));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RES));

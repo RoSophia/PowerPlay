@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
@@ -48,7 +49,7 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.4;
+    public static double CPT = 0.3;
     public static double CET = 0.1;
     public static double CHT = 0.3;
     public static double WPT = 0.0;
@@ -235,6 +236,7 @@ public class Clown implements Runnable {
                 if (et.seconds() > (tims.get(timt) + CD + CC) * DT && !_csc) { /// Open the claw after it has reached the holding bay
                     sClaw.setPosition(SMDESCHIS);
                     sHeading.setPosition(SHAP);
+                    sBalans.setPosition(SBAAP);
                     _csc = true;
                 }
                 if (et.seconds() > (tims.get(timt) + CD + CC + WT) * DT && !_csw) { /// Move the claw to the waiting position
@@ -283,6 +285,7 @@ public class Clown implements Runnable {
                 toPrepCone = false;
                 cprepCone = true;
                 cget = false;
+                cput = false;
                 rtg = false;
                 if (tppc) {
                     DT = PUTC;
@@ -294,8 +297,13 @@ public class Clown implements Runnable {
 
             if (cprepCone && ct.seconds() > CIP) { /// Currently getting the cone
                 cprepCone = false;
-                conversiePerverssa(SAH);
-                sBalans.setPosition(SBAH);
+                if (!toPut) {
+                    conversiePerverssa(SAH);
+                    sBalans.setPosition(SBAH);
+                } else {
+                    conversiePerverssa(SAP);
+                    sBalans.setPosition(SBAP);
+                }
                 armHolding = true;
                 coneClaw = true;
                 cget = false;

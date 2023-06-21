@@ -20,22 +20,23 @@ public class RobotVars {
 
     public static double SAG = 0.400;     // Grabber Arm Get position
     public static double SAH = 0.610;     // Grabber Arm Hold Position
-    public static double SAP = 0.74;      // Grabber Arm Put position
+    public static double SAP = 0.75;      // Grabber Arm Put position
     public static double SAW = 0.680;     // Grabber Arm Wait position
 
     public static double SBAG = 0.59;     // 4bar Get position
     public static double SBAH = 0.39;     // 4bar Hold position
-    public static double SBAP = 0.73;     // 4bar Put position
+    public static double SBAP = 0.78;     // 4bar Put position
+    public static double SBAAP = 0.9;     // 4bar Put position
 
     public static double SDIF = 0.1;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
     public static double SHG = 0.065;     // Grabber Get Heading
-    public static double SHP = 0.50;      // Grabber Put Heading
-    public static double SHAP = 0.60;     // Grabber After Put Heading
+    public static double SHP = 0.065;      // Grabber Put Heading
+    public static double SHAP = 0.065;     // Grabber After Put Heading
 
-    public static double SCO = 0.5;       // Cone Securing Mini Servo Open Position
-    public static double SCC = 1.0;       // Cone Securing Mini Servo Close Position
+    public static double SCO = 0.3;       // Cone Securing Mini Servo Open Position
+    public static double SCC = 0.9;       // Cone Securing Mini Servo Close Position
 
     public static double DOT = 0.0;       // Time To Lower The Lift
     public static double UPT = 0.1;       // Time To Hoist Up The Thing
@@ -59,7 +60,7 @@ public class RobotVars {
     public static double emd = 10;
     public static double ebp = 0.0001;
 
-    public static double rp = 0.015;  // Lift pidf and correction term between the motors
+    public static double rp = 0.0075;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.001;
@@ -72,7 +73,7 @@ public class RobotVars {
     public static double RBP = 1.0;
 
     public static boolean useExt = true;
-    public static boolean useRid = false;
+    public static boolean useRid = true;
 
     public static boolean STARTW = true;
     public static String LES = "RF";
@@ -86,6 +87,9 @@ public class RobotVars {
 
     public static double SHITTY_WORKAROUND_TIME = 0.2;
     public static double SHITTY_WORKAROUND_POWER = 1;
+
+    public static int MAX_DIF_RID = 5;
+    public static int MAX_DIF_EXT = 25;
 
     /*
      * Expansion:

@@ -125,23 +125,23 @@ public class AutoVortex extends LinearOpMode {
     public static double P1H = 0.541;
     public static double P1X = -139;
     public static double P1Y = -13;
-    public static double P2H = 1.40;
+    public static double P2H = 1.475;
     public static double P2X = -123;
     public static double P2Y = -23;
-    public static double P3H = 1.96;
+    public static double P3H = 2.00;
     public static double P3X = -109;
-    public static double P3Y = -71;
-    public static double P4H = 1.37;
+    public static double P3Y = -69;
+    public static double P4H = 1.45;
     public static double P4X = -120;
     public static double P4Y = -24;
 
-    public static double OFFX = 4;
+    public static double OFFX = 2;
     public static double OFFY = 0;
-    public static double OFFH = -0.002;
+    public static double OFFH = 0.005;
 
     public static double OFFX1 = 2;
     public static double OFFY1 = 0.2;
-    public static double OFFH1 = -0.002;
+    public static double OFFH1 = 0.006;
 
     public static double P678X = -118;
     public static double P678H = 1.431;
@@ -310,7 +310,7 @@ public class AutoVortex extends LinearOpMode {
     public static double HT = 0.13;
     public static double HHT = 0.12;
 
-    public static double WHO = 0.4;
+    public static double WHO = 0.0;
     public static double WEX = 0.0;
 
     int lp = 1;
@@ -633,11 +633,11 @@ public class AutoVortex extends LinearOpMode {
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
 
-    public static double WAT = 0.6;
+    public static double WAT = 0.0;
 
-    CamGirl qtGirl, coneGirl;
+    //CamGirl qtGirl, coneGirl;
     void init_auto() {
-        initma(hardwareMap);
+        initma(hardwareMap, true);
         ihk = new IchHasseKinder();
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
@@ -649,12 +649,14 @@ public class AutoVortex extends LinearOpMode {
         sBalans.setPosition(SBAG);
         sHeading.setPosition(SHG);
 
+        /*
         qtPipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
-        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline);
+        //qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline);
+        qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 160, 120, qtPipeline);*/
 
         /*
         conePipeline = new ConePipeline();
-        coneGirl = new CamGirl(this, "coneGirl", OpenCvCameraRotation.UPRIGHT, 640, 480, );
+
         coneGirl.onNewFrame();
         */
 
@@ -665,6 +667,7 @@ public class AutoVortex extends LinearOpMode {
             epd.shouldClose = true;
         }
 
+        /*
         TelemetryPacket packet;
         while (!isStarted() && !isStopRequested()) {
             if (qtGirl.getOpened()) {
@@ -686,7 +689,7 @@ public class AutoVortex extends LinearOpMode {
                 telemetry.update();
             }
             sleep(10);
-        }
+        }*/
 
         mktraj();
 
@@ -698,9 +701,10 @@ public class AutoVortex extends LinearOpMode {
         init_auto();
 
         waitForStart();
+        /*
         if (qtGirl.getOpened()) {
             qtGirl.stop();
-        }
+        }*/
 
         startma(this, telemetry, false);
         ihk.shouldClose = false;
@@ -762,7 +766,7 @@ public class AutoVortex extends LinearOpMode {
             set_wait_time(0);
             follow_traj(goToPreload);
             getpos();
-            wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
+            wtfor(RobotFuncs.WAITS.HOISTER, 0); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(WAT);
             follow_traj(preloadToGet);
             wtfor(RobotFuncs.WAITS.EXTENSION, WEX);

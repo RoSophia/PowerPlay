@@ -102,6 +102,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -126,10 +127,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static int RID_POS = 0;
     public static int oldpos;
 
-    public static double UPPS = 100;
-    double UPP = 100;
-    public static double UPPP = 100;
-
     public double lep, led, lei, lef, lebp;
     public double rep, red, rei, ref, rebp;
 
@@ -150,12 +147,13 @@ public class OP_Mode_mk3 extends LinearOpMode {
 
     public void runOpMode() {
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = coneReady = false;
-        UPP = UPPS;
         oldpos = RID_POS;
 
-        initma(hardwareMap);
+        initma(hardwareMap, false);
         RobotFuncs.drive = null;
 
+        //AnalogInput lamprey2 = hardwareMap.get(AnalogInput.class, "lamprey2");
+        //lamprey2.
         waitForStart();
 
         startma(this, telemetry, true);
@@ -218,11 +216,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
             final double rfPower = mc - turn;
             final double lbPower = mc + turn;
             final double rbPower = ms - turn;
-
-            if (!L2RB && gamepad2.right_bumper) {
-                UPP += UPPP;
-            }
-            L2RB = gamepad2.right_bumper;
 
             if (!L2A && gamepad2.a) {
                 rid(RTOP_POS);

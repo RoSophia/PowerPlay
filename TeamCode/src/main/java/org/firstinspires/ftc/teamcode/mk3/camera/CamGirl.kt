@@ -46,6 +46,7 @@ class CamGirl(opm: OpMode,
     var camera: OpenCvWebcam
     var ecode: Int = 0
     var opened: Boolean = false
+    var expos: Int = 10
     private var dashboardStreaming = false
 
     init {
@@ -54,16 +55,19 @@ class CamGirl(opm: OpMode,
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId)
         camera.setPipeline(pipeline)
 
-        if (exposure != 0) {
-            camera.exposureControl.mode = ExposureControl.Mode.Manual
-            camera.exposureControl.setExposure(10, TimeUnit.MILLISECONDS)
-        }
-
-        camera.gainControl.gain = gain
+        expos = exposure
 
         dashboardStreaming = streaming
         val cameraListener = object : OpenCvCamera.AsyncCameraOpenListener {
             override fun onOpened() {
+                /*
+                if (exposure != 0) {
+                    camera.exposureControl.mode = ExposureControl.Mode.Manual
+                    camera.exposureControl.setExposure(expos.toLong(), TimeUnit.MILLISECONDS)
+                }
+                camera.gainControl.gain = gain
+                 */
+
                 camera.startStreaming(resX, resY, orientation)
                 if (streaming) {
                     FtcDashboard.getInstance().startCameraStream(camera, 20.0);
@@ -80,11 +84,13 @@ class CamGirl(opm: OpMode,
         while (waitForOpen && !opened) {
             sleep(5)
         }
+
     }
 
-    fun setExposure(exp: Long) {
+    fun updateExposure(exp: Int) {
+        expos = exp
         camera.exposureControl.mode = ExposureControl.Mode.Manual
-        camera.exposureControl.setExposure(exp, TimeUnit.MILLISECONDS)
+        camera.exposureControl.setExposure(expos.toLong(), TimeUnit.MILLISECONDS)
     }
 
     fun stop() {
