@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.ConeHeight;
+import static org.firstinspires.ftc.teamcode.RobotVars.ConeRotation;
+import static org.firstinspires.ftc.teamcode.RobotVars.ConeWidth;
 import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
@@ -84,12 +87,15 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.Traject
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.time.chrono.ThaiBuddhistEra;
+import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive", name = "Autonomous (firma din centru)")
+@Autonomous(group = "drive", name = "Autonomous (Firma din centru)")
 @SuppressLint("DefaultLocale")
 public class AutonomousStanga extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
@@ -122,29 +128,44 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P1H = -0.541;
     public static double P1X = -139;
     public static double P1Y = 13;
-    public static double P2H = -1.4;
+    public static double P2H = -1.47;
     public static double P2X = -123;
-    public static double P2Y = 21;
+    public static double P2Y = 16;
     public static double P3H = -2.00;
     public static double P3X = -109;
-    public static double P3Y = 69;
-    public static double P4H = -3.1415;
+    public static double P3Y = 67;
+    public static double P4H = -1.424;
     public static double P4X = -120;
-    public static double P4Y = 24;
+    public static double P4Y = 20;
 
     public static double OFFX = 2;
-    public static double OFFY = -0;
-    public static double OFFH = 0.005;
+    public static double OFFY = 0.5;
+    public static double OFFH = 0.013;
 
-    public static double OFFX1 = 2;
+    public static double OFFX1 = 1;
     public static double OFFY1 = -0.2;
-    public static double OFFH1 = -0.006;
+    public static double OFFH1 = -0.002;
 
-    public static double P678X = -118;
-    public static double P678H = -1.431;
-    public static double P6Y = 58;
-    public static double P7Y = -4;
-    public static double P8Y = -60;
+    public static double P678X = -85;
+    public static double P678H = -0;
+    public static double P6Y = -65;
+    public static double P7Y = 4;
+    public static double P8Y = 55;
+
+    public static double P71X = 20;
+    public static double P71Y = 3.14;
+    public static double P72X = 30;
+    public static double P72Y = 4;
+
+    public static double P81X = 30;
+    public static double P81Y = -2;
+    public static double P82X = 50;
+    public static double P82Y = 3.5;
+
+    public static double P61X = 50;
+    public static double P61Y = 2.8;
+    public static double P62X = 80;
+    public static double P62Y = 2.2;
 
     public static double PTG1X = 15.0;
     public static double PTG1Y = -1.5;
@@ -541,7 +562,6 @@ public class AutonomousStanga extends LinearOpMode {
                 .build();
 
         switch (LAST_ID) {
-            default:
             case 7:
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
                         .addTemporalMarker(() -> {
@@ -551,7 +571,7 @@ public class AutonomousStanga extends LinearOpMode {
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
                         })
-                        .lineToLinearHeading(new Pose2d(P678X, P7Y, P678H), vc, ac)
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P7Y, P678H), new Vector2d(P71X, P71Y), new Vector2d(P72X, P72Y), vc, ac, dc)
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
                         .waitSeconds(1)
@@ -566,14 +586,15 @@ public class AutonomousStanga extends LinearOpMode {
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
                         })
-                        .lineToLinearHeading(new Pose2d(P678X, P6Y, P678H), vc, ac)
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P6Y, P678H), new Vector2d(P61X, P61Y), new Vector2d(P62X, P62Y), vc, ac, dc)
                         .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> ext(EMIN))
                         .addTemporalMarker(this::ltime)
                         .waitSeconds(1)
                         .build();
                 break;
+            default:
             case 8:
-                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y, P4H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
                             sClose.setPosition(SDESCHIS);
@@ -581,7 +602,7 @@ public class AutonomousStanga extends LinearOpMode {
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
                         })
-                        .lineToLinearHeading(new Pose2d(P678X, P8Y, P678H), vc, ac)
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P8Y, P678H), new Vector2d(P81X, P81Y), new Vector2d(P82X, P82Y), vc, ac, dc)
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> ext(EMIN))
                         .waitSeconds(1)
@@ -696,8 +717,8 @@ public class AutonomousStanga extends LinearOpMode {
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
 
-    public static double WAT = 0.1;
-    public static double WOT = 0.1;
+    public static double WAT = 0.3;
+    public static double WOT = 0.12;
 
     void runBBBBBBBBBBBBBB() {
         clo.shouldClose = true;
@@ -720,6 +741,7 @@ public class AutonomousStanga extends LinearOpMode {
                 draw(fieldOverlay, trss.get(0).get(0));
                 draw(fieldOverlay, trss.get(0).get(1));
                 draw(fieldOverlay, trss.get(0).get(2));
+                draw(fieldOverlay, goToPark);
                 p.put("Updated!", 0);
                 dashboard.sendTelemetryPacket(p);
                 P11X = RAI1X;
@@ -739,6 +761,8 @@ public class AutonomousStanga extends LinearOpMode {
 
         }
     }
+
+    public static int CURLID = 7;
 
     ConePipeline conePipeline;
     CamGirl qtGirl, coneGirl;
@@ -796,11 +820,11 @@ public class AutonomousStanga extends LinearOpMode {
         }
          */
 
+        LAST_ID = CURLID;
         if (!isStopRequested()) {
             mktraj();
         }
 
-        LAST_ID = 8;
         telemetry.addData("All done! Got ID: ", LAST_ID);
     }
 
