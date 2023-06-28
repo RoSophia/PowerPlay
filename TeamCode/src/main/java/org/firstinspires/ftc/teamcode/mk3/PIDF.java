@@ -78,13 +78,6 @@ class PIDF implements Runnable {
         if (motA == null) {
             return;
         }
-        if (useTele) {
-            TelemetryPacket cp = new TelemetryPacket();
-            cp.put(name + "GoToLpos", target);
-            cp.put(name + "GoToCpos", targ);
-            cp.put(name + "GoToTime", tim);
-            dashboard.sendTelemetryPacket(cp);
-        }
         ltarg = target;
         target = targ;
         DUR = tim;

@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
-import static org.firstinspires.ftc.teamcode.RobotVars.ConeHeight;
-import static org.firstinspires.ftc.teamcode.RobotVars.ConeRotation;
-import static org.firstinspires.ftc.teamcode.RobotVars.ConeWidth;
 import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
@@ -87,17 +84,14 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.Traject
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
-import org.openftc.apriltag.AprilTagDetection;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.time.chrono.ThaiBuddhistEra;
-import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive")
+@Autonomous(group = "drive", name = "Autonomous (firma din centru)")
 @SuppressLint("DefaultLocale")
-public class AutoVortex extends LinearOpMode {
+public class AutonomousStanga extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
 
@@ -125,47 +119,47 @@ public class AutoVortex extends LinearOpMode {
     // -38.7 -57.7 117.2
     // 206.6 8.318 28.337
 
-    public static double P1H = 0.541;
+    public static double P1H = -0.541;
     public static double P1X = -139;
-    public static double P1Y = -13;
-    public static double P2H = 1.4;
+    public static double P1Y = 13;
+    public static double P2H = -1.4;
     public static double P2X = -123;
-    public static double P2Y = -21;
-    public static double P3H = 2.00;
+    public static double P2Y = 21;
+    public static double P3H = -2.00;
     public static double P3X = -109;
-    public static double P3Y = -69;
-    public static double P4H = 3.1415;
+    public static double P3Y = 69;
+    public static double P4H = -3.1415;
     public static double P4X = -120;
-    public static double P4Y = -24;
+    public static double P4Y = 24;
 
     public static double OFFX = 2;
-    public static double OFFY = 0;
-    public static double OFFH = -0.005;
+    public static double OFFY = -0;
+    public static double OFFH = 0.005;
 
     public static double OFFX1 = 2;
-    public static double OFFY1 = 0.2;
-    public static double OFFH1 = 0.006;
+    public static double OFFY1 = -0.2;
+    public static double OFFH1 = -0.006;
 
     public static double P678X = -118;
-    public static double P678H = 1.431;
-    public static double P6Y = -58;
-    public static double P7Y = 4;
-    public static double P8Y = 60;
+    public static double P678H = -1.431;
+    public static double P6Y = 58;
+    public static double P7Y = -4;
+    public static double P8Y = -60;
 
     public static double PTG1X = 15.0;
-    public static double PTG1Y = 1.5;
+    public static double PTG1Y = -1.5;
     public static double PTG2X = 15.0;
-    public static double PTG2Y = 0.5;
+    public static double PTG2Y = -0.5;
 
     public static double RAI1X = 20;
-    public static double RAI1Y = 4;
+    public static double RAI1Y = -4;
     public static double RAI2X = 30;
-    public static double RAI2Y = 3.2;
+    public static double RAI2Y = -3.2;
 
     public static double RBI1X = 20;
-    public static double RBI1Y = 4;
+    public static double RBI1Y = -4;
     public static double RBI2X = 30;
-    public static double RBI2Y = 3.2;
+    public static double RBI2Y = -3.2;
 
     public static boolean BBBBBBBBBBBBBB = true;
     public static boolean RECURRING_SINGULARITY = false;
@@ -181,9 +175,9 @@ public class AutoVortex extends LinearOpMode {
      */
 
     public static double R1X = 40;
-    public static double R1Y = 2.4;
+    public static double R1Y = -2.4;
     public static double R2X = 40;
-    public static double R2Y = 1.2;
+    public static double R2Y = -1.2;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -448,7 +442,7 @@ public class AutoVortex extends LinearOpMode {
     TrajectorySequence ender;
     Vector<Vector<TrajectorySequence>> trss = new Vector<>();
 
-    IchHasseKinder ihk;
+    FirmaDinCentru ihk;
     Thread ihkT;
 
     void mktraj() {
@@ -751,7 +745,7 @@ public class AutoVortex extends LinearOpMode {
 
     void init_auto() {
         initma(hardwareMap, true);
-        ihk = new IchHasseKinder(this);
+        ihk = new FirmaDinCentru(this);
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         RobotFuncs.drive = drive;

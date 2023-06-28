@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: org.ftclib.ftclib:core:2.0.1@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/bcb4c642c2d1f4ed99e4c8399ef58d59/transformed/jetified-core-2.0.1/AndroidManifest.xml" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/bcb4c642c2d1f4ed99e4c8399ef58d59/transformed/jetified-core-2.0.1/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/bcb4c642c2d1f4ed99e4c8399ef58d59/transformed/jetified-core-2.0.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/2241e10ef86616765182bb6a1158f265/transformed/jetified-core-2.0.1/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/2241e10ef86616765182bb6a1158f265/transformed/jetified-core-2.0.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/2241e10ef86616765182bb6a1158f265/transformed/jetified-core-2.0.1/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ftclib.ftclib/core/2.0.1/958448335f45c93bf212508b64b99bcac17ed95e/core-2.0.1-javadoc.jar!/" />

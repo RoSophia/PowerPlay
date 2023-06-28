@@ -3,13 +3,19 @@ package org.firstinspires.ftc.teamcode.mk3.camera
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.config.Config
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.BC
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.DRAW_BOXES
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.INVERT
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.RC
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.TB
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.TR
-import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.Vars.USE_TELE
+import com.qualcomm.robotcore.util.ElapsedTime
+import org.firstinspires.ftc.teamcode.mk3.AutoVortex.CAMERA_UPDATE
+import org.firstinspires.ftc.teamcode.mk3.AutoVortex.CUR_DONE_CORRECTION
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.BC
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.COL_INDEX
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.DO_I_EVEN_PROCESS_FRAME
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.DRAW_BOXES
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.DRAW_MEDIAN
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.INVERT
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.RC
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.TB
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.TR
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.USE_TELE
 import org.opencv.core.Core
 import org.opencv.core.Mat
 import org.opencv.core.Point
@@ -50,8 +56,6 @@ class Box2d(x: Int, y: Int, w: Int, h: Int) : Comparable<Box2d> {
 }
 
 class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
-    private val frame: Mat = Mat()
-
     var xoff: Double = 0.0
 
     var results: Array<Box2d> = arrayOf(Box2d())
@@ -69,7 +73,6 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
 
         results.sort()
         return res
-        TODO("MAKE THIS RUN ONLY ONCE")
     }
 
     private fun draw(frame: Mat, cb: Box2d, vl: Double, ll: Double) {
@@ -78,16 +81,15 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
         val p3 = Point(cb.sx.toDouble() + cb.width.toDouble(),
                 cb.sy.toDouble() + cb.height.toDouble())
 
-        val red = Scalar(ll, ll, ll, Vars.ALPHA)
-        val col = Scalar(vl, vl, vl, Vars.ALPHA)
+        val red = Scalar(ll, ll, ll, CameraControls.ALPHA)
+        val col = Scalar(vl, vl, vl, CameraControls.ALPHA)
 
         Imgproc.rectangle(frame, p1, p3, red, 7)
         Imgproc.rectangle(frame, p1, p3, col, -1)
     }
 
-    var framec = 0
-
-    object Vars {
+    @Config
+    object CameraControls {
         @JvmField
         var WIDTH: Int = 15
 
@@ -101,7 +103,7 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
         var XOFF: Int = 0
 
         @JvmField
-        var YOFF: Int = 0
+        var YOFF: Int = 100
 
         @JvmField
         var INVERT: Boolean = false
@@ -128,10 +130,16 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
         var TP: Double = 1.0
 
         @JvmField
-        var DRAW_BOXES: Boolean = true
+        var DRAW_BOXES: Boolean = false
+
+        @JvmField
+        var DRAW_MEDIAN: Boolean = true
 
         @JvmField
         var USE_TELE: Boolean = false
+
+        @JvmField
+        var DO_I_EVEN_PROCESS_FRAME: Boolean = true
     }
 
     private fun subm(img: Mat, box: Box2d): Mat {
@@ -151,6 +159,7 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
         val bg = b - g
         val bcoef = (-(b / 255) + 1.5) * BC
 
+        /*
         if (USE_TELE) {
             val tp = TelemetryPacket()
             tp.put("abs(r - g)", abs(r - g))
@@ -162,7 +171,7 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
             tp.put("bg * bcoef", bg * bcoef)
 
             FtcDashboard.getInstance().sendTelemetryPacket(tp)
-        }
+        }*/
 
         if (abs(r - g) * rcoef < TR) {
             if (bg > TB) {
@@ -172,78 +181,127 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
         return false
     }
 
-    fun getRecommendedExposureDifference(): Int {
-        val mc = Core.mean(frame)
-        val mbrightness = mc.`val`[0] * 0.0722 + mc.`val`[1] * 0.7152 + mc.`val`[2] * 0.2126
-        val tp = TelemetryPacket()
-        tp.put("MED_BRIGHTNESS", mbrightness)
-        tp.put("UpdatedBright", ((Vars.TARGET_BRIGHTNESS - mbrightness) * Vars.TP).toInt())
-        FtcDashboard.getInstance().sendTelemetryPacket(tp)
-        return ((Vars.TARGET_BRIGHTNESS - mbrightness) * Vars.TP).toInt()
-    }
-
     var checkLocations: Array<Box2d> = if (INVERT) {
-        mklocations(Vars.LUP, Vars.LUT, Vars.WIDTH, Vars.YOFF, Vars.XOFF, height, width)
+        mklocations(CameraControls.LUP, CameraControls.LUT, CameraControls.WIDTH, CameraControls.YOFF, CameraControls.XOFF, height, width)
     } else {
-        mklocations(Vars.LUT, Vars.LUP, Vars.WIDTH, Vars.XOFF, Vars.YOFF, width, height)
+        mklocations(CameraControls.LUT, CameraControls.LUP, CameraControls.WIDTH, CameraControls.XOFF, CameraControls.YOFF, width, height)
     }
 
+    private val ourTimer = ElapsedTime(0)
+    private val theirTimer = ElapsedTime(0)
+    private var startTimer = false
     override fun processFrame(input: Mat): Mat {
-        input.copyTo(frame)
-
-        if (frame.empty()) {
+        if (!startTimer) {
+            theirTimer.reset()
+            startTimer = true
+        }
+        ourTimer.reset()
+        if (input.empty()) {
             return input
         }
+        if (DO_I_EVEN_PROCESS_FRAME) {
+            val frame = Mat()
+            input.copyTo(frame)
 
-        val ff = Mat()
-        frame.copyTo(ff)
-        val tp = TelemetryPacket()
-        var medXS = 0
-        var medYS = 0
-        var redc = 0
-        for ((ci, element) in checkLocations.withIndex()) {
-            val vl = check(frame, element)
+
+            val ff = Mat()
+            if (DRAW_BOXES || DRAW_MEDIAN) {
+                frame.copyTo(ff)
+            }
+            var medXS = 0
+            var medYS = 0
+            var redc = 0
+            //val tp = TelemetryPacket()
+            for ((ci, element) in checkLocations.withIndex()) {
+                val vl = check(frame, element)
+                /*
+                if (checkLocations.size <= 6 && USE_TELE) {
+                    for (i in vl.indices) {
+                        tp.put("val$ci _$i", vl[i])
+                    }
+                }*/
+                if (isRed(vl)) {
+                    medXS += element.sx + element.width / 2
+                    medYS += element.sy + element.height / 2
+                    ++redc
+                    if (DRAW_BOXES) {
+                        draw(ff, element, 255.0, vl[COL_INDEX])
+                    }
+                } else {
+                    if (DRAW_BOXES) {
+                        draw(ff, element, 0.0, vl[COL_INDEX])
+                    }
+                }
+            }
+            /*
             if (checkLocations.size <= 6 && USE_TELE) {
-                for (i in vl.indices) {
-                    tp.put("val$ci _$i", vl[i])
-                }
-            }
-            if (isRed(vl)) {
-                medXS += element.sx + element.width / 2
-                medYS += element.sy + element.height / 2
-                ++redc
-                if (DRAW_BOXES) {
-                    draw(ff, element, 255.0, vl[Vars.COL_INDEX])
-                }
+                FtcDashboard.getInstance().sendTelemetryPacket(tp)
+            }*/
+
+            val w = frame.width()
+            val h = frame.height()
+            val medX = if (redc > 0) {
+                medXS.toDouble() / redc.toDouble()
             } else {
-                if (DRAW_BOXES) {
-                    draw(ff, element, 0.0, vl[Vars.COL_INDEX])
+                w / 2.0
+            }
+            val medY = if (redc > 0) {
+                medYS.toDouble() / redc.toDouble()
+            } else {
+                h / 2.0
+            }
+
+            if (DRAW_MEDIAN && !ff.empty()) {
+                val p1 = Point(w / 2.0, h / 2.0)
+                val p2 = Point(medX, medY)
+
+                val c1 = Point(w / 2.0 + CUR_DONE_CORRECTION * 20, 10.0)
+                val c2 = Point(w / 2.0, 10.0)
+
+                Imgproc.line(ff, c1, c2, Scalar(0.0, 0.0, 0.0, 255.0), 9)
+                if (CAMERA_UPDATE) {
+                    Imgproc.line(ff, c1, c2, Scalar(0.0, 255.0, 0.0, 255.0), 8)
+                } else {
+                    Imgproc.line(ff, c1, c2, Scalar(200.0, 0.0, 255.0, 255.0), 8)
+                }
+
+                if (CAMERA_UPDATE) {
+                    Imgproc.line(ff, p1, p2, Scalar(0.0, 0.0, 0.0, 255.0), 6)
+                    Imgproc.line(ff, p1, p2, Scalar(255.0, 0.0, 0.0, 255.0), 4)
+                } else {
+                    Imgproc.line(ff, p1, p2, Scalar(255.0, 255.0, 255.0, 255.0), 6)
                 }
             }
-        }
-        if (checkLocations.size <= 6 && USE_TELE) {
-            FtcDashboard.getInstance().sendTelemetryPacket(tp)
-        }
 
-        val w = frame.width()
-        val h = frame.height()
-        val medX = if (redc > 0) {
-            medXS.toDouble() / redc.toDouble()
+            xoff = medX - (w / 2.0)
+            //xoff = ((medX - (w / 2.0)) / w) * 2
+
+            if (USE_TELE) {
+                val telp = TelemetryPacket()
+                telp.put("GOT XOFF", xoff)
+                telp.put("CONE_PIPELINE_MY_CYCLE", ourTimer.seconds())
+                telp.put("CONE_PIPELINE_THEIR_CYCLE", theirTimer.seconds())
+                ourTimer.reset()
+                theirTimer.reset()
+                FtcDashboard.getInstance().sendTelemetryPacket(telp)
+            }
+
+            return if ((DRAW_BOXES || DRAW_MEDIAN) && !ff.empty()) {
+                ff
+            } else {
+                frame
+            }
         } else {
-            w / 2.0
+            if (USE_TELE) {
+                val telp = TelemetryPacket()
+                telp.put("GOT XOFF", xoff)
+                telp.put("CONE_PIPELINE_MY_CYCLE", ourTimer.seconds())
+                telp.put("CONE_PIPELINE_THEIR_CYCLE", theirTimer.seconds())
+                ourTimer.reset()
+                theirTimer.reset()
+                FtcDashboard.getInstance().sendTelemetryPacket(telp)
+            }
+            return input
         }
-        val medY = if (redc > 0) {
-            medYS.toDouble() / redc.toDouble()
-        } else {
-            h / 2.0
-        }
-        val p1 = Point(w / 2.0, h / 2.0)
-        val p2 = Point(medX, medY)
-        Imgproc.line(ff, p1, p2, Scalar(255.0, 0.0, 0.0, 255.0), 6)
-
-        xoff = ((medX - (w / 2.0)) / w) * 2
-
-        ++framec
-        return ff
     }
 }

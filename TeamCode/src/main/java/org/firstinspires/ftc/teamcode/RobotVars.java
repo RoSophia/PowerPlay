@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.openftc.easyopencv.OpenCvCameraRotation;
+
 @Config
 public class RobotVars {
     public static double SMDESCHIS = 0.79; // Claw Very Open (After put)
@@ -18,7 +20,7 @@ public class RobotVars {
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
-    public static double SAG = 0.400;     // Grabber Arm Get position
+    public static double SAG = 0.406;     // Grabber Arm Get position
     public static double SAH = 0.610;     // Grabber Arm Hold Position
     public static double SAP = 0.75;      // Grabber Arm Put position
     public static double SAW = 0.680;     // Grabber Arm Wait position
@@ -31,7 +33,7 @@ public class RobotVars {
     public static double SDIF = 0.1;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
-    public static double SHG = 0.065;     // Grabber Get Heading
+    public static double SHG = 0.085;     // Grabber Get Heading
     public static double SHP = 0.065;      // Grabber Put Heading
     public static double SHAP = 0.065;     // Grabber After Put Heading
 
@@ -39,7 +41,7 @@ public class RobotVars {
     public static double SCC = 0.9;       // Cone Securing Mini Servo Close Position
 
     public static double DOT = 0.0;       // Time To Lower The Lift
-    public static double UPT = 0.1;       // Time To Hoist Up The Thing
+    public static double UPT = 0.75;       // Time To Hoist Up The Thing
     public static double EXTT = 0.8;      // Time To Fully Extend
     public static double RETT = 0.0;      // Time To Retract
 
@@ -64,7 +66,7 @@ public class RobotVars {
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.001;
-    public static double rmd = 10;
+    public static double rmd = 12;
     public static double rbp = 0.0018;
 
     public static double EAP = 1.0; // Extension A Scale Term
@@ -73,7 +75,7 @@ public class RobotVars {
     public static double RBP = 1.0;
 
     public static boolean useExt = true;
-    public static boolean useRid = true;
+    public static boolean useRid = false;
 
     public static boolean STARTW = true;
     public static String LES = "RF";
@@ -90,6 +92,10 @@ public class RobotVars {
 
     public static int MAX_DIF_RID = 5;
     public static int MAX_DIF_EXT = 25;
+
+    public static int ConeHeight = 480;
+    public static int ConeWidth = 640;
+    public static OpenCvCameraRotation ConeRotation = OpenCvCameraRotation.UPSIDE_DOWN;
 
     /*
      * Expansion:

@@ -28,6 +28,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epsEq;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -49,9 +50,9 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.3;
-    public static double CET = 0.1;
-    public static double CHT = 0.3;
+    public static double CPT = 0.40;
+    public static double CET = 0.15;
+    public static double CHT = 0.35;
     public static double WPT = 0.0;
     public static double WET = 0.0;
     public static double WHT = 0.25;
@@ -164,6 +165,7 @@ public class Clown implements Runnable {
                 packet.put("ctim", tims.get(timt));
                 packet.put("SER_SBA", sBalans.getPosition());
                 packet.put("SER_SEA", sextA.getPosition());
+                packet.put("SER_SEB", sextB.getPosition());
                 packet.put("SER_SEH", sHeading.getPosition());
                 packet.put("csens", cd);
 

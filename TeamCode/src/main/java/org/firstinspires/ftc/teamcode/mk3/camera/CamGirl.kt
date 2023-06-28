@@ -1,20 +1,18 @@
 package org.firstinspires.ftc.teamcode.mk3.camera
 
 import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.config.Config
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl
-import org.firstinspires.ftc.teamcode.mk3.tests.CamTest
-import org.opencv.videoio.VideoCapture
-import org.opencv.videoio.Videoio.CAP_PROP_AUTO_EXPOSURE
 import org.openftc.easyopencv.*
 import java.lang.Thread.sleep
 import java.util.concurrent.TimeUnit
 
 /// Thanks to Brainstormz for generously "gifting" this code to us
 
-class CamGirl(opm: OpMode,
+class CamGirl(lom: LinearOpMode,
               name: String,
               orientation: OpenCvCameraRotation,
               resX: Int,
@@ -25,15 +23,15 @@ class CamGirl(opm: OpMode,
               gain: Int,
               exposure: Int) {
 
-    constructor(opm: OpMode,
+    constructor(lom: LinearOpMode,
                 name: String,
                 orientation: OpenCvCameraRotation,
                 resX: Int,
                 resY: Int,
                 pipeline: OpenCvPipeline
-    ) : this(opm, name, orientation, resX, resY, pipeline, false, false)
+    ) : this(lom, name, orientation, resX, resY, pipeline, false, false)
 
-    constructor(opm: OpMode,
+    constructor(lom: LinearOpMode,
                 name: String,
                 orientation: OpenCvCameraRotation,
                 resX: Int,
@@ -41,7 +39,7 @@ class CamGirl(opm: OpMode,
                 pipeline: OpenCvPipeline,
                 streaming: Boolean,
                 waitForOpen: Boolean,
-    ) : this(opm, name, orientation, resX, resY, pipeline, streaming, waitForOpen, 100, 0)
+    ) : this(lom, name, orientation, resX, resY, pipeline, streaming, waitForOpen, 100, 0)
 
     var camera: OpenCvWebcam
     var ecode: Int = 0
@@ -50,8 +48,8 @@ class CamGirl(opm: OpMode,
     private var dashboardStreaming = false
 
     init {
-        val cameraMonitorViewId: Int = opm.hardwareMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", opm.hardwareMap.appContext.packageName)
-        val webcamName: WebcamName = opm.hardwareMap.get(WebcamName::class.java, name)
+        val cameraMonitorViewId: Int = lom.hardwareMap.appContext.resources.getIdentifier("cameraMonitorViewId", "id", lom.hardwareMap.appContext.packageName)
+        val webcamName: WebcamName = lom.hardwareMap.get(WebcamName::class.java, name)
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId)
         camera.setPipeline(pipeline)
 
@@ -60,17 +58,15 @@ class CamGirl(opm: OpMode,
         dashboardStreaming = streaming
         val cameraListener = object : OpenCvCamera.AsyncCameraOpenListener {
             override fun onOpened() {
-                /*
                 if (exposure != 0) {
                     camera.exposureControl.mode = ExposureControl.Mode.Manual
                     camera.exposureControl.setExposure(expos.toLong(), TimeUnit.MILLISECONDS)
                 }
                 camera.gainControl.gain = gain
-                 */
 
                 camera.startStreaming(resX, resY, orientation)
                 if (streaming) {
-                    FtcDashboard.getInstance().startCameraStream(camera, 20.0);
+                    FtcDashboard.getInstance().startCameraStream(camera, 30.0)
                 }
                 opened = true
             }
@@ -81,16 +77,17 @@ class CamGirl(opm: OpMode,
         }
 
         camera.openCameraDeviceAsync(cameraListener)
-        while (waitForOpen && !opened) {
+        while (waitForOpen && !opened && !lom.isStopRequested) {
+            val tp = TelemetryPacket()
+            tp.addLine("Currently waiting on cam open")
+            FtcDashboard.getInstance().sendTelemetryPacket(tp)
+            lom.telemetry.addLine("Waiting on cam open")
+            lom.telemetry.update()
             sleep(5)
         }
+        lom.telemetry.addLine("Cam opened")
+        lom.telemetry.update()
 
-    }
-
-    fun updateExposure(exp: Int) {
-        expos = exp
-        camera.exposureControl.mode = ExposureControl.Mode.Manual
-        camera.exposureControl.setExposure(expos.toLong(), TimeUnit.MILLISECONDS)
     }
 
     fun stop() {

@@ -9,16 +9,17 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.wtfor_nonblocking;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
-class IchHasseKinder implements Runnable {
+class FirmaDinCentru implements Runnable {
     public LinearOpMode lom;
     public boolean shouldClose = false;
-    AutoVortex cav;
+    AutonomousStanga cav;
 
-    public IchHasseKinder(AutoVortex av) {
+    public FirmaDinCentru(AutonomousStanga av) {
         cav = av;
     }
 
