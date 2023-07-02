@@ -75,6 +75,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
+import dalvik.system.DelegateLastClassLoader;
+
 @SuppressWarnings("ALL")
 public class RobotFuncs {
     public static DcMotorEx ridA;
@@ -93,7 +95,7 @@ public class RobotFuncs {
     public static LinearOpMode lom;
     public static Telemetry telemetry;
 
-    static double eps = 0.00001;
+    static double eps = 0.01;
 
     static boolean epsEq(double o1, double o2) {
         if (Math.abs(o1 - o2) < eps) {
@@ -163,7 +165,11 @@ public class RobotFuncs {
                 coneReady = false;
                 rpd.set_target(pos, DOT);
             } else {
-                rpd.set_target(pos, UPT);
+                if (pos == RTOP_POS) {
+                    rpd.set_target(pos, UPT);
+                } else {
+                    rpd.set_target(pos, UPT / 2);
+                }
             }
         } else {
             if (!coneClaw) {
@@ -206,14 +212,17 @@ public class RobotFuncs {
     }
 
 
+    static double TIMEOUT = 1.6;
     public static void wtfor(WAITS p, double extra) {
         TelemetryPacket pa = new TelemetryPacket();
         pa.put("WAIT_FOR_P", p);
         pa.put("WAIT_FOR_E", extra);
         dashboard.sendTelemetryPacket(pa);
+        ElapsedTime timeout = new ElapsedTime(0);
+        timeout.reset();
         try {
             if (p == WAITS.TRANSFER) { /// 0: Wait for transfer to finish
-                while (!lom.isStopRequested() && !coneReady) {
+                while (!lom.isStopRequested() && !coneReady && timeout.seconds() < TIMEOUT) {
                     leftBack.setPower(0);
                     rightBack.setPower(0);
                     leftFront.setPower(0);
@@ -231,7 +240,7 @@ public class RobotFuncs {
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
-                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) > MAX_DIF_RID) {
+                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
                     leftBack.setPower(0);
                     rightBack.setPower(0);
                     leftFront.setPower(0);
@@ -250,7 +259,7 @@ public class RobotFuncs {
                     sleep(2);
                 }
             } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
-                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) > MAX_DIF_EXT) {
+                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) > MAX_DIF_EXT && timeout.seconds() < TIMEOUT) {
                     leftBack.setPower(0);
                     rightBack.setPower(0);
                     leftFront.setPower(0);
@@ -269,7 +278,7 @@ public class RobotFuncs {
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER_FALL) { /// 2: Wait for hoisster to not the thing
-                while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) > MAX_DIF_RID) {
+                while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
                     leftBack.setPower(0);
                     rightBack.setPower(0);
                     leftFront.setPower(0);
@@ -342,19 +351,13 @@ public class RobotFuncs {
     }
 
     static void ext(int pos) { /// Extend to a set position
-        TelemetryPacket cp = new TelemetryPacket();
         if (pos == EMAX) {
             clo.toGet = true;
             coneReady = false;
-            cp.put("GoToPos", pos);
-            cp.put("GoToTim", EXTT);
             epd.set_target(pos, EXTT);
         } else {
-            cp.put("GoToPos", pos);
-            cp.put("GoToTim", RETT);
             epd.set_target(pos, RETT);
         }
-        dashboard.sendTelemetryPacket(cp);
         rid(RBOT_POS);
     }
 

@@ -12,16 +12,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
 @Config
-class PIDF implements Runnable {
+class MPIDF implements Runnable {
     DcMotorEx motA, motB;
 
     public boolean shouldClose = false;
     public boolean use = true;
     public boolean curRet = false;
-    public boolean useTele = false;
+    public boolean useTele = true;
     public String name;
     public LinearOpMode lom;
 
@@ -32,7 +30,7 @@ class PIDF implements Runnable {
     public double b;
     public double md;
 
-    public PIDF(DcMotorEx motA, DcMotorEx motB, String n, double p, double d, double i, double f, double b, double md) {
+    public MPIDF(DcMotorEx motA, DcMotorEx motB, String n, double p, double d, double i, double f, double b, double md) {
         if (motA == null) {
             return;
         }
@@ -92,6 +90,7 @@ class PIDF implements Runnable {
             return;
         }
         double x;
+        x = ltarg - target;
         if (DUR > 0.0001) {
             x = ttim.seconds() * (1 / DUR); /// Rescale the elapsed time to [0, 1]
         } else {
@@ -129,9 +128,6 @@ class PIDF implements Runnable {
 
     public static double CORRECTION = 0.13;
 
-    public static int MAX_CURRENT_DRAW = 7000;
-    public static double MAX_OVERCURRENT_TIME = 2.5;
-
     @SuppressWarnings("BusyWait")
     public void run() {
         if (motA == null) {
@@ -151,11 +147,7 @@ class PIDF implements Runnable {
             motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }*/
         boolean lf = false;
-        ElapsedTime MOTATIMER = new ElapsedTime(0);
-        MOTATIMER.reset();
         while (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) {
-
-
             cp = motA.getCurrentPosition();
             if (motB != null) {
                 cpb = motB.getCurrentPosition();
@@ -234,14 +226,6 @@ class PIDF implements Runnable {
                     pack.addLine("Peer into the void");
                 }
                 dashboard.sendTelemetryPacket(pack);
-
-
-                if (motA.getCurrent(CurrentUnit.MILLIAMPS) < MAX_CURRENT_DRAW || motB.getCurrent(CurrentUnit.MILLIAMPS) < MAX_CURRENT_DRAW) {
-                    MOTATIMER.reset();
-                } else if (MOTATIMER.seconds() > MAX_OVERCURRENT_TIME) {
-                    outp = 0;
-                }
-
                 if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) { /// `lom` here is used to prevent powering the motor after the OpMode stopped.
                     motA.setPower(outp * pcoef);
 

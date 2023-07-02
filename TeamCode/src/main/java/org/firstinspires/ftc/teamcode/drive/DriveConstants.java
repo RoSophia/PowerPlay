@@ -73,14 +73,14 @@ public class DriveConstants {
      */
 
     public static double MAX_VEL = 200;// 254
-    public static double MAX_ACCEL = 200;//100;
+    public static double MAX_ACCEL = 160;//100;
     public static double MAX_DECEL = 180;//70;
 
     //public static double MAX_VEL = 110;// True max: 170
     //public static double MAX_ACCEL = 110;
     //public static double MAX_DECEL = 60;
     public static double MAX_ANG_VEL = 6.832;
-    public static double MAX_ANG_ACCEL = 6.832;
+    public static double MAX_ANG_ACCEL = 3.832;
 
 
     public static double encoderTicksToInches(double ticks) {

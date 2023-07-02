@@ -46,6 +46,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
@@ -123,6 +124,12 @@ public class OP_Mode_mk3 extends LinearOpMode {
     boolean G2LT = false;
     boolean G2L = false;
     boolean RB = false;
+    boolean R1X = false;
+    boolean R1Y = false;
+    boolean R1A = false;
+    boolean R1B = false;
+    boolean R1DD = false;
+    boolean R1DU = false;
 
     public static int RID_POS = 0;
     public static int oldpos;
@@ -145,8 +152,19 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double EXTL = 0.2;
     public static double RIDL = 0.2;
 
+    public static double SGS = 0.495;
+    public static double SGD = 0.021;
+    public static double SBAS = 0.60;
+    public static double SBAD = 0.0;
+
+    void set_grab_pos(int p) {
+        conversiePerverssa(SGS - SGD * (p - 1));
+        sBalans.setPosition(SBAS - SBAD * (p - 1));
+        //sClose.setPosition(SDESCHIS);
+    }
+
     public void runOpMode() {
-        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = coneReady = false;
+        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = R1B = R1X = R1Y = R1A = R1DD = R1DU = coneReady = false;
         oldpos = RID_POS;
 
         initma(hardwareMap, false);
@@ -196,12 +214,12 @@ public class OP_Mode_mk3 extends LinearOpMode {
             if (CU_TESTING == 1) {
                 conversiePerverssa(SAP);
                 sHeading.setPosition(SHP);
-                sMCLaw.setPosition(SCC);
+                sMCLaw.setPosition(SCO);
                 sBalans.setPosition(SBAP);
             } else if (CU_TESTING == 2) {
                 conversiePerverssa(SAG);
                 sHeading.setPosition(SHG);
-                sMCLaw.setPosition(SCO);
+                sMCLaw.setPosition(SCC);
                 sBalans.setPosition(SBAG);
             }
 
@@ -221,18 +239,21 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 rid(RTOP_POS);
             }
             L2A = gamepad2.a;
+
             if (!L2U && gamepad2.dpad_up) {
                 rid(RMID_POS);
             }
             L2U = gamepad2.dpad_up;
+
             if (!L2D && gamepad2.dpad_down) {
                 rid(RMIU_POS);
             }
             L2D = gamepad2.dpad_down;
-            if (!L2B && gamepad2.b) {
+
+            if (!L2B && (gamepad2.b || gamepad1.right_bumper)) {
                 ext(EMIN);
             }
-            L2B = gamepad2.b;
+            L2B = gamepad2.b || gamepad1.right_bumper;
 
             if (!G2L && gamepad2.dpad_left) {
                 sMCLaw.setPosition(SCC);
@@ -257,10 +278,46 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             R2LB = gamepad2.left_bumper;
 
-            if (!R2RB && gamepad2.right_bumper) {
-                ext(EMAX);
+            if (!R1DD && gamepad1.dpad_down) {
+                conversiePerverssa(SAG);
+                clo.toGet = true;
+            }
+            R1DD = gamepad1.dpad_down;
+
+            if (!R1DU && gamepad1.dpad_up) {
+                clo.toPrepCone = true;
+            }
+            R1DU = gamepad1.dpad_up;
+
+            if (!R2RB && gamepad2.right_bumper && !coneClaw) {
+                clo.rtg = false;
+                conversiePerverssa(SAW);
+                sBalans.setPosition(SBAG);
+                sClose.setPosition(SMEDIU);
+                sHeading.setPosition(SHG);
+                conversiePerverssa(SAW);
             }
             R2RB = gamepad2.right_bumper;
+
+            if (!R1Y && gamepad1.y) {
+                set_grab_pos(1);
+            }
+            R1Y = gamepad1.y;
+
+            if (!R1B && gamepad1.b) {
+                set_grab_pos(2);
+            }
+            R1B = gamepad1.b;
+
+            if (!R1A && gamepad1.a && !gamepad1.start) {
+                set_grab_pos(3);
+            }
+            R1A = gamepad1.a;
+
+            if (!R1X && gamepad1.x) {
+                set_grab_pos(4);
+            }
+            R1X = gamepad1.x;
 
             final double DPC = 1 - 0.6 * gamepad2.right_trigger;
             if (Math.abs(gamepad2.left_stick_y) > 0.001) {
@@ -291,7 +348,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 rpd.set_target(ridA.getCurrentPosition(), 0);
             }
 
-            if (!G2X && gamepad2.x) {
+            if (!G2X && (gamepad2.x || gamepad1.left_bumper)) {
                 telemetry.addData("CLIC X", i);
                 if (sClose.getPosition() < SINCHIS) {
                     sClose.setPosition(SINCHIS);
@@ -302,7 +359,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 }
                 ++i;
             }
-            G2X = gamepad2.x;
+            G2X = gamepad2.x || gamepad1.left_bumper;
 
             if (!G2LT && gamepad2.left_trigger > 0.9) {
                 if (extA != null) {

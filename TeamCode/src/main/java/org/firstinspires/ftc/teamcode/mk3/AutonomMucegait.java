@@ -94,7 +94,7 @@ import java.util.Vector;
 @Config
 @Autonomous(group = "drive", name = "Autonomous (Firma din centru)")
 @SuppressLint("DefaultLocale")
-public class AutonomousStanga extends LinearOpMode {
+public class AutonomMucegait extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
 
@@ -460,7 +460,7 @@ public class AutonomousStanga extends LinearOpMode {
     TrajectorySequence ender;
     Vector<Vector<TrajectorySequence>> trss = new Vector<>();
 
-    FirmaDinCentru ihk;
+    FloriDeMucegai ihk;
     Thread ihkT;
 
     void mktraj() {
@@ -775,7 +775,7 @@ public class AutonomousStanga extends LinearOpMode {
 
     void init_auto() {
         initma(hardwareMap, true);
-        ihk = new FirmaDinCentru(this);
+        ihk = new FloriDeMucegai(this);
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         RobotFuncs.drive = drive;

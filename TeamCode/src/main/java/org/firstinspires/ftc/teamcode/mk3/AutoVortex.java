@@ -96,6 +96,7 @@ import java.util.Vector;
 
 @Autonomous(group = "drive")
 @SuppressLint("DefaultLocale")
+@Config
 public class AutoVortex extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
@@ -124,14 +125,14 @@ public class AutoVortex extends LinearOpMode {
     // -38.7 -57.7 117.2
     // 206.6 8.318 28.337
 
-    public static double P1H = 0.541;
-    public static double P1X = -139;
+    public static double P1H = 0.561;
+    public static double P1X = -130;
     public static double P1Y = -13;
     public static double P2H = 1.4;
     public static double P2X = -123;
     public static double P2Y = -21;
-    public static double P3H = 2.00;
-    public static double P3X = -109;
+    public static double P3H = 1.94;
+    public static double P3X = -100;
     public static double P3Y = -69;
     public static double P4H = 1.424;
     public static double P4X = -120;
@@ -143,7 +144,7 @@ public class AutoVortex extends LinearOpMode {
 
     public static double OFFX1 = 1;
     public static double OFFY1 = 0.2;
-    public static double OFFH1 = 0.002;
+    public static double OFFH1 = 0.03;
 
     public static double P678X = -85;
     public static double P678H = -0;
@@ -185,8 +186,8 @@ public class AutoVortex extends LinearOpMode {
     public static boolean RECURRING_SINGULARITY = false;
     public static boolean GPOS = false;
 
-    public static double MVEL = 250;
-    public static double MAL = 250;
+    public static double MVEL = 220;
+    public static double MAL = 220;
     public static double MDL = 100;
     /*
     public static double MVEL = 999; // THE ONLY TYPE OF
@@ -194,9 +195,9 @@ public class AutoVortex extends LinearOpMode {
     public static double MDL = 999;  // BREAKING BAD
      */
 
-    public static double R1X = 40;
-    public static double R1Y = 2.4;
-    public static double R2X = 40;
+    public static double R1X = 20;
+    public static double R1Y = 2.1;
+    public static double R2X = 20;
     public static double R2Y = 1.2;
 
     Vector<Double> v = new Vector<>();
@@ -717,7 +718,7 @@ public class AutoVortex extends LinearOpMode {
     boolean SHITTY_WORKAROUND_TIMED = false;
 
     public static double WAT = 0.3;
-    public static double WOT = 0.12;
+    public static double WOT = 0.15;
 
     void runBBBBBBBBBBBBBB() {
         clo.shouldClose = true;
@@ -779,10 +780,8 @@ public class AutoVortex extends LinearOpMode {
         sBalans.setPosition(SBAG);
         sHeading.setPosition(SHG);
 
-        /*
         qtPipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
         qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline, true, true);
-         */
 
         /*
         conePipeline = new ConePipeline(ConeHeight, ConeWidth);
@@ -794,7 +793,6 @@ public class AutoVortex extends LinearOpMode {
             epd.shouldClose = true;
         }
 
-        /*
         TelemetryPacket packet;
         while (!isStarted() && !isStopRequested()) {
             if (qtGirl.getOpened()) {
@@ -817,13 +815,12 @@ public class AutoVortex extends LinearOpMode {
             }
             sleep(10);
         }
-         */
 
         if (!isStopRequested()) {
             mktraj();
         }
 
-        LAST_ID = CURLID;
+        //LAST_ID = CURLID;
         telemetry.addData("All done! Got ID: ", LAST_ID);
     }
 
@@ -836,10 +833,9 @@ public class AutoVortex extends LinearOpMode {
             return;
         }
         waitForStart();
-        /*
         if (qtGirl.getOpened()) {
             qtGirl.stop();
-        }*/
+        }
 
         startma(this, telemetry, false);
         ihk.shouldClose = false;

@@ -77,7 +77,7 @@ class CamGirl(lom: LinearOpMode,
         }
 
         camera.openCameraDeviceAsync(cameraListener)
-        while (waitForOpen && !opened && !lom.isStopRequested) {
+        while (waitForOpen && !opened && !lom.isStopRequested && !lom.isStarted) {
             val tp = TelemetryPacket()
             tp.addLine("Currently waiting on cam open")
             FtcDashboard.getInstance().sendTelemetryPacket(tp)
@@ -91,9 +91,15 @@ class CamGirl(lom: LinearOpMode,
     }
 
     fun stop() {
-        camera.stopStreaming()
+        var tp = TelemetryPacket()
+        tp.addLine("Started stop")
+        FtcDashboard.getInstance().sendTelemetryPacket(tp)
+        camera.closeCameraDeviceAsync {  }
         if (dashboardStreaming) {
             FtcDashboard.getInstance().stopCameraStream();
         }
+        tp = TelemetryPacket()
+        tp.addLine("Done with stop")
+        FtcDashboard.getInstance().sendTelemetryPacket(tp)
     }
 }

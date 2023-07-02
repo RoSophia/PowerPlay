@@ -26,6 +26,8 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epsEq;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextB;
@@ -50,15 +52,16 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.40;
+    public static double CPT = 0.42;
     public static double CET = 0.15;
-    public static double CHT = 0.35;
+    public static double CHT = 0.222222;
     public static double WPT = 0.0;
     public static double WET = 0.0;
-    public static double WHT = 0.25;
+    public static double WHT = 0.4;
     public static double TTT = 0.0;
     public static boolean CLAW = false;
     public static double PUTC = 1.212;
+    public static double UPTC = 1.212;
     public static double PREPC = 0.8;
     public static double CIP = 0.11;
     public static double GB = 0.20;
@@ -136,6 +139,8 @@ public class Clown implements Runnable {
     double sp;
     double DT = 1.212;
     ElapsedTime gtim = new ElapsedTime(0);
+    boolean AAAAAAAAAAAAA = false;
+    boolean BBBBBBBBBBBBB = false;
 
     public void run() {
         while (!shouldClose) {
@@ -203,9 +208,6 @@ public class Clown implements Runnable {
                 sp = sa.getPosition();
 
                 et.reset();
-                if (et.seconds() >= wtim.get(timt) * DT) {
-                    conversiePerverssa(SAP + poff.get(timt));
-                }
                 ext(EMIN);
                 //sHeading.setPosition(SHP);
                 sClaw.setPosition(SINCHIS);
@@ -289,7 +291,9 @@ public class Clown implements Runnable {
                 cget = false;
                 cput = false;
                 rtg = false;
-                if (tppc) {
+                if (BBBBBBBBBBBBB) {
+                    DT = UPTC;
+                } else if (tppc) {
                     DT = PUTC;
                 } else {
                     DT = PREPC;
@@ -297,30 +301,44 @@ public class Clown implements Runnable {
                 ct.reset();
             }
 
-            if (cprepCone && ct.seconds() > CIP) { /// Currently getting the cone
-                cprepCone = false;
-                if (!toPut) {
+            if (!AAAAAAAAAAAAA) {
+                if (cprepCone && ct.seconds() > CIP && ((epsEq(sextA.getPosition(), SAG) || epsEq(sextA.getPosition(), SAH) || epsEq(sextA.getPosition(), SAW)))) { /// Currently getting the cone
+                    cprepCone = false;
+                    if (!toPut) {
+                        conversiePerverssa(SAH);
+                        sBalans.setPosition(SBAH);
+                    } else if (!BBBBBBBBBBBBB) {
+                        conversiePerverssa(SAP);
+                        sBalans.setPosition(SBAP);
+                    }
+                    armHolding = true;
+                    coneClaw = true;
+                    cget = false;
+                    if (!toPut || BBBBBBBBBBBBB) {
+                        timt = 2;
+                        BBBBBBBBBBBBB = false;
+                    } else {
+                        timt = 0;
+                    }
+                    if (epd.target > MIP && toPut) { /// Shortcut: to save on time when putting a cone while extended, start retracting immediatly
+                        sHeading.setPosition(SHP);
+                        sBalans.setPosition(SBAP);
+                        conversiePerverssa(SAP + poff.get(2));
+                        ext(EMIN);
+                        timt = 1;
+                    }
+                } else if (cprepCone && ct.seconds() > CIP) {
                     conversiePerverssa(SAH);
                     sBalans.setPosition(SBAH);
-                } else {
-                    conversiePerverssa(SAP);
-                    sBalans.setPosition(SBAP);
+                    AAAAAAAAAAAAA = true;
+                    ct.reset();
                 }
-                armHolding = true;
-                coneClaw = true;
-                cget = false;
-                if (!toPut) {
-                    timt = 2;
-                } else {
-                    timt = 0;
-                }
-                if (epd.target > MIP && toPut) { /// Shortcut: to save on time when putting a cone while extended, start retracting immediatly
-                    sHeading.setPosition(SHP);
-                    sBalans.setPosition(SBAP);
-                    conversiePerverssa(SAP + poff.get(2));
-                    ext(EMIN);
-                    timt = 1;
-                }
+            } else if (ct.seconds() > 0.13) {
+                cprepCone = false;
+                timt = 2;
+                AAAAAAAAAAAAA = false;
+                BBBBBBBBBBBBB = true;
+                toPrepCone = true;
             }
 
             if (toGet) { /// Setting the robot in the getting position
@@ -331,8 +349,10 @@ public class Clown implements Runnable {
                 armHolding = false;
                 toGet = false;
                 cget = true;
-                conversiePerverssa(SAG);
-                sBalans.setPosition(SBAG);
+                if (!((sextA.getPosition() > SAG + 0.01) && (sextA.getPosition() < SAH - 0.01))) {
+                    conversiePerverssa(SAG);
+                    sBalans.setPosition(SBAG);
+                }
                 if (epsEq(sClose.getPosition(), SMEDIU)) {
                     sClose.setPosition(SDESCHIS);
                 }

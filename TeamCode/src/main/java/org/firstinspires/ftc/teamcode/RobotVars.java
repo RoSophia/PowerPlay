@@ -27,27 +27,27 @@ public class RobotVars {
 
     public static double SBAG = 0.59;     // 4bar Get position
     public static double SBAH = 0.39;     // 4bar Hold position
-    public static double SBAP = 0.78;     // 4bar Put position
+    public static double SBAP = 0.79;     // 4bar Put position
     public static double SBAAP = 0.9;     // 4bar Put position
 
     public static double SDIF = 0.1;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
     public static double SHG = 0.085;     // Grabber Get Heading
-    public static double SHP = 0.065;      // Grabber Put Heading
-    public static double SHAP = 0.065;     // Grabber After Put Heading
+    public static double SHP = 0.2;      // Grabber Put Heading
+    public static double SHAP = 0.2;     // Grabber After Put Heading
 
-    public static double SCO = 0.3;       // Cone Securing Mini Servo Open Position
+    public static double SCO = 0.0;       // Cone Securing Mini Servo Open Position
     public static double SCC = 0.9;       // Cone Securing Mini Servo Close Position
 
     public static double DOT = 0.0;       // Time To Lower The Lift
-    public static double UPT = 0.75;       // Time To Hoist Up The Thing
+    public static double UPT = 0.5;       // Time To Hoist Up The Thing
     public static double EXTT = 0.8;      // Time To Fully Extend
     public static double RETT = 0.0;      // Time To Retract
 
     public static boolean USE_PHOTON = true;
 
-    public static boolean USE_TELE = true; // Use Telemetry
+    public static boolean USE_TELE = false; // Use Telemetry
     public static int CU_TESTING = 0;
     public static double pcoef = 1.0; // Voltage Normalising Term (set during runtime)
 
@@ -67,7 +67,7 @@ public class RobotVars {
     public static double ri = 0.0;
     public static double rf = 0.001;
     public static double rmd = 12;
-    public static double rbp = 0.0018;
+    public static double rbp = 0.008;
 
     public static double EAP = 1.0; // Extension A Scale Term
     public static double EBP = 1.0; // Extension B Scale Term
@@ -75,7 +75,7 @@ public class RobotVars {
     public static double RBP = 1.0;
 
     public static boolean useExt = true;
-    public static boolean useRid = false;
+    public static boolean useRid = true;
 
     public static boolean STARTW = true;
     public static String LES = "RF";
