@@ -36,6 +36,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.STARTW;
 import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
+import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
@@ -84,7 +85,7 @@ public class RobotFuncs {
     public static DcMotorEx ridB;
     public static DcMotorEx extA, extB;
     public static ServoImplEx sextA, sextB;
-    public static Servo sClose, sHeading, sBalans, sMCLaw;
+    public static ServoImplEx sClose, sHeading, sBalans, sMCLaw;
     public static PIDF epd, rpd;
     public static Clown clo;
     public static BNO055IMU imu;
@@ -436,17 +437,25 @@ public class RobotFuncs {
         }
         //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
 
-        sClose = hardwareMap.get(Servo.class, "sClose");
-        sHeading = hardwareMap.get(Servo.class, "sHeading");
-        sBalans = hardwareMap.get(Servo.class, "sBalans");
-        sMCLaw = hardwareMap.get(Servo.class, "sMCLaw");
+        sClose = hardwareMap.get(ServoImplEx.class, "sClose");
+        sHeading = hardwareMap.get(ServoImplEx.class, "sHeading");
+        sBalans = hardwareMap.get(ServoImplEx.class, "sBalans");
+        sMCLaw = hardwareMap.get(ServoImplEx.class, "sMCLaw");
         sextA = hardwareMap.get(ServoImplEx.class, "sextA");
         sextB = hardwareMap.get(ServoImplEx.class, "sextB");
 
         sextA.setPwmEnable();
-        sextB.setPwmEnable();
         sextA.setPwmRange(new PwmControl.PwmRange(505, 2495));
+        sextB.setPwmEnable();
         sextB.setPwmRange(new PwmControl.PwmRange(505, 2495));
+        sClose.setPwmEnable();
+        sClose.setPwmRange(new PwmControl.PwmRange(505, 2495));
+        sHeading.setPwmEnable();
+        sHeading.setPwmRange(new PwmControl.PwmRange(505, 2495));
+        sBalans.setPwmEnable();
+        sBalans.setPwmRange(new PwmControl.PwmRange(505, 2495));
+        sMCLaw.setPwmEnable();
+        sMCLaw.setPwmRange(new PwmControl.PwmRange(505, 2495));
 
         if (AUTONOMUS) {
             sMCLaw.setPosition(SCC);
@@ -539,12 +548,14 @@ public class RobotFuncs {
 
         epd.shouldClose = false;
         epd.use = true;
+        epd.useTele = USE_TELE;
         epd.target = EMIN;
         epd.lom = lom;
         extT.start();
 
         rpd.shouldClose = false;
         rpd.use = true;
+        rpd.useTele = USE_TELE;
         rpd.target = RBOT_POS;
         rpd.lom = lom;
         ridT.start();
@@ -562,6 +573,13 @@ public class RobotFuncs {
         rightFront.setPower(0);
         leftBack.setPower(0);
         rightBack.setPower(0);
+        sextA.setPwmDisable();
+        sextB.setPwmDisable();
+        sClose.setPwmDisable();
+        sHeading.setPwmDisable();
+        sBalans.setPwmDisable();
+        sMCLaw.setPwmDisable();
+        ///TODO: SET PWM RANGE 0
         if (ridA != null) {
             ridA.setPower(0);
             ridB.setPower(0);

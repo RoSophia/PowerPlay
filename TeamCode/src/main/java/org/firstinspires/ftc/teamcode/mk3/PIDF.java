@@ -21,7 +21,7 @@ class PIDF implements Runnable {
     public boolean shouldClose = false;
     public boolean use = true;
     public boolean curRet = false;
-    public boolean useTele = false;
+    public boolean useTele = true;
     public String name;
     public LinearOpMode lom;
 

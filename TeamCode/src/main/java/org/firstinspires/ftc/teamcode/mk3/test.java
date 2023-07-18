@@ -14,24 +14,24 @@ public class test extends LinearOpMode {
     public Servo ccs, ccs2 = null;
     public static int CT = 1;
     public static boolean CC = false;
-    public static double OFF = 0.089;
+    public static double OFF = 0.076;
     public static double OFP = 0.00;
     public void runOpMode() {
         if ((CT & 1) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sClose"); // sClose
+            ccs = hardwareMap.get(Servo.class, "sClose");
         } else if ((CT & 2) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sHeading"); // sBalans
+            ccs = hardwareMap.get(Servo.class, "sHeading");
         } else if ((CT & 4) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sBalans"); // sHeading
+            ccs = hardwareMap.get(Servo.class, "sBalans");
         } else if ((CT & 8) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sMCLaw"); // sExtA
+            ccs = hardwareMap.get(Servo.class, "sMCLaw");
         } else if ((CT & 16) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sextA"); //
+            ccs = hardwareMap.get(Servo.class, "sextA");
             if (CC) {
                 ccs2 = hardwareMap.get(Servo.class, "sextB");
             }
         } else if ((CT & 32) != 0) {
-            ccs = hardwareMap.get(Servo.class, "sextB"); // sMCLaw
+            ccs = hardwareMap.get(Servo.class, "sextB");
         } else {
             ccs = hardwareMap.get(Servo.class, "Toate");
         }

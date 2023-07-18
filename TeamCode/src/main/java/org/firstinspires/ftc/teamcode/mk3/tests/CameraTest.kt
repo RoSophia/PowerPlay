@@ -70,8 +70,9 @@ fun conversiePerverssa(sextA: Servo, sextB: Servo, p: Double) { /// Handle movin
 @TeleOp
 class CameraTest : LinearOpMode() {
     override fun runOpMode() {
+        /*
         val conePipeline = ConePipeline(ConeHeight, ConeWidth)
-        val coneGirl = CamGirl(this, "coneGirl", ConeRotation, ConeWidth, ConeHeight, conePipeline, streaming = STREAM, waitForOpen = true)
+        val coneGirl = CamGirl(this, "coneGirl", ConeRotation, ConeWidth, ConeHeight, conePipeline, streaming = STREAM, waitForOpen = true)*/
 
         val lamprey1 = hardwareMap.get(AnalogInput::class.java, "lamprey");
         val lamprey2 = hardwareMap.get(AnalogInput::class.java, "lamprey2");
@@ -94,6 +95,7 @@ class CameraTest : LinearOpMode() {
         val ext = initm(hardwareMap, "extA", e = true, r = false)
 
         while (opModeIsActive()) {
+            /*
             sHeading.position = SHG
             sBalans.position = SBAG
             conversiePerverssa(sextA, sextB, SAG)
@@ -110,15 +112,16 @@ class CameraTest : LinearOpMode() {
             }
             monkey.put("Yoff", yoff)
             monkey.put("CurExt", ext.currentPosition)
-            FtcDashboard.getInstance().sendTelemetryPacket(monkey)
+            FtcDashboard.getInstance().sendTelemetryPacket(monkey)*/
 
             val ttp = TelemetryPacket()
             ttp.put("L1_MAX", lamprey1.maxVoltage)
             ttp.put("L1_CUR", lamprey1.voltage)
             ttp.put("L2_MAX", lamprey2.maxVoltage)
             ttp.put("L2_CUR", lamprey2.voltage)
-            ttp.put("CONE_PIPELINE_CAM_FPS", coneGirl.camera.fps)
-            //FtcDashboard.getInstance().sendTelemetryPacket(ttp)
+            //ttp.put("CONE_PIPELINE_CAM_FPS", coneGirl.camera.fps)
+            FtcDashboard.getInstance().sendTelemetryPacket(ttp)
+            /*
             if (LG != CamTest.GAIN) {
                 coneGirl.camera.gainControl.gain = CamTest.GAIN
                 LG = CamTest.GAIN
@@ -127,11 +130,11 @@ class CameraTest : LinearOpMode() {
             if (LE != CamTest.EXPOSURE) {
                 coneGirl.camera.exposureControl.setExposure(CamTest.EXPOSURE.toLong(), TimeUnit.MILLISECONDS)
                 LE = CamTest.EXPOSURE
-            }
+            }*/
 
             sleep(2)
         }
 
-        coneGirl.stop()
+        //coneGirl.stop()
     }
 }

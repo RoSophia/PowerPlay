@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
 public class RobotVars {
     public static double SMDESCHIS = 0.79; // Claw Very Open (After put)
-    public static double SDESCHIS = 0.82; // Claw Open
+    public static double SDESCHIS = 0.80; // Claw Open
     public static double SMEDIU = 0.87; // Claw Medium
     public static double SINCHIS = 0.915;   // Claw Close
 
@@ -30,11 +31,11 @@ public class RobotVars {
     public static double SBAP = 0.78;     // 4bar Put position
     public static double SBAAP = 0.9;     // 4bar Put position
 
-    public static double SDIF = 0.1;      // Grabber Arm Servo Diff Term
+    public static double SDIF = 0.076;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
     public static double SHG = 0.085;     // Grabber Get Heading
-    public static double SHP = 0.2;      // Grabber Put Heading
+    public static double SHP = 0.28;      // Grabber Put Heading
     public static double SHAP = 0.2;     // Grabber After Put Heading
 
     public static double SCO = 0.0;       // Cone Securing Mini Servo Open Position
@@ -97,34 +98,41 @@ public class RobotVars {
     public static int ConeWidth = 640;
     public static OpenCvCameraRotation ConeRotation = OpenCvCameraRotation.UPSIDE_DOWN;
 
-    /*
+     /*
      * Expansion:
      *     Motors:
-     *         0: RB
+     *         0: LF
      *         1: RF
-     *         2: LF
+     *         2: RB
      *         3: LB
      *     Servos:
-     *         0: sBalans
+     *         0: sHeading
      *         1:
-     *         2: sClose
+     *         2: sBalans
      *         3:
-     *         4: sHeading
+     *         4: sClose
      *         5:
      * Control:
      *     Motors:
-     *         0: ridB
-     *         1: extA
-     *         2: ridA
-     *         3: extB
+     *         0: extB
+     *         1: ridA
+     *         2: extA
+     *         3: ridB
      *     Servos:
      *         0: Toate
-     *         1: sMCLaw
+     *         1: sextB
      *         2:
-     *         3: sextB
+     *         3: sMCLaw
      *         4:
      *         5: sextA
      *     I2C:
      *         3: csensor
+     * Colours:
+     *     Verde Cacaniu: sBalans
+     *     Verde Deschis Adi: sHeading
+     *     Rosu: sClose
+     *     Normal Steag Germania: sExtA
+     *     Normal Steag Germania Imperial: sMCLaw
+     *     Albastru: sExtB
      */
 }
