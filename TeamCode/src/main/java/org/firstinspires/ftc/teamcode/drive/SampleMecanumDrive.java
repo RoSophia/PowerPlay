@@ -14,13 +14,16 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
 import static java.lang.Thread.sleep;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
@@ -38,6 +41,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -46,7 +50,11 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.internal.system.RefCounted;
+import org.firstinspires.ftc.teamcode.mk3.RobotFuncs;
+import org.firstinspires.ftc.teamcode.mk3.ThreadedLocalization;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
@@ -62,9 +70,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(7, 0, 0);
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(6, 0, 0);
     public static PIDCoefficients LATERAL_PID = new PIDCoefficients(7, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(10, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 0, 0);
     public static double CORT = 0.0;
 
     public static double LATERAL_MULTIPLIER = 1;
@@ -81,11 +89,30 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public TrajectoryFollower follower;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
-    private List<DcMotorEx> motors;
+    private final DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    private final List<DcMotorEx> motors;
 
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
+
+    public ThreadedLocalization tl;
+    Thread tlt;
+
+    public void startTlt(LinearOpMode lom) {
+        tl = new ThreadedLocalization(this);
+        tl.lom = lom;
+        tlt = new Thread(tl);
+        tlt.start();
+    }
+
+    public void joinTlt() {
+        tl.setShouldClose(true);
+        try {
+            tlt.join();
+        } catch (Exception ignored) {
+
+        }
+    }
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
@@ -95,6 +122,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
         follower = new HolonomicPIDVAFollower(AXIAL_PID, LATERAL_PID, HEADING_PID,
                 new Pose2d(2, 2, Math.toRadians(2)), CORT);
@@ -211,7 +239,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void turnAsync(double angle) {
         trajectorySequenceRunner.followTrajectorySequenceAsync(
-                trajectorySequenceBuilder(getPoseEstimate())
+                trajectorySequenceBuilder(tl.getPoseEstimate())
                         .turn(angle)
                         .build()
         );
@@ -249,8 +277,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
-        updatePoseEstimate();
-        DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        //updatePoseEstimate();
+        DriveSignal signal = trajectorySequenceRunner.update(tl.getPoseEstimate(), tl.getPoseVelocity());
         if (signal != null) setDriveSignal(signal);
     }
 
@@ -326,6 +354,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public static boolean MOVE = true;
+
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         if (MOVE) {

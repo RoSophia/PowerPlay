@@ -39,7 +39,6 @@ package org.firstinspires.ftc.teamcode.mk3;
  */
 
 import static org.firstinspires.ftc.teamcode.RobotVars.CU_TESTING;
-import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
@@ -57,7 +56,6 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.SMEDIU;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
@@ -72,6 +70,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rf;
 import static org.firstinspires.ftc.teamcode.RobotVars.ri;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.SHOULD_CLOSE_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.batteryVoltageSensor;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
@@ -87,6 +86,8 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.log_state;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.opcl;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.preinit;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightBack;
@@ -96,6 +97,8 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sHeading;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.set_grab_pos;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
 
@@ -103,10 +106,11 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @SuppressWarnings({"SpellCheckingInspection", "CommentedOutCode"})
 @Config
@@ -143,6 +147,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
     public static double P4 = 1;
     public static double XC = 1;
     public static double YC = 1;
+    public static double TURP = 0.2;
     int i;
 
     ElapsedTime etimer = new ElapsedTime(1000);
@@ -151,30 +156,67 @@ public class OP_Mode_mk3 extends LinearOpMode {
     boolean SHITTY_WORKAROUND_TIMED = false;
     public static double EXTL = 0.2;
     public static double RIDL = 0.2;
+    ElapsedTime tpi = new ElapsedTime(0);
 
-    public static double SGS = 0.495;
-    public static double SGD = 0.021;
-    public static double SBAS = 0.60;
-    public static double SBAD = 0.0;
+    double gdif(double lr) {
+        if (lr < Math.PI) {
+            return -lr;
+        } else {
+            return 2 * Math.PI - lr;
+        }
+    }
 
-    void set_grab_pos(int p) {
-        conversiePerverssa(SGS - SGD * (p - 1));
-        sBalans.setPosition(SBAS - SBAD * (p - 1));
-        //sClose.setPosition(SDESCHIS);
+    public static double turnLastError = 0;
+    double sign(double error) {
+        if (error == 0) {
+            return 0;
+        } else if (error > 0) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    public static double TURNP = 0.5;
+    public static double TURND = 0.09;
+    public static double TURNF = 0.15;
+    public static double MAX_ERROR = 0.03;
+
+    double get_turn() {
+        double lr = imu.getLastRead();
+        double error = gdif(lr);
+        double derivate = (error - turnLastError) / tpi.seconds();
+        TelemetryPacket telp = new TelemetryPacket();
+        telp.put("GET_TURN_LR", lr);
+        telp.put("GET_TURN_ERROR", error);
+        telp.put("GET_TURN_DERIVATE", derivate);
+        dashboard.sendTelemetryPacket(telp);
+        turnLastError = error;
+        if (Math.abs(error) > MAX_ERROR) {
+            return error * TURNP + derivate * TURND + sign(error) * TURNF;
+        } else {
+            return 0;
+        }
     }
 
     public void runOpMode() {
+        preinit();
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = R1B = R1X = R1Y = R1A = R1DD = R1DU = coneReady = false;
         oldpos = RID_POS;
 
-        initma(hardwareMap, false);
-        RobotFuncs.drive = null;
+        RobotFuncs.drive = new SampleMecanumDrive(hardwareMap);
+        initma(hardwareMap);
+        /*
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+         */
+        //RobotFuncs.drive = null;
 
-        //AnalogInput lamprey2 = hardwareMap.get(AnalogInput.class, "lamprey2");
-        //lamprey2.
         waitForStart();
 
-        startma(this, telemetry, true);
+        startma(this, telemetry);
 
         ElapsedTime timer = new ElapsedTime(0);
         /*ElapsedTime g1t = new ElapsedTime(0);
@@ -191,6 +233,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
         rebp = rbp;
         timer.reset();
         SHITTY_WORKAROUND_TIMER.reset();
+        tpi.reset();
         while (opModeIsActive()) {
             if (oldpos != RID_POS) {
                 rpd.set_target(RID_POS, 0);
@@ -226,7 +269,13 @@ public class OP_Mode_mk3 extends LinearOpMode {
             final double speed = Math.hypot(gamepad1.left_stick_x * XC, gamepad1.left_stick_y * YC);
             final double angle = Math.atan2(gamepad1.left_stick_y * YC, gamepad1.left_stick_x * XC) - Math.PI / 4;// + ch;
 
-            final double turn = -gamepad1.right_stick_x;
+            double turn;
+            if (gamepad1.left_trigger > 0.5 && Math.abs(gamepad1.right_stick_x) < 0.05) {
+                turn = get_turn();
+            } else {
+                turn = -gamepad1.right_stick_x;
+            }
+            tpi.reset();
             final double ms = speed * Math.sin(angle);
             final double mc = speed * Math.cos(angle);
 
@@ -261,15 +310,13 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             G2L = gamepad2.dpad_left;
 
-            if (!L2Y && gamepad2.y) {
+            if (!L2Y && (gamepad2.y || gamepad1.dpad_right)) {
                 clo.toPut = true;
             }
-            L2Y = gamepad2.y;
+            L2Y = (gamepad2.y || gamepad1.dpad_right);
 
             if (!R2LB && gamepad2.left_bumper) {
-                if (epsEq(sClose.getPosition(), SMEDIU)) {
-                    sClose.setPosition(SDESCHIS);
-                }
+                opcl();
                 if (!clo.rtg) {
                     clo.toGet = true;
                 } else {
@@ -293,28 +340,32 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 clo.rtg = false;
                 conversiePerverssa(SAW);
                 sBalans.setPosition(SBAG);
-                sClose.setPosition(SMEDIU);
+                sClose.setPosition(SINCHIS);
                 sHeading.setPosition(SHG);
                 conversiePerverssa(SAW);
             }
             R2RB = gamepad2.right_bumper;
 
             if (!R1Y && gamepad1.y) {
+                opcl();
                 set_grab_pos(1);
             }
             R1Y = gamepad1.y;
 
             if (!R1B && gamepad1.b) {
+                opcl();
                 set_grab_pos(2);
             }
             R1B = gamepad1.b;
 
             if (!R1A && gamepad1.a && !gamepad1.start) {
+                opcl();
                 set_grab_pos(3);
             }
             R1A = gamepad1.a;
 
             if (!R1X && gamepad1.x) {
+                opcl();
                 set_grab_pos(4);
             }
             R1X = gamepad1.x;
@@ -350,12 +401,12 @@ public class OP_Mode_mk3 extends LinearOpMode {
 
             if (!G2X && (gamepad2.x || gamepad1.left_bumper)) {
                 telemetry.addData("CLIC X", i);
-                if (sClose.getPosition() < SINCHIS) {
-                    sClose.setPosition(SINCHIS);
-                    coneClaw = true;
-                } else {
+                if (epsEq(sClose.getPosition(), SINCHIS)) {
                     sClose.setPosition(SDESCHIS);
                     coneClaw = false;
+                } else {
+                    sClose.setPosition(SINCHIS);
+                    coneClaw = true;
                 }
                 ++i;
             }
@@ -388,7 +439,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
             if (USE_TELE) {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put("CycleTime", timer.milliseconds());
-                pack.put("Orient", imu.getAngularOrientation());
                 log_state();
                 dashboard.sendTelemetryPacket(pack);
                 timer.reset();
@@ -411,6 +461,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 }
             }
 
+            if (gamepad2.left_trigger > 0.7 && gamepad2.right_trigger > 0.7) {
+                break;
+            }
+
             pcoef = 12.0 / batteryVoltageSensor.getVoltage();
             final double spcoef = 1 - 0.65 * gamepad1.right_trigger;
             final double fcoef = pcoef * spcoef;
@@ -420,6 +474,17 @@ public class OP_Mode_mk3 extends LinearOpMode {
             rightBack.setPower(rbPower * fcoef * P4);
         }
 
+        boolean KILL = false;
+
         endma();
+
+        while (!isStopRequested()) {
+            if (!KILL && gamepad2.left_trigger < 0.2 && gamepad2.right_trigger < 0.2) {
+                KILL = true;
+            } else if (KILL && gamepad2.left_trigger > 0.7 && gamepad2.right_trigger > 0.7) {
+                runOpMode();
+            }
+            sleep(5);
+        }
     }
 }

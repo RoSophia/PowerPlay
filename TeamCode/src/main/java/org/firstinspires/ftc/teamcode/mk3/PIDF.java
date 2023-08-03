@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
+import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.emd;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.RobotVars.rmd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
@@ -21,7 +23,7 @@ class PIDF implements Runnable {
     public boolean shouldClose = false;
     public boolean use = true;
     public boolean curRet = false;
-    public boolean useTele = true;
+    public static boolean USE_TELE = true;
     public String name;
     public LinearOpMode lom;
 
@@ -97,7 +99,7 @@ class PIDF implements Runnable {
         } else {
             x = 314;
         }
-        if (useTele) {
+        if (USE_TELE) {
             TelemetryPacket cp = new TelemetryPacket();
             cp.put(name + "CurX", x);
             dashboard.sendTelemetryPacket(cp);
@@ -132,6 +134,10 @@ class PIDF implements Runnable {
     public static int MAX_CURRENT_DRAW = 7000;
     public static double MAX_OVERCURRENT_TIME = 2.0;
 
+    int lastExtPos = 0;
+    ElapsedTime lastExtTim = new ElapsedTime(0);
+    public static double EXT_RESET_TIME = 1.5;
+
     @SuppressWarnings("BusyWait")
     public void run() {
         if (motA == null) {
@@ -154,13 +160,11 @@ class PIDF implements Runnable {
         ElapsedTime MOTATIMER = new ElapsedTime(0);
         MOTATIMER.reset();
         while (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) {
-
-
             cp = motA.getCurrentPosition();
             if (motB != null) {
                 cpb = motB.getCurrentPosition();
             }
-            if (useTele) {
+            if (USE_TELE) {
                 TelemetryPacket pack = new TelemetryPacket();
                 pack.put(name + "CycleTimeArm", timer2.milliseconds());
                 timer2.reset();
@@ -184,6 +188,8 @@ class PIDF implements Runnable {
                 pack.put(name + "PID_i", i);
                 pack.put(name + "PID_d", d);
                 pack.put(name + "PID_f", f);
+                pack.put(name + "LAST_EXT_POS", lastExtPos);
+                pack.put(name + "LAST_EXT_TIM", lastExtTim);
                 dashboard.sendTelemetryPacket(pack);
             }
             updt();
@@ -195,7 +201,6 @@ class PIDF implements Runnable {
                         motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     }
-                    cp = 0;
                     lastError = 0;
                 }
                 if (lastTarget != target) {
@@ -206,14 +211,12 @@ class PIDF implements Runnable {
                 integralSum = integralSum + (error * timer.seconds());
 
                 outp = (p * error) + (d * derivate) + (i * integralSum) + f;
-                TelemetryPacket pack = new TelemetryPacket();
 
                 //if (ctarg == target && (target < 100)) {
                 if (ctarg == target) {
                     // THIS IS A HACK ON TOP OF ANOTHER HACK
                     // DO NOT ATTEMPT THIS AT HOME
                     if (Math.abs(ctarg - cp) < md) {
-                        pack.addLine("Into the void");
                         if (md == rmd && ctarg <= RBOT_POS + 1) {
                             outp = 0;
                         } else {
@@ -228,16 +231,35 @@ class PIDF implements Runnable {
                         }
                     } else {
                         lf = false;
-                        pack.addLine("Out of the void");
                     }
-                } else {
-                    pack.addLine("Peer into the void");
                 }
-                dashboard.sendTelemetryPacket(pack);
 
                 /// KILL MYSELF
                 if (md == rmd && target == RBOT_POS && cp > 15) {
                     outp = -1;
+                }
+
+                /// KRILL MYSELF
+                if (md == emd && target == EMIN && cp >= emd) {
+                    if (lastExtTim.seconds() > EXT_RESET_TIME) {
+                        if (lastExtPos - cp < emd / 2) {
+                            TelemetryPacket tp = new TelemetryPacket();
+                            tp.put("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 1);
+                            dashboard.sendTelemetryPacket(tp);
+                            motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                            motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                            if (motB != null) {
+                                motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                                motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                            }
+                        }
+                    } else {
+                        lastExtPos = cp;
+                        lastExtTim.reset();
+                    }
+                } else {
+                    lastExtPos = cp;
+                    lastExtTim.reset();
                 }
 
                 if (motA.getCurrent(CurrentUnit.MILLIAMPS) < MAX_CURRENT_DRAW || motB.getCurrent(CurrentUnit.MILLIAMPS) < MAX_CURRENT_DRAW) {
@@ -247,12 +269,13 @@ class PIDF implements Runnable {
                     target = ctarg = cp;
                 }
 
+
                 if (!shouldClose && !lom.isStopRequested() && lom.opModeIsActive()) { /// `lom` here is used to prevent powering the motor after the OpMode stopped.
                     motA.setPower(outp * pcoef);
 
                     if (motB != null) {
                         double bdif = (cp - cpb) * b;
-                        if (Math.abs(cp - cpb) < 2) {
+                        if ((Math.abs(cp - cpb) < 4) || ctarg < 15) {
                             bdif = 0;
                         }
                         motB.setPower((outp + bdif) * pcoef);

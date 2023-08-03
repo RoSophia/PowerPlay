@@ -4,10 +4,10 @@ import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.config.Config
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket
 import com.qualcomm.robotcore.util.ElapsedTime
-import org.firstinspires.ftc.teamcode.mk3.AutoVortex.CAMERA_UPDATE
-import org.firstinspires.ftc.teamcode.mk3.AutoVortex.CUR_DONE_CORRECTION
 import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.BC
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.CAMERA_UPDATE
 import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.COL_INDEX
+import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.CUR_DONE_CORRECTION
 import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.DO_I_EVEN_PROCESS_FRAME
 import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.DRAW_BOXES
 import org.firstinspires.ftc.teamcode.mk3.camera.ConePipeline.CameraControls.DRAW_MEDIAN
@@ -140,6 +140,12 @@ class ConePipeline(height: Int, width: Int) : OpenCvPipeline() {
 
         @JvmField
         var DO_I_EVEN_PROCESS_FRAME: Boolean = true
+
+        @JvmField
+        var CAMERA_UPDATE: Boolean = false
+
+        @JvmField
+        var CUR_DONE_CORRECTION: Int = 0
     }
 
     private fun subm(img: Mat, box: Box2d): Mat {

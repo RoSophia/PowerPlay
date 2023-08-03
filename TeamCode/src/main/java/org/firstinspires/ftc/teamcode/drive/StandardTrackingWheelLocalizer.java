@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RER;
 import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -17,7 +18,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
@@ -38,8 +42,8 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double WHEEL_RADIUS = 1.75;
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 11.2; // distance between the left and right wheels
-    public static double FORWARD_OFFSET = 23.07; // offset of the lateral wheel
+    public static double LATERAL_DISTANCE = 11.24; // distance between the left and right wheels
+    public static double FORWARD_OFFSET = 26.00; // offset of the lateral wheel
 
     private final Encoder leftEncoder, rightEncoder, frontEncoder;
 
@@ -86,5 +90,11 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
                 encoderTicksToInches(rightEncoder.getCorrectedVelocity()),
                 encoderTicksToInches(frontEncoder.getCorrectedVelocity())
         );
+    }
+
+    @NonNull
+    @Override
+    public List<Double> getRunningTimes() {
+        return Arrays.asList(1.0, 1.0, 1.0);
     }
 }

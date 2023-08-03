@@ -7,39 +7,45 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
 public class RobotVars {
-    public static double SMDESCHIS = 0.79; // Claw Very Open (After put)
-    public static double SDESCHIS = 0.80; // Claw Open
-    public static double SMEDIU = 0.87; // Claw Medium
-    public static double SINCHIS = 0.915;   // Claw Close
+    public static double SMDESCHIS = 0.785; // Claw Very Open (After put)
+    public static double SDESCHIS = 0.865; // Claw Open
+    public static double SINCHIS = 0.96;   // Claw Close
 
     public static int EMIN = 7;          // Minimum Extension
     public static int EMAX = 590;         // Maximum Extension
 
     public static int RTOP_POS = 590;     // Maximum Lift Position
-    public static int RMIU_POS = 342;     // Medium Lift Position
+    public static int RMIU_POS = 338;     // Medium Lift Position
     public static int RMID_POS = 100;     // Low Lift Position
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
-    public static double SAG = 0.406;     // Grabber Arm Get position
+    public static double SAG = 0.415;     // Grabber Arm Get position
     public static double SAH = 0.610;     // Grabber Arm Hold Position
-    public static double SAP = 0.75;      // Grabber Arm Put position
+    public static double SAP = 0.77;      // Grabber Arm Put position
     public static double SAW = 0.680;     // Grabber Arm Wait position
 
     public static double SBAG = 0.59;     // 4bar Get position
     public static double SBAH = 0.39;     // 4bar Hold position
-    public static double SBAP = 0.78;     // 4bar Put position
+    public static double SBAC = 0.57;     // 4bar Hold position
+    public static double SBAP = 0.73;     // 4bar Put position
     public static double SBAAP = 0.9;     // 4bar Put position
 
     public static double SDIF = 0.076;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
-    public static double SHG = 0.085;     // Grabber Get Heading
-    public static double SHP = 0.28;      // Grabber Put Heading
-    public static double SHAP = 0.2;     // Grabber After Put Heading
+    public static double SHG = 0.29;     // Grabber Get Heading
+    public static double SHP = 0.29;      // Grabber Put Heading
+    public static double SHAP = 0.35;     // Grabber After Put Heading
 
     public static double SCO = 0.0;       // Cone Securing Mini Servo Open Position
-    public static double SCC = 0.9;       // Cone Securing Mini Servo Close Position
+    public static double SCM = 0.6;       // Cone Securing Mini Servo Medium Position
+    public static double SCC = 0.86;       // Cone Securing Mini Servo Close Position
+
+    public static double SGS = 0.498;  // Cone stack start position
+    public static double SGD = 0.021;  // Cone stack diff
+    public static double SBAS = 0.60;  // Cone stack balance start position
+    public static double SBAD = 0.0;   // Cone stack balance diff
 
     public static double DOT = 0.0;       // Time To Lower The Lift
     public static double UPT = 0.5;       // Time To Hoist Up The Thing
@@ -49,6 +55,7 @@ public class RobotVars {
     public static boolean USE_PHOTON = true;
 
     public static boolean USE_TELE = true; // Use Telemetry
+    public static boolean USE_TELE_MOVE = true; // Use Telemetry
     public static int CU_TESTING = 0;
     public static double pcoef = 1.0; // Voltage Normalising Term (set during runtime)
 
@@ -61,14 +68,14 @@ public class RobotVars {
     public static double ei = 0.0;
     public static double ef = 0;
     public static double emd = 10;
-    public static double ebp = 0.0001;
+    public static double ebp = 0.0000;
 
     public static double rp = 0.0075;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
     public static double rf = 0.001;
-    public static double rmd = 12;
-    public static double rbp = 0.008;
+    public static double rmd = 15;
+    public static double rbp = 0.018;
 
     public static double EAP = 1.0; // Extension A Scale Term
     public static double EBP = 1.0; // Extension B Scale Term
@@ -86,6 +93,8 @@ public class RobotVars {
     public static boolean RER = true;
     public static boolean FER = true;
 
+    public static String RIDICARE_LAMPREY = "lamprey2";
+
     public static boolean AUTO_CLOW = false;
 
     public static double SHITTY_WORKAROUND_TIME = 0.2;
@@ -97,6 +106,7 @@ public class RobotVars {
     public static int ConeHeight = 480;
     public static int ConeWidth = 640;
     public static OpenCvCameraRotation ConeRotation = OpenCvCameraRotation.UPSIDE_DOWN;
+    public static int LOCALIZATION_SLEEP_TIME = 5;
 
      /*
      * Expansion:
@@ -112,6 +122,8 @@ public class RobotVars {
      *         3:
      *         4: sClose
      *         5:
+     *      Analog:
+     *         0-1: Lamprey
      * Control:
      *     Motors:
      *         0: extB
@@ -125,14 +137,15 @@ public class RobotVars {
      *         3: sMCLaw
      *         4:
      *         5: sextA
-     *     I2C:
-     *         3: csensor
      * Colours:
-     *     Verde Cacaniu: sBalans
-     *     Verde Deschis Adi: sHeading
-     *     Rosu: sClose
-     *     Normal Steag Germania: sExtA
-     *     Normal Steag Germania Imperial: sMCLaw
-     *     Albastru: sExtB
+     *     Verde Cacaniu:                  sBalans  - Spm 1
+     *     Verde Deschis Adi:              sHeading - Expansion 0
+     *     Rosu:                           sClose   - Expansion 4
+     *
+     *     Normal Steag Germania -> Cablu pictat albastru: sExtA    - Spm 2
+     *     Normal Steag Germania Imperial                : sMCLaw   - Spm 6
+     *     Albastru:                                       sExtB    - Spm 5
+     *
+     *     Cacaniu: Through-bore balans
      */
 }

@@ -6,29 +6,32 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAAP;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
+import static org.firstinspires.ftc.teamcode.RobotVars.SCM;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SGS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SMDESCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.SMEDIU;
-import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
 import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epsEq;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.opcl;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridlamp;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextA;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sextB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
@@ -36,6 +39,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.spe;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -52,27 +56,34 @@ public class Clown implements Runnable {
     public static int MIP = 100;
     public static double ME = 5;
     public static double ETC = 0.14;
-    public static double CPT = 0.42;
-    public static double CET = 0.15;
-    public static double CHT = 0.222222;
-    public static double WPT = 0.0;
+    public static double CPT = 0.0;
+    public static double CET = 0.0;
+    public static double CHT = 0.0;
+    public static double WPT = 0.05;
     public static double WET = 0.0;
-    public static double WHT = 0.4;
+    public static double WHT = 0.2;
     public static double TTT = 0.0;
     public static boolean CLAW = false;
     public static double PUTC = 1.212;
     public static double UPTC = 1.212;
-    public static double PREPC = 0.8;
+    public static double PREPC = 1.212;
     public static double CIP = 0.11;
     public static double GB = 0.20;
     public static double GHT = 0.1;
     public static double WT = 0.14;
-    public static double CD = 0.0;
-    public static double CC = 0.3;
-    public static double ED = 0.1;
+    public static double CD = 0.00;
+    public static double CB = 0.05;
+    public static double CC = 0.0;
+    public static double ED = 0.15;
     public static double CDIST = 200;
     public static boolean AUTO_CLOW = false;
     public static double RET_POW = -0.2;
+    public static double RLAMP_MPOS = 0.5;
+    public static double RLAMP_POS = 1.12;
+    public static boolean USE_TELE = false;
+    public static double CLWT = 0.08;
+
+    public static LinearOpMode lom;
 
     private Servo sa, sb, sHeading, sClaw, sBalans, sMClaw;
     private DcMotorEx ce;
@@ -88,11 +99,15 @@ public class Clown implements Runnable {
     public boolean waiting = true;
     public boolean hput = false;
     public boolean chput = false;
-    private boolean _chead = false;
+    private boolean _rlamp = false;
+    private boolean _rrlamp = false;
+    private boolean _cba = false;
     private boolean _cmc = false;
     private boolean _csc = false;
     private boolean _csp = false;
     private boolean _csw = false;
+    public boolean _clw = true;
+    public ElapsedTime clw = new ElapsedTime(0);
 
     public static double OPP = 0.0;
     public static double OEP = 0.0;
@@ -101,7 +116,7 @@ public class Clown implements Runnable {
     public DistanceSensor csensor;
     ElapsedTime ht = new ElapsedTime(0);
 
-    List<Double> tims = Arrays.asList(WPT + CPT, WET + CET, WHT + CHT);
+    List<Double> tims = Arrays.asList(CPT, CET, CHT);
     List<Double> wtim = Arrays.asList(WPT, WET, WHT);
     List<Double> poff = Arrays.asList(OPP, OEP, OHP);
     int timt = 0;
@@ -122,6 +137,14 @@ public class Clown implements Runnable {
         waiting = true;
         hput = false;
         chput = false;
+        _rlamp = false;
+        _rrlamp = false;
+        _cmc = false;
+        _cba = false;
+        _csc = false;
+        _csp = false;
+        _csw = false;
+        _clw = true;
     }
 
     public Clown(Servo sa, Servo sb, Servo sHeading, Servo sClaw, Servo sMClaw, Servo sBalans, DcMotorEx ce, DistanceSensor csensor) {
@@ -143,7 +166,7 @@ public class Clown implements Runnable {
     boolean BBBBBBBBBBBBB = false;
 
     public void run() {
-        while (!shouldClose) {
+        while (!shouldClose && !lom.isStopRequested()) {
             double cd = 0;
             if (AUTO_CLOW && csensor != null) {
                 cd = csensor.getDistance(DistanceUnit.MM);
@@ -151,7 +174,7 @@ public class Clown implements Runnable {
 
             if (USE_TELE) {
                 TelemetryPacket packet = new TelemetryPacket();
-                tims = Arrays.asList(WPT + CPT, WET + CET, WHT + CHT);
+                tims = Arrays.asList(CPT, CET, CHT);
                 wtim = Arrays.asList(WPT, WET, WHT);
                 poff = Arrays.asList(OPP, OEP, OHP);
 
@@ -172,6 +195,7 @@ public class Clown implements Runnable {
                 packet.put("SER_SEA", sextA.getPosition());
                 packet.put("SER_SEB", sextB.getPosition());
                 packet.put("SER_SEH", sHeading.getPosition());
+                packet.put("SER_LAM", ridlamp.getPosition());
                 packet.put("csens", cd);
 
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
@@ -213,8 +237,11 @@ public class Clown implements Runnable {
                 sClaw.setPosition(SINCHIS);
                 sMClaw.setPosition(SCO);
                 sBalans.setPosition(SBAP);
-                _chead = false;
+                sHeading.setPosition(SHP);
+                _rlamp = false;
+                _rrlamp = false;
                 _cmc = false;
+                _cba = false;
                 _csc = false;
                 _csp = false;
                 _csw = false;
@@ -223,47 +250,57 @@ public class Clown implements Runnable {
             if (cput) { // Currently putting
                 epd.curRet = true;
                 spe(false, RET_POW);
-                //spe(true, RET_POW / 2);
-                if (et.seconds() > TTT * DT && !_chead) { /// Start rotating the claw after TTT time to avoid bumping the cone into the whole arm
-                    sBalans.setPosition(SBAP);
-                    sHeading.setPosition(SHP);
-                    _chead = true;
-                }
+
                 if (et.seconds() >= wtim.get(timt) * DT && !_csp) {
                     conversiePerverssa(SAP + poff.get(timt));
                     _csp = true;
-                }
-                if (et.seconds() > (tims.get(timt) + CD) * DT && !_cmc) { /// Close the mini servo to keep the cone in the holding bay
-                    sMClaw.setPosition(SCC);
-                    _cmc = true;
-                }
-                if (et.seconds() > (tims.get(timt) + CD + CC) * DT && !_csc) { /// Open the claw after it has reached the holding bay
-                    sClaw.setPosition(SMDESCHIS);
-                    sHeading.setPosition(SHAP);
-                    sBalans.setPosition(SBAAP);
-                    _csc = true;
-                }
-                if (et.seconds() > (tims.get(timt) + CD + CC + WT) * DT && !_csw) { /// Move the claw to the waiting position
-                    conversiePerverssa(SAW);
-                    _csw = true;
-                }
-                if (et.seconds() > (tims.get(timt) + CD + CC + WT + ED) * DT) { /// Reset everything to normal
-                    sBalans.setPosition(SBAG);
-                    sClaw.setPosition(SMEDIU);
-                    sHeading.setPosition(SHG);
-                    conversiePerverssa(SAW);
-                    coneReady = true;
-                    armHolding = false;
-                    coneClaw = false;
-                    toGet = false;
-                    cget = false;
-                    cput = false;
-                    waiting = true;
-                    timt = 0;
-                    et.reset();
-                    spe(false, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
-                    //spe(true, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
-                    epd.curRet = false;
+                } else if (_csp) {
+                    if (ridlamp.getPosition() >= RLAMP_MPOS && !_rlamp && !_rrlamp) {
+                        sMCLaw.setPosition(SCM);
+                        _rrlamp = true;
+                    }
+                    if (ridlamp.getPosition() >= RLAMP_POS && !_rlamp) {
+                        _rlamp = true;
+                        et.reset();
+                    } else if (_rlamp) {
+                        //spe(true, RET_POW / 2);
+                        if (et.seconds() > (tims.get(timt) + CD) * DT && !_cmc) { /// Close the mini servo to keep the cone in the holding bay
+                            sMClaw.setPosition(SCC);
+                            _cmc = true;
+                        }
+                        if (et.seconds() > (tims.get(timt) + CD + CC) * DT && !_csc) { /// Open the claw after it has reached the holding bay
+                            sClaw.setPosition(SMDESCHIS);
+                            _csc = true;
+                        }
+                        if (et.seconds() > (tims.get(timt) + CD + CC + CB) * DT && !_cba) { /// Open the claw after it has reached the holding bay
+                            sHeading.setPosition(SHAP);
+                            sBalans.setPosition(SBAAP);
+                            _cba = true;
+                        }
+                        if (et.seconds() > (tims.get(timt) + CD + CC + CB + WT) * DT && !_csw) { /// Move the claw to the waiting position
+                            conversiePerverssa(SAW);
+                            sClaw.setPosition(SINCHIS);
+                            _csw = true;
+                        }
+                        if (et.seconds() > (tims.get(timt) + CD + CC + CB + WT + ED) * DT) { /// Reset everything to normal
+                            sBalans.setPosition(SBAG);
+                            sClaw.setPosition(SINCHIS);
+                            sHeading.setPosition(SHG);
+                            conversiePerverssa(SAW);
+                            coneReady = true;
+                            armHolding = false;
+                            coneClaw = false;
+                            toGet = false;
+                            cget = false;
+                            cput = false;
+                            waiting = true;
+                            timt = 0;
+                            et.reset();
+                            spe(false, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
+                            //spe(true, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
+                            epd.curRet = false;
+                        }
+                    }
                 }
             }
 
@@ -280,11 +317,9 @@ public class Clown implements Runnable {
 
 
             if (toPrepCone) { // Tries to grab the cone and set the robot in the holding state
+                opcl();
                 if (toPut) {
                     sClaw.setPosition(SINCHIS);
-                }
-                if (epsEq(sClaw.getPosition(), SMEDIU)) {
-                    sClaw.setPosition(SDESCHIS);
                 }
                 toPrepCone = false;
                 cprepCone = true;
@@ -307,9 +342,6 @@ public class Clown implements Runnable {
                     if (!toPut) {
                         conversiePerverssa(SAH);
                         sBalans.setPosition(SBAH);
-                    } else if (!BBBBBBBBBBBBB) {
-                        conversiePerverssa(SAP);
-                        sBalans.setPosition(SBAP);
                     }
                     armHolding = true;
                     coneClaw = true;
@@ -328,8 +360,17 @@ public class Clown implements Runnable {
                         timt = 1;
                     }
                 } else if (cprepCone && ct.seconds() > CIP) {
+                    TelemetryPacket tp = new TelemetryPacket();
+                    tp.put("AAAAAAAAAAAAAAAAAAAAAAAAAAA+1", sextA.getPosition());
+                    tp.put("AAAAAAAAAAAAAAAAAAAAAAAAAAA+2", SGS);
+                    tp.put("AAAAAAAAAAAAAAAAAAAAAAAAAAA+3", epsEq(sextA.getPosition(), SGS));
+                    dashboard.sendTelemetryPacket(tp);
+                    if (epsEq(sextA.getPosition(), SGS)) {
+                        sBalans.setPosition(SBAH);
+                    } else {
+                        sBalans.setPosition(SBAC);
+                    }
                     conversiePerverssa(SAH);
-                    sBalans.setPosition(SBAH);
                     AAAAAAAAAAAAA = true;
                     ct.reset();
                 }
@@ -353,11 +394,14 @@ public class Clown implements Runnable {
                     conversiePerverssa(SAG);
                     sBalans.setPosition(SBAG);
                 }
-                if (epsEq(sClose.getPosition(), SMEDIU)) {
-                    sClose.setPosition(SDESCHIS);
-                }
+                opcl();
                 rtg = true;
                 gtim.reset();
+            }
+
+            if (!_clw && clw.seconds() > CLWT) {
+                _clw = true;
+                sClose.setPosition(SDESCHIS);
             }
 
             if (cget && gtim.seconds() > GHT * DT) { /// Currently Getting

@@ -15,6 +15,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
+import static org.firstinspires.ftc.teamcode.RobotVars.SGS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
@@ -27,6 +28,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.SHOULD_CLOSE_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
@@ -41,6 +43,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftEncoder;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.leftFront;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.log_state;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.preinit;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rid;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightBack;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rightEncoder;
@@ -50,6 +53,7 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sBalans;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sHeading;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sMCLaw;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.set_grab_pos;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.wtfor;
 import static org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner.COLOR_INACTIVE_TRAJECTORY;
@@ -119,21 +123,18 @@ public class AutonomousStanga extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    // -38.7 -57.7 117.2
-    // 206.6 8.318 28.337
-
-    public static double P1H = -0.544;
-    public static double P1X = -131;
-    public static double P1Y = 15;
-    public static double P2H = -1.454;
-    public static double P2X = -123;
-    public static double P2Y = 16;
-    public static double P3H = -1.941;
-    public static double P3X = -100;
-    public static double P3Y = 62;
-    public static double P4H = -1.433;
-    public static double P4X = -121;
-    public static double P4Y = 20;
+    public static double P1H = 5.585;
+    public static double P1X = -135;
+    public static double P1Y = 11;
+    public static double P2H = 4.625;
+    public static double P2X = -125;
+    public static double P2Y = 15;
+    public static double P3H = 4.06;
+    public static double P3X = -103;
+    public static double P3Y = 64;
+    public static double P4H = 4.625;
+    public static double P4X = -123;
+    public static double P4Y = 21;
 
     public static double OFFX = -0.8;
     public static double OFFY = 0.0;
@@ -174,14 +175,9 @@ public class AutonomousStanga extends LinearOpMode {
     public static double RAI2X = 30;
     public static double RAI2Y = -3.2;
 
-    public static double RBI1X = 20;
-    public static double RBI1Y = -4;
-    public static double RBI2X = 30;
-    public static double RBI2Y = -3.2;
-
     public static boolean BBBBBBBBBBBBBB = true;
-    public static boolean RECURRING_SINGULARITY = false;
-    public static boolean GPOS = false;
+    public static boolean RECURRING_SINGULARITY = true;
+    public static boolean GPOS = true;
 
     public static double MVEL = 220;
     public static double MAL = 220;
@@ -192,9 +188,9 @@ public class AutonomousStanga extends LinearOpMode {
     public static double MDL = 999;  // BREAKING BAD
      */
 
-    public static double R1X = 40;
+    public static double R1X = 30;
     public static double R1Y = -2.4;
-    public static double R2X = 40;
+    public static double R2X = 30;
     public static double R2Y = -1.2;
 
     Vector<Double> v = new Vector<>();
@@ -286,7 +282,7 @@ public class AutonomousStanga extends LinearOpMode {
                 }
                 TelemetryPacket cpa = new TelemetryPacket();
 
-                double cdist = STARTC - drive.getPoseEstimate().getY() - exPerTick * extA.getCurrentPosition() - camDist;
+                double cdist = STARTC - drive.tl.getPoseEstimate().getY() - exPerTick * extA.getCurrentPosition() - camDist;
                 double cang = radPerPixel * conePipeline.getXoff();
                 double xoff;
                 if (cang >= 0) {
@@ -298,7 +294,7 @@ public class AutonomousStanga extends LinearOpMode {
                 if (xoff > Y_HAPPY) {
                     conePipeline.setXoff(0);
                     drive.updatePoseEstimate();
-                    Pose2d cp = drive.getPoseEstimate();
+                    Pose2d cp = drive.tl.getPoseEstimate();
                     Pose2d cep = curTraj.end();
                     telemetry.addData("CPOSE", cp);
                     telemetry.addData("CEPOSE", cep);
@@ -407,7 +403,7 @@ public class AutonomousStanga extends LinearOpMode {
     }
 
     public static double RD = -1.0;
-    public static double RTT = -0.9;
+    public static double RTT = -0.0;
     public static double HT = 0.13;
 
     public static double START_CORRECTION_TIME1 = -0.4;
@@ -417,10 +413,6 @@ public class AutonomousStanga extends LinearOpMode {
     public static double WEX = 0.0;
 
     int lp = 1;
-    public static double SGS = 0.495;
-    public static double SGD = 0.021;
-    public static double SBAS = 0.60;
-    public static double SBAD = 0.0;
 
     void ret() {
         armHolding = false;
@@ -433,13 +425,8 @@ public class AutonomousStanga extends LinearOpMode {
         clo.tppc = false;
         clo.toPrepCone = false;
         clo.timt = 1;
-        sClose.setPosition(SDESCHIS);
+        openClaw();
         clo.toPut = false;
-    }
-
-    void set_grab_pos(int p) {
-        conversiePerverssa(SGS - SGD * (p - 1));
-        sBalans.setPosition(SBAS - SBAD * (p - 1));
     }
 
     public void st_grab_pos() {
@@ -463,11 +450,14 @@ public class AutonomousStanga extends LinearOpMode {
     FirmaDinCentru ihk;
     Thread ihkT;
 
+    void openClaw() {
+        clo.clw.reset();
+        clo._clw = false;
+    }
+
     void mktraj() {
         Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
         Vector2d RAI2 = new Vector2d(RAI2X, RAI2Y);
-        Vector2d RBI1 = new Vector2d(RBI1X, RBI1Y);
-        Vector2d RBI2 = new Vector2d(RBI2X, RBI2Y);
         Vector2d R1 = new Vector2d(R1X, R1Y);
         Vector2d R2 = new Vector2d(R2X, R2Y);
         Vector2d PTG1 = new Vector2d(PTG1X, PTG1Y);
@@ -524,7 +514,9 @@ public class AutonomousStanga extends LinearOpMode {
                         ret();
                         st_grab_pos();
                     })
-                    .funnyRaikuCurve(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2, 0.567, 1.0)
+                    .lineToLinearHeading(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i))
+                    .UNSTABLE_addTemporalMarkerOffset(0, this::getpos)
+                    //.funnyRaikuCurve(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2, 0.0, 0.5)
                     //.funnyRaikuCurveLinear(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2)
                     .UNSTABLE_addTemporalMarkerOffset(RTT, () -> {
                         epd.set_target(EMAX, 0);
@@ -574,7 +566,7 @@ public class AutonomousStanga extends LinearOpMode {
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
-                            sClose.setPosition(SDESCHIS);
+                            sClose.setPosition(SINCHIS);
                             sHeading.setPosition(SHG);
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
@@ -589,7 +581,7 @@ public class AutonomousStanga extends LinearOpMode {
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
-                            sClose.setPosition(SDESCHIS);
+                            sClose.setPosition(SINCHIS);
                             sHeading.setPosition(SHG);
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
@@ -604,7 +596,7 @@ public class AutonomousStanga extends LinearOpMode {
                 goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y, P4H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
-                            sClose.setPosition(SDESCHIS);
+                            sClose.setPosition(SINCHIS);
                             sHeading.setPosition(SHG);
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
@@ -632,8 +624,8 @@ public class AutonomousStanga extends LinearOpMode {
         if (GPOS) {
             while (!isStopRequested() && !gamepad1.right_bumper) {
                 drive.updatePoseEstimate();
-                telemetry.addData("PE", drive.getPoseEstimate());
-                telemetry.addData("PEH", drive.getPoseEstimate().getHeading() / 180 * Math.PI);
+                telemetry.addData("PE", drive.tl.getPoseEstimate());
+                telemetry.addData("PEH", drive.tl.getPoseEstimate().getHeading() / 180 * Math.PI);
                 telemetry.addData("Pe", drive.getLastError());
                 telemetry.update();
                 log_state();
@@ -774,17 +766,13 @@ public class AutonomousStanga extends LinearOpMode {
     CamGirl qtGirl, coneGirl;
 
     void init_auto() {
-        initma(hardwareMap, true);
+        initma(hardwareMap);
+        sMCLaw.setPosition(SCC);
         ihk = new FirmaDinCentru(this);
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         RobotFuncs.drive = drive;
         coneReady = true;
-        sMCLaw.setPosition(SCC);
-        conversiePerverssa(SAP);
-        sClose.setPosition(SDESCHIS);
-        sBalans.setPosition(SBAG);
-        sHeading.setPosition(SHG);
 
         qtPipeline = new AprilTagDetectionPipeline(TAGSIZE, FX, FY, CX, CY);
         qtGirl = new CamGirl(this, "qtGirl", OpenCvCameraRotation.SIDEWAYS_LEFT, 640, 480, qtPipeline, true, false);
@@ -835,6 +823,7 @@ public class AutonomousStanga extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        preinit();
         CAMERA_UPDATE = false;
         init_auto();
 
@@ -851,10 +840,12 @@ public class AutonomousStanga extends LinearOpMode {
             qtGirl.stop();
         }
 
-        startma(this, telemetry, false);
+        startma(this, telemetry);
+        sMCLaw.setPosition(SCC);
         ihk.shouldClose = false;
         ihk.lom = this;
         ihkT.start();
+        sClose.setPosition(SINCHIS);
 
         if (!BBBBBBBBBBBBBB) {
             runBBBBBBBBBBBBBB();
@@ -875,30 +866,34 @@ public class AutonomousStanga extends LinearOpMode {
             wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(WAT);
             follow_traj(preloadToGet);
-            /*
+            getpos();
             epd.set_target(EMAX, 0);
             upd_grab_pos();
+            getpos();
             CAMERA_UPDATE = false;
             wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
             set_wait_time(0);
             follow_traj(startGrab);
+            getpos();
             ihk.stage = 1;
-            getpos();*/
+            getpos();
             for (int i = 0; i < NUMC - 1; ++i) {
                 set_wait_time(WOT);
                 follow_traj(trss.get(i).get(0)); // Go to stalp
+                getpos();
                 wtfor(RobotFuncs.WAITS.HOISTER, WHO);
                 set_wait_time(WAT);
-                /*follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
+                follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
+                getpos();
                 CAMERA_UPDATE = false;
                 wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
                 set_wait_time(0);
                 follow_traj(trss.get(i).get(2)); // At get (retract)
+                getpos();
                 ihk.stage = 1;
-                getpos();*/
+                getpos();
             }
 
-        /*
             if (NUMC >= 1) {
                 set_wait_time(WOT);
                 follow_traj(trss.get(NUMC - 1).get(0)); // Go to stalp
@@ -907,19 +902,20 @@ public class AutonomousStanga extends LinearOpMode {
                 ret();
                 //wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0.001);
             }
-            getpos();*/
+            getpos();
+
+            set_wait_time(1);
+            follow_traj(goToPark);
 
             if (RECURRING_SINGULARITY && !isStopRequested()) {
-                TrajectorySequence traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                TrajectorySequence traj = drive.trajectorySequenceBuilder(drive.tl.getPoseEstimate())
                         .addDisplacementMarker(() -> ext(EMIN))
                         .lineToLinearHeading(new Pose2d(0, 0, 0))
                         .build();
                 follow_traj(traj);
-            } else if (!isStopRequested()) {
-                set_wait_time(1);
-                follow_traj(goToPark);
             }
 
+            SHOULD_CLOSE_IMU = false;
             endma();
             ihk.shouldClose = true;
 

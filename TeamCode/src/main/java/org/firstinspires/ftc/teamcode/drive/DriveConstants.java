@@ -47,7 +47,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.75; // cm
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 33.83; // cm
+    public static double TRACK_WIDTH = 42.00; // cm
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -55,9 +55,13 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.006;
-    public static double kA = 0.0019;
-    public static double kStatic = 0.001;
+    /*public static double kV = 0.0058;
+    public static double kA = 0.0015;
+    public static double kStatic = 0.000;*/
+
+    public static double kV = 0.0048;
+    public static double kA = 0.0016;
+    public static double kStatic = 0.04;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -72,15 +76,15 @@ public class DriveConstants {
     public static double MAX_DECEL = 999;  // BREAKING BAD
      */
 
-    public static double MAX_VEL = 240;// 254
+    public static double MAX_VEL = 170;// 254
     public static double MAX_ACCEL = 210;//100;
     public static double MAX_DECEL = 180;//70;
 
     //public static double MAX_VEL = 110;// True max: 170
     //public static double MAX_ACCEL = 110;
     //public static double MAX_DECEL = 60;
-    public static double MAX_ANG_VEL = 6.832;
-    public static double MAX_ANG_ACCEL = 3.832;
+    public static double MAX_ANG_VEL = 5;
+    public static double MAX_ANG_ACCEL = 5;
 
 
     public static double encoderTicksToInches(double ticks) {

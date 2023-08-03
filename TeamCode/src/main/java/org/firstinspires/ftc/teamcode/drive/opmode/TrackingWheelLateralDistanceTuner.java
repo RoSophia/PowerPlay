@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.initma;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.log_state;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -13,6 +15,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.mk3.RobotFuncs;
 
 /**
  * Opmode designed to assist the user in tuning the `StandardTrackingWheelLocalizer`'s
@@ -73,7 +76,9 @@ public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        initma(hardwareMap);
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        RobotFuncs.drive = drive;
 
         if (!(drive.getLocalizer() instanceof StandardTrackingWheelLocalizer)) {
             RobotLog.setGlobalErrorMsg("StandardTrackingWheelLocalizer is not being set in the "
@@ -91,6 +96,7 @@ public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
         waitForStart();
 
         if (isStopRequested()) return;
+        startma(this, telemetry);
 
         telemetry.clearAll();
         telemetry.update();
@@ -112,6 +118,8 @@ public class TrackingWheelLateralDistanceTuner extends LinearOpMode {
 
             headingAccumulator += Angle.normDelta(deltaHeading);
             lastHeading = heading;
+
+            log_state();
 
             telemetry.clearAll();
             telemetry.addLine("Total Heading (deg): " + Math.toDegrees(headingAccumulator));

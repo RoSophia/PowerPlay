@@ -21,22 +21,28 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RBP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RER;
 import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
+import static org.firstinspires.ftc.teamcode.RobotVars.RIDICARE_LAMPREY;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAD;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SBAS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIF;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIP;
+import static org.firstinspires.ftc.teamcode.RobotVars.SGD;
+import static org.firstinspires.ftc.teamcode.RobotVars.SGS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
+import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.STARTW;
 import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
-import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE;
+import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE_MOVE;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.ebp;
@@ -54,19 +60,19 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rmd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
 import static org.firstinspires.ftc.teamcode.RobotVars.useExt;
 import static org.firstinspires.ftc.teamcode.RobotVars.useRid;
-
 import static java.lang.Thread.sleep;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
@@ -77,8 +83,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
-import dalvik.system.DelegateLastClassLoader;
-
 @SuppressWarnings("ALL")
 public class RobotFuncs {
     public static DcMotorEx ridA;
@@ -88,7 +92,7 @@ public class RobotFuncs {
     public static ServoImplEx sClose, sHeading, sBalans, sMCLaw;
     public static PIDF epd, rpd;
     public static Clown clo;
-    public static BNO055IMU imu;
+    public static ThreadedIMU imu = null;
     public static DcMotorEx leftBack, leftFront, rightBack, rightFront;
     public static VoltageSensor batteryVoltageSensor;
     public static FtcDashboard dashboard;
@@ -186,20 +190,32 @@ public class RobotFuncs {
     public static Encoder leftEncoder;
     public static Encoder rightEncoder;
     public static Encoder frontEncoder;
+    public static Lamprey ridlamp;
+
+    static double angDiff(double o1, double o2) {
+        return ((o2 - o1 + Math.PI / 2.0) % Math.PI + Math.PI) % Math.PI - Math.PI / 2.0;
+    }
+
+    public static void set_grab_pos(int p) {
+        conversiePerverssa(SGS - SGD * (p - 1));
+        sBalans.setPosition(SBAS - SBAD * (p - 1));
+    }
 
     public static void log_state() {
         TelemetryPacket pack = new TelemetryPacket();
         if (drive != null) {
-            pack.put("Ex", drive.getPoseEstimate().getX());
-            pack.put("Ey", drive.getPoseEstimate().getY());
-            pack.put("Eh", drive.getPoseEstimate().getHeading());
-            pack.put("EEh0", imu.getAngularOrientation().firstAngle / Math.PI * 180);
-            pack.put("EEh1", imu.getAngularOrientation().secondAngle / Math.PI * 180);
-            pack.put("EEh2", imu.getAngularOrientation().thirdAngle / Math.PI * 180);
+            pack.put("POSE_x", drive.tl.getPoseEstimate().getX());
+            pack.put("POSE_y", drive.tl.getPoseEstimate().getY());
+            pack.put("POSE_h", drive.tl.getPoseEstimate().getHeading());
+            pack.put("POSE_hdif", angDiff(drive.tl.getPoseEstimate().getHeading(), imu.getLastRead()));
+            drive.update();
         }
         pack.put("vel", leftEncoder.getCorrectedVelocity());
         pack.put("ver", rightEncoder.getCorrectedVelocity());
         pack.put("vef", frontEncoder.getCorrectedVelocity());
+        pack.put("vcl", leftEncoder.getCurrentPosition());
+        pack.put("vcr", rightEncoder.getCurrentPosition());
+        pack.put("vcf", frontEncoder.getCurrentPosition());
         pack.put("voltage", batteryVoltageSensor.getVoltage());
         if (extA != null) {
             pack.put("CUR_extA", extA.getCurrent(CurrentUnit.MILLIAMPS));
@@ -213,11 +229,21 @@ public class RobotFuncs {
             pack.put("POW_ridA", ridA.getPower());
             pack.put("POW_ridB", ridB.getPower());
         }
+        if (USE_TELE_MOVE) {
+            pack.put("CUR_leftFront", leftFront.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("POW_leftFront", leftFront.getPower());
+            pack.put("CUR_leftBack", leftBack.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("POW_leftBack", leftBack.getPower());
+            pack.put("CUR_rightFront", rightFront.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("POW_rightFront", rightFront.getPower());
+            pack.put("CUR_rightBack", rightBack.getCurrent(CurrentUnit.MILLIAMPS));
+            pack.put("POW_rightBack", rightBack.getPower());
+        }
         dashboard.sendTelemetryPacket(pack);
     }
 
-
     static double TIMEOUT = 1.6;
+
     public static void wtfor(WAITS p, double extra) {
         TelemetryPacket pa = new TelemetryPacket();
         pa.put("WAIT_FOR_P", p);
@@ -369,7 +395,6 @@ public class RobotFuncs {
         return false;
     }
 
-
     static public void conversiePerverssa(double p) { /// Handle moving both grabber arm servos
         // MidFunnyRaikuStabilizer
         sextA.setPosition(p);
@@ -387,12 +412,14 @@ public class RobotFuncs {
         rid(RBOT_POS);
     }
 
-    static DcMotorEx initm(String s, boolean e, boolean r) { /// Init a motor
+    static DcMotorEx initm(String s, boolean e, boolean r, boolean oclock) { /// Init a motor
         DcMotorEx m = hardwareMap.get(DcMotorEx.class, s);
 
-        MotorConfigurationType mconf = m.getMotorType().clone();
-        mconf.setAchieveableMaxRPMFraction(1.0);
-        m.setMotorType(mconf);
+        if (oclock) {
+            MotorConfigurationType mconf = m.getMotorType().clone();
+            mconf.setAchieveableMaxRPMFraction(1.0);
+            m.setMotorType(mconf);
+        }
 
         if (e) {
             m.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -405,37 +432,47 @@ public class RobotFuncs {
         return m;
     }
 
-    static Thread extT, ridT, cloT;
+    static Thread extT, ridT, cloT, imuT;
 
-    public static void initma(HardwareMap ch, boolean AUTONOMUS) { /// Init all hardware info
+    public static void preinit() {
         if (USE_PHOTON) {
+            PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+            PhotonCore.experimental.setMaximumParallelCommands(8);
             PhotonCore.enable();
-            PhotonCore.experimental.setSinglethreadedOptimized(false);
+            PhotonCore.EXPANSION_HUB.clearBulkCache();
         }
+    }
+
+    public static void initma(HardwareMap ch) { /// Init all hardware info
         hardwareMap = ch;
 
         dashboard = FtcDashboard.getInstance();
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        rightBack = initm("RB", false, true);   // P4
-        rightFront = initm("RF", false, true);  // P2
-        leftBack = initm("LB", false, false);   // P3
-        leftFront = initm("LF", false, false);  // P1
+        rightBack = initm("RB", false, true, false);   // P4
+        rightFront = initm("RF", false, true, false);  // P2
+        leftBack = initm("LB", false, false, false);   // P3
+        leftFront = initm("LF", false, false, false);  // P1
+
         if (useExt) {
-            extA = initm("extA", true, false);
-            extB = initm("extB", true, true);
+            extA = initm("extA", true, false, true);
+            extB = initm("extB", true, true, true);
         } else {
             extA = null;
             extB = null;
         }
         if (useRid) {
-            ridA = initm("ridA", true, true);
-            ridB = initm("ridB", true, false);
+            ridA = initm("ridA", true, true, true);
+            ridB = initm("ridB", true, false, true);
         } else {
             ridA = null;
             ridB = null;
         }
         //underglow = hardwareMap.get(DcMotor.class, "Underglow"); You will not be forgotten
+
+        if (imu == null) {
+            imu = new ThreadedIMU(hardwareMap.get(BNO055IMU.class, "imu"));
+        }
 
         sClose = hardwareMap.get(ServoImplEx.class, "sClose");
         sHeading = hardwareMap.get(ServoImplEx.class, "sHeading");
@@ -448,6 +485,7 @@ public class RobotFuncs {
         sextA.setPwmRange(new PwmControl.PwmRange(505, 2495));
         sextB.setPwmEnable();
         sextB.setPwmRange(new PwmControl.PwmRange(505, 2495));
+        /*
         sClose.setPwmEnable();
         sClose.setPwmRange(new PwmControl.PwmRange(505, 2495));
         sHeading.setPwmEnable();
@@ -456,14 +494,17 @@ public class RobotFuncs {
         sBalans.setPwmRange(new PwmControl.PwmRange(505, 2495));
         sMCLaw.setPwmEnable();
         sMCLaw.setPwmRange(new PwmControl.PwmRange(505, 2495));
+         */
 
-        if (AUTONOMUS) {
-            sMCLaw.setPosition(SCC);
-            conversiePerverssa(SAP);
-            sClose.setPosition(SDESCHIS);
-            sBalans.setPosition(SBAG);
-            sHeading.setPosition(SHG);
+        if (STARTW) {
+            conversiePerverssa(SAW);
+        } else {
+            conversiePerverssa(SAG);
         }
+        sHeading.setPosition(SHG);
+        sClose.setPosition(SINCHIS);
+        sMCLaw.setPosition(SCO);
+        sBalans.setPosition(SBAG);
 
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, LES));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, RES));
@@ -472,96 +513,72 @@ public class RobotFuncs {
         rightEncoder.setDirection(RER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
         frontEncoder.setDirection(FER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        /*parameters.mode = BNO055IMU.SensorMode.COMPASS;
-        parameters.gyroPowerMode = BNO055IMU.GyroPowerMode.FAST;
-        parameters.gyroBandwidth = BNO055IMU.GyroBandwidth.HZ523; /// TODO ???????
-        parameters.gyroRange = BNO055IMU.GyroRange.DPS2000;*/
-        imu.initialize(parameters);
+        ridlamp = new Lamprey(hardwareMap.get(AnalogInput.class, RIDICARE_LAMPREY));
+
         if (AUTO_CLOW) {
             sensorRange = hardwareMap.get(DistanceSensor.class, "csensor");
         } else {
             sensorRange = null;
         }
 
-        /*
-        TelemetryPacket pack = new TelemetryPacket();
-        pack.put("ID_rightFront", rightFront.getPortNumber());
-        pack.put("ID_rightFrontCinfo", rightFront.getConnectionInfo());
-        pack.put("ID_leftFront", leftFront.getPortNumber());
-        pack.put("ID_leftFrontCinfo", leftFront.getConnectionInfo());
-        pack.put("ID_rightBack", rightBack.getPortNumber());
-        pack.put("ID_rightBackCinfo", rightBack.getConnectionInfo());
-        pack.put("ID_leftBack", leftBack.getPortNumber());
-        pack.put("ID_leftBackCinfo", leftBack.getConnectionInfo());
-        pack.put("ID_ridA", ridA.getPortNumber());
-        pack.put("ID_ridACinfo", ridA.getConnectionInfo());
-        pack.put("ID_ridB", ridB.getPortNumber());
-        pack.put("ID_ridBCinfo", ridB.getConnectionInfo());
-        pack.put("ID_extA", extA.getPortNumber());
-        pack.put("ID_extACinfo", extA.getConnectionInfo());
-        pack.put("ID_extB", extB.getPortNumber());
-        pack.put("ID_extBCinfo", extB.getConnectionInfo());
-        pack.put("ID_sClose", sClose.getPortNumber());
-        pack.put("ID_sCloseCinfo", sClose.getConnectionInfo());
-        pack.put("ID_sHeading", sHeading.getPortNumber());
-        pack.put("ID_sHeadingCinfo", sHeading.getConnectionInfo());
-        pack.put("ID_sBalans", sBalans.getPortNumber());
-        pack.put("ID_sBalansCinfo", sBalans.getConnectionInfo());
-        pack.put("ID_sMCLaw", sMCLaw.getPortNumber());
-        pack.put("ID_sMCLawCinfo", sMCLaw.getConnectionInfo());
-        pack.put("ID_sextA", sextA.getPortNumber());
-        pack.put("ID_sextACinfo", sextA.getConnectionInfo());
-        pack.put("ID_sextB", sextB.getPortNumber());
-        pack.put("ID_sextBCinfo", sextB.getConnectionInfo());
-        dashboard.sendTelemetryPacket(pack);
-         */
-
-
         epd = new PIDF(extA, extB, "Ex", ep, ed, ei, ef, ebp, emd);
         rpd = new PIDF(ridA, ridB, "Ri", rp, rd, ri, rf, rbp, rmd);
         clo = new Clown(sextA, sextB, sHeading, sClose, sMCLaw, sBalans, extA, sensorRange);
 
+        if (imuT == null) {
+            imuT = new Thread(imu);
+        }
         extT = new Thread(epd);
         ridT = new Thread(rpd);
         cloT = new Thread(clo);
     }
 
-    public static void startma(LinearOpMode lom, Telemetry tele, boolean im) { /// Set all values to their starting ones and start the PID threads
+    public static boolean SHOULD_CLOSE_IMU = false;
+    public static void startma(LinearOpMode lom, Telemetry tele) { /// Set all values to their starting ones and start the PID threads
         pcoef = 12.0 / batteryVoltageSensor.getVoltage();
         RobotFuncs.lom = lom;
         RobotFuncs.telemetry = tele;
 
-        if (im) { /// Set these positions only if called by a teleop class
-            if (STARTW) {
-                conversiePerverssa(SAW);
-            } else {
-                conversiePerverssa(SAG);
-            }
-            sHeading.setPosition(SHG);
-            sClose.setPosition(SDESCHIS);
-            sMCLaw.setPosition(SCO);
-            sBalans.setPosition(SBAG);
+        if (STARTW) {
+            conversiePerverssa(SAW);
+        } else {
+            conversiePerverssa(SAG);
         }
+        sHeading.setPosition(SHG);
+        sClose.setPosition(SINCHIS);
+        sMCLaw.setPosition(SCO);
+        sBalans.setPosition(SBAG);
 
         epd.shouldClose = false;
         epd.use = true;
-        epd.useTele = USE_TELE;
         epd.target = EMIN;
         epd.lom = lom;
         extT.start();
 
         rpd.shouldClose = false;
         rpd.use = true;
-        rpd.useTele = USE_TELE;
         rpd.target = RBOT_POS;
         rpd.lom = lom;
         ridT.start();
 
         clo.shouldClose = false;
+        clo.lom = lom;
         cloT.start();
+
+        if (drive != null) {
+            drive.startTlt(lom);
+        }
+
+        SHOULD_CLOSE_IMU = true;
+        imu.setLom(lom);
+        imuT.start();
+    }
+
+    public static void opcl() {
+        if (epsEq(sextA.getPosition(), SAW) && epsEq(sClose.getPosition(), SINCHIS)) {
+            clo.clw.reset();
+            clo._clw = false;
+        }
     }
 
     public static void endma() { /// Shut down the robot
@@ -579,7 +596,15 @@ public class RobotFuncs {
         sHeading.setPwmDisable();
         sBalans.setPwmDisable();
         sMCLaw.setPwmDisable();
-        ///TODO: SET PWM RANGE 0
+        ridlamp.close();
+        TelemetryPacket tp = new TelemetryPacket();
+        tp.put("SHOULD_CLOSE_IMU", SHOULD_CLOSE_IMU);
+        dashboard.sendTelemetryPacket(tp);
+        if (SHOULD_CLOSE_IMU) {
+            SHOULD_CLOSE_IMU = false;
+            imu.close();
+            imu = null;
+        }
         if (ridA != null) {
             ridA.setPower(0);
             ridB.setPower(0);
@@ -588,15 +613,19 @@ public class RobotFuncs {
             extA.setPower(0);
             extB.setPower(0);
         }
-        imu.close();
         if (sensorRange != null) {
             sensorRange.close();
         }
+        if (drive != null) {
+            drive.joinTlt();
+        }
         batteryVoltageSensor.close();
         try {
+            imuT.join();
             extT.join();
             ridT.join();
             cloT.join();
+            imuT = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
