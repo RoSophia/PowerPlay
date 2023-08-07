@@ -73,7 +73,7 @@ public class Clown implements Runnable {
     public static double WT = 0.14;
     public static double CD = 0.00;
     public static double CB = 0.05;
-    public static double CC = 0.0;
+    public static double CC = 0.1;
     public static double ED = 0.15;
     public static double CDIST = 200;
     public static boolean AUTO_CLOW = false;

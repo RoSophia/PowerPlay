@@ -1,18 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
 public class RobotVars {
     public static double SMDESCHIS = 0.785; // Claw Very Open (After put)
-    public static double SDESCHIS = 0.865; // Claw Open
+    public static double SDESCHIS = 0.83; // Claw Open
     public static double SINCHIS = 0.96;   // Claw Close
 
     public static int EMIN = 7;          // Minimum Extension
-    public static int EMAX = 590;         // Maximum Extension
+    public static int EMAX = 630;         // Maximum Extension
 
     public static int RTOP_POS = 590;     // Maximum Lift Position
     public static int RMIU_POS = 338;     // Medium Lift Position
@@ -28,7 +25,7 @@ public class RobotVars {
     public static double SBAG = 0.59;     // 4bar Get position
     public static double SBAH = 0.39;     // 4bar Hold position
     public static double SBAC = 0.57;     // 4bar Hold position
-    public static double SBAP = 0.73;     // 4bar Put position
+    public static double SBAP = 0.77;     // 4bar Put position
     public static double SBAAP = 0.9;     // 4bar Put position
 
     public static double SDIF = 0.076;      // Grabber Arm Servo Diff Term
@@ -85,13 +82,14 @@ public class RobotVars {
     public static boolean useExt = true;
     public static boolean useRid = true;
 
-    public static boolean STARTW = true;
     public static String LES = "RF";
     public static String RES = "RB";
     public static String FES = "LF";
     public static boolean LER = true;
     public static boolean RER = true;
     public static boolean FER = true;
+
+    public static boolean USE_UPD_HEAD = false;
 
     public static String RIDICARE_LAMPREY = "lamprey2";
 
@@ -103,9 +101,6 @@ public class RobotVars {
     public static int MAX_DIF_RID = 5;
     public static int MAX_DIF_EXT = 25;
 
-    public static int ConeHeight = 480;
-    public static int ConeWidth = 640;
-    public static OpenCvCameraRotation ConeRotation = OpenCvCameraRotation.UPSIDE_DOWN;
     public static int LOCALIZATION_SLEEP_TIME = 5;
 
      /*

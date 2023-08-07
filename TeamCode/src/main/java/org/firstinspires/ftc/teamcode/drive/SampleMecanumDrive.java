@@ -70,10 +70,10 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(6, 0, 0);
-    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(7, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 0, 0);
-    public static double CORT = 0.0;
+    public static PIDCoefficients AXIAL_PID = new PIDCoefficients(9, 0, 0.2);
+    public static PIDCoefficients LATERAL_PID = new PIDCoefficients(6, 0, 0.2);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 0, 0.2);
+    public static double CORT = 0.2;
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -125,7 +125,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
 
         follower = new HolonomicPIDVAFollower(AXIAL_PID, LATERAL_PID, HEADING_PID,
-                new Pose2d(2, 2, Math.toRadians(2)), CORT);
+                new Pose2d(0.0, 0.0, Math.toRadians(0.0)), CORT);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 

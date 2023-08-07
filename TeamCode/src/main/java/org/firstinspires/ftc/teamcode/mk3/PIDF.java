@@ -136,7 +136,7 @@ class PIDF implements Runnable {
 
     int lastExtPos = 0;
     ElapsedTime lastExtTim = new ElapsedTime(0);
-    public static double EXT_RESET_TIME = 1.5;
+    public static double EXT_RESET_TIME = 2.0;
 
     @SuppressWarnings("BusyWait")
     public void run() {
@@ -242,20 +242,15 @@ class PIDF implements Runnable {
                 /// KRILL MYSELF
                 if (md == emd && target == EMIN && cp >= emd) {
                     if (lastExtTim.seconds() > EXT_RESET_TIME) {
-                        if (lastExtPos - cp < emd / 2) {
-                            TelemetryPacket tp = new TelemetryPacket();
-                            tp.put("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 1);
-                            dashboard.sendTelemetryPacket(tp);
-                            motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                            motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                            if (motB != null) {
-                                motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                                motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                            }
+                        TelemetryPacket tp = new TelemetryPacket();
+                        tp.put("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 1);
+                        dashboard.sendTelemetryPacket(tp);
+                        motA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        motA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        if (motB != null) {
+                            motB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                            motB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                         }
-                    } else {
-                        lastExtPos = cp;
-                        lastExtTim.reset();
                     }
                 } else {
                     lastExtPos = cp;

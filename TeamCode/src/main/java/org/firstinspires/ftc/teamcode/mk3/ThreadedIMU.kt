@@ -10,6 +10,7 @@ import java.lang.Thread.sleep
 class ThreadedIMU(im: BNO055IMU) : Runnable {
     private val imu: BNO055IMU
     var lastRead: Double = 0.0
+    var updated = false
     var isRunning = true
     lateinit var lom: LinearOpMode
 
@@ -31,6 +32,7 @@ class ThreadedIMU(im: BNO055IMU) : Runnable {
             ET.reset()
             val ar = imu.angularOrientation.firstAngle.toDouble()
             lastRead = (ar + Math.PI * 2) % (2 * Math.PI)
+            updated = true
             val tp = TelemetryPacket()
             tp.put("IMU_CYCLE_TIME", ET.seconds())
             tp.put("IMU_ACTUAL_READ", ar)

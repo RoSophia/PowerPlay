@@ -6,12 +6,11 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.util.ElapsedTime
 import kotlinx.coroutines.sync.Mutex
-import org.firstinspires.ftc.teamcode.RobotVars.LOCALIZATION_SLEEP_TIME
-import org.firstinspires.ftc.teamcode.RobotVars.USE_TELE
+import org.firstinspires.ftc.teamcode.RobotVars.*
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive
 import java.lang.Thread.sleep
 
-class ThreadedLocalization(dr: SampleMecanumDrive): Runnable {
+class ThreadedLocalization(dr: SampleMecanumDrive) : Runnable {
     lateinit var lom: LinearOpMode
     val drive: SampleMecanumDrive
     var shouldClose = false
@@ -20,15 +19,30 @@ class ThreadedLocalization(dr: SampleMecanumDrive): Runnable {
     private var new = true
     private lateinit var poseEstimate: Pose2d
     private var poseVelocity: Pose2d? = null
+    private var lastError: Pose2d? = null
 
-    private fun updEst()  {
+    private fun updEst() {
         while (!mtx.tryLock()) {
             sleep(3)
         }
         poseEstimate = drive.poseEstimate
         poseVelocity = drive.poseVelocity
+        lastError = drive.lastError
         new = false
         mtx.unlock()
+    }
+
+    fun updHeading() {
+        if (USE_UPD_HEAD) {
+            while (!mtx.tryLock()) {
+                sleep(3)
+            }
+            val clr = RobotFuncs.imu.lastRead // Seramitae
+            RobotFuncs.imu.updated = false
+            val cpe = drive.poseEstimate
+            drive.poseEstimate = Pose2d(cpe.x, cpe.y, clr)
+            mtx.unlock()
+        }
     }
 
     fun getPoseEstimate(): Pose2d {
@@ -43,6 +57,13 @@ class ThreadedLocalization(dr: SampleMecanumDrive): Runnable {
             updEst()
         }
         return poseVelocity
+    }
+
+    fun getLastError(): Pose2d? {
+        if (new) {
+            updEst()
+        }
+        return lastError
     }
 
     init {

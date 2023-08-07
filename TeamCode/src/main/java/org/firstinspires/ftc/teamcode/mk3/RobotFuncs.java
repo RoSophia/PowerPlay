@@ -24,22 +24,17 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RIDICARE_LAMPREY;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
-import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
-import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAD;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAS;
-import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
-import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIF;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDIP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SGD;
 import static org.firstinspires.ftc.teamcode.RobotVars.SGS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
-import static org.firstinspires.ftc.teamcode.RobotVars.STARTW;
 import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_PHOTON;
 import static org.firstinspires.ftc.teamcode.RobotVars.USE_TELE_MOVE;
@@ -208,6 +203,11 @@ public class RobotFuncs {
             pack.put("POSE_y", drive.tl.getPoseEstimate().getY());
             pack.put("POSE_h", drive.tl.getPoseEstimate().getHeading());
             pack.put("POSE_hdif", angDiff(drive.tl.getPoseEstimate().getHeading(), imu.getLastRead()));
+
+            pack.put("POSEER_x", drive.tl.getLastError().getX());
+            pack.put("POSEER_y", drive.tl.getLastError().getY());
+            pack.put("POSEER_h", drive.tl.getLastError().getHeading());
+
             drive.update();
         }
         pack.put("vel", leftEncoder.getCorrectedVelocity());
@@ -496,11 +496,21 @@ public class RobotFuncs {
         sMCLaw.setPwmRange(new PwmControl.PwmRange(505, 2495));
          */
 
-        if (STARTW) {
-            conversiePerverssa(SAW);
-        } else {
-            conversiePerverssa(SAG);
-        }
+        conversiePerverssa(SAW);
+        conversiePerverssa(SAW - 0.001);
+        sBalans.setPosition(SBAG + 0.001);
+        conversiePerverssa(SAW + 0.001);
+        sBalans.setPosition(SBAG - 0.001);
+        conversiePerverssa(SAW - 0.001);
+        sBalans.setPosition(SBAG + 0.001);
+        conversiePerverssa(SAW + 0.001);
+        sBalans.setPosition(SBAG - 0.001);
+        conversiePerverssa(SAW - 0.001);
+        sBalans.setPosition(SBAG + 0.001);
+        conversiePerverssa(SAW + 0.001);
+        sBalans.setPosition(SBAG - 0.001);
+        conversiePerverssa(SAW);
+
         sHeading.setPosition(SHG);
         sClose.setPosition(SINCHIS);
         sMCLaw.setPosition(SCO);
@@ -539,11 +549,7 @@ public class RobotFuncs {
         RobotFuncs.lom = lom;
         RobotFuncs.telemetry = tele;
 
-        if (STARTW) {
-            conversiePerverssa(SAW);
-        } else {
-            conversiePerverssa(SAG);
-        }
+        conversiePerverssa(SAW);
         sHeading.setPosition(SHG);
         sClose.setPosition(SINCHIS);
         sMCLaw.setPosition(SCO);

@@ -1,24 +1,20 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.DOT;
-import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
-import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
-import static org.firstinspires.ftc.teamcode.RobotVars.SBAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
-import static org.firstinspires.ftc.teamcode.RobotVars.SHP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.armHolding;
 import static org.firstinspires.ftc.teamcode.RobotVars.coneClaw;
@@ -26,7 +22,6 @@ import static org.firstinspires.ftc.teamcode.RobotVars.coneReady;
 import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.SHOULD_CLOSE_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
@@ -89,9 +84,9 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive", name = "Autonomous (Firma din centru)")
+@Autonomous(group = "drive")
 @SuppressLint("DefaultLocale")
-public class AutonomousStanga extends LinearOpMode {
+public class Teotonom extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
 
@@ -113,26 +108,12 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P1H = 5.585;
     public static double P1X = -134;
     public static double P1Y = 16;
-    public static double P22H = 4.886;
-    public static double P22X = -118;
-    public static double P22Y = 0;
-    public static double P2H = 4.72;
-    public static double P2X = -128;
-    public static double P2Y = 19;
-    public static double P3H = 4.38;
-    public static double P3X = -98;
-    public static double P3Y = 66;
-    public static double P4H = 4.73;
-    public static double P4X = -130;
-    public static double P4Y = 22.5;
-
-    public static double OFFX = -0.1;
-    public static double OFFY = -0.2;
-    public static double OFFH = 0.01;
-
-    public static double OFFX1 = 0;
-    public static double OFFY1 = 0.0;
-    public static double OFFH1 = 0.0;
+    public static double P2H = 4.59;
+    public static double P2X = -119;
+    public static double P2Y = 14;
+    public static double P3H = 4.31;
+    public static double P3X = -96;
+    public static double P3Y = 6;
 
     public static double P678X = -85;
     public static double P678H = -0;
@@ -154,11 +135,6 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P61Y = 3;
     public static double P62X = 20;
     public static double P62Y = 4;
-
-    public static double PTG1X = 15.0;
-    public static double PTG1Y = -1.5;
-    public static double PTG2X = 15.0;
-    public static double PTG2Y = -0.5;
 
     public static double RAI1X = 20;
     public static double RAI1Y = -4;
@@ -182,6 +158,8 @@ public class AutonomousStanga extends LinearOpMode {
     public static double R1Y = -2.4;
     public static double R2X = 30;
     public static double R2Y = -1.2;
+
+    public static int EM = 450;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -289,7 +267,6 @@ public class AutonomousStanga extends LinearOpMode {
     }
 
     public static double RD = -1.0;
-    public static double HT = 0.13;
 
     public static double WHO = 0.08;
     public static double WEX = 0.0;
@@ -324,13 +301,9 @@ public class AutonomousStanga extends LinearOpMode {
 
     TrajectorySequence goToPreload;
     TrajectorySequence preloadToGet;
-    TrajectorySequence fixHead;
-    TrajectorySequence startGrab;
     TrajectorySequence goToPark;
-    TrajectorySequence ender;
-    Vector<Vector<TrajectorySequence>> trss = new Vector<>();
 
-    FirmaDinCentru ihk;
+    Tecton ihk;
     Thread ihkT;
 
     void openClaw() {
@@ -338,16 +311,9 @@ public class AutonomousStanga extends LinearOpMode {
         clo._clw = false;
     }
 
-    public static boolean USE_SPLINE_1 = false;
-    public static boolean USE_SPLINE_2 = false;
-
     void mktraj() {
-        Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
-        Vector2d RAI2 = new Vector2d(RAI2X, RAI2Y);
         Vector2d R1 = new Vector2d(R1X, R1Y);
         Vector2d R2 = new Vector2d(R2X, R2Y);
-        Vector2d PTG1 = new Vector2d(PTG1X, PTG1Y);
-        Vector2d PTG2 = new Vector2d(PTG2X, PTG2Y);
         TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
@@ -358,120 +324,14 @@ public class AutonomousStanga extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RTOP_POS))
                 .build();
 
-        if (USE_SPLINE_1) {
-            /*
-            preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                        rid(RBOT_POS);
-                        ret();
-                        set_grab_pos(1);
-                    })
-                    .funnyRaikuCurveLinear(new Pose2d(P2X, P2Y, P2H), PTG1, PTG2)
-                    .waitSeconds(0.12)
-                    .build();
-            */
-            preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                        rid(RBOT_POS);
-                        ret();
-                        set_grab_pos(1);
-                    })
-                    .lineToLinearHeading(new Pose2d(P2X, P2Y, P1H))
-                    .turn(P2H - P1H)
-                    .build();
-        } else {
-            preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
-                    .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
-                        rid(RBOT_POS);
-                        ret();
-                        set_grab_pos(1);
-                    })
-                    .lineToLinearHeading(new Pose2d(P22X, P22Y, P22H))
-                    .UNSTABLE_addTemporalMarkerOffset(0, this::getpos)
-                    .lineToLinearHeading(new Pose2d(P2X + 0.001, P2Y, P2H))
-                    .build();
-        }
-        fixHead = drive.trajectorySequenceBuilder(new Pose2d(P2X + 0.00001, P2Y, P2H))
+        preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                    rid(RBOT_POS);
+                    ret();
+                    set_grab_pos(1);
+                })
                 .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H))
-                .build();
-
-        startGrab = drive.trajectorySequenceBuilder(new Pose2d(P2X + 0.0001, P2Y, P2H))
-                .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H))
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    sClose.setPosition(SINCHIS);
-                    coneClaw = true;
-                })
-                .waitSeconds(0.11)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    conversiePerverssa(SAH);
-                    sBalans.setPosition(SBAH);
-                })
-                .waitSeconds(HT)
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    sHeading.setPosition(SHP);
-                    sBalans.setPosition(SBAP);
-                    conversiePerverssa(SAP);
-                })
-                .waitSeconds(0.01)
-                .build();
-
-        for (int i = 0; i < NUMC; ++i) {
-            Vector<TrajectorySequence> trs = new Vector<>();
-            if (USE_SPLINE_2) {
-                trs.add(drive.trajectorySequenceBuilder(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i)) /// From Get cone to stalp
-                        .funnyRaikuCurveLinear(new Pose2d(P3X + OFFX1 * i, P3Y + OFFY1 * i, P3H + OFFH1 * i), RAI1, RAI2)
-                        .build());
-            } else {
-                trs.add(drive.trajectorySequenceBuilder(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i)) /// From Get cone to stalp
-                        .lineToLinearHeading(new Pose2d(P3X + OFFX1 * i, P3Y + OFFY1 * i, P3H + OFFH1 * i))
-                        .build());
-            }
-
-            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P3X + OFFX1 * i, P3Y + OFFY1 * i, P3H + OFFH1 * i)) // Retract, extend and go to ext
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        ihk.stage = 0;
-                        rid(RBOT_POS);
-                        ret();
-                        st_grab_pos();
-                    })
-                    .lineToLinearHeading(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i))
-                    .UNSTABLE_addTemporalMarkerOffset(0, this::getpos)
-                    //.funnyRaikuCurve(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2, 0.0, 0.5)
-                    //.funnyRaikuCurveLinear(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RBI1, RBI2)
-                    .waitSeconds(0.05)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        epd.set_target(EMAX, 0);
-                        upd_grab_pos();
-                    })
-                    .build());
-
-            trs.add(drive.trajectorySequenceBuilder(new Pose2d(P4X + OFFX * i + 0.0001, P4Y + OFFY * i, P4H + OFFH * i)) // At get retract
-                    .lineToLinearHeading(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i))
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        sClose.setPosition(SINCHIS);
-                        coneClaw = true;
-                    })
-                    .waitSeconds(0.11)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        conversiePerverssa(SAH);
-                        sBalans.setPosition(SBAH);
-                    })
-                    .waitSeconds(HT)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        sHeading.setPosition(SHP);
-                        sBalans.setPosition(SBAP);
-                        conversiePerverssa(SAP);
-                    })
-                    .waitSeconds(0.01)
-                    .build());
-
-            trss.add(trs);
-        }
-
-        ender = drive.trajectorySequenceBuilder(new Pose2d(P3X + OFFX1 * NUMC + 0.0001, P3Y + OFFY1 * NUMC, P3H + OFFH1 * NUMC))
-                .lineToLinearHeading(new Pose2d(P3X + OFFX1 * NUMC, P3Y + OFFY1 * NUMC, P3H + OFFH1 * NUMC))
-                .addTemporalMarker(this::ret)
-                .waitSeconds(1)
+                .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
                 .build();
 
         TelemetryPacket tatp = new TelemetryPacket();
@@ -486,7 +346,7 @@ public class AutonomousStanga extends LinearOpMode {
         switch (LAST_ID) {
             default:
             case 7:
-                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P3X, P3Y - 10, P3H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
                             sClose.setPosition(SINCHIS);
@@ -501,7 +361,7 @@ public class AutonomousStanga extends LinearOpMode {
                         .build();
                 break;
             case 6:
-                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y - 10, P4H))
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P3X, P3Y - 10, P3H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
                             sClose.setPosition(SINCHIS);
@@ -516,7 +376,7 @@ public class AutonomousStanga extends LinearOpMode {
                         .build();
                 break;
             case 8:
-                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P4X, P4Y, P4H))
+                goToPark = drive.trajectorySequenceBuilder(new Pose2d(P3X, P3Y, P3H))
                         .addTemporalMarker(() -> {
                             conversiePerverssa(SAW);
                             sClose.setPosition(SINCHIS);
@@ -582,7 +442,7 @@ public class AutonomousStanga extends LinearOpMode {
 
                 if (gamepad1.y && !TB) {
                     sClose.setPosition(SDESCHIS);
-                    epd.set_target(EMAX, 0);
+                    epd.set_target(EM, 0);
                 }
                 TB = gamepad1.y;
 
@@ -639,7 +499,6 @@ public class AutonomousStanga extends LinearOpMode {
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
 
-    public static double WAT = 0.10;
     public static double WOT = 0.02;
 
     void runBBBBBBBBBBBBBB() {
@@ -661,10 +520,6 @@ public class AutonomousStanga extends LinearOpMode {
                 Canvas fieldOverlay = p.fieldOverlay();
                 draw(fieldOverlay, goToPreload);
                 draw(fieldOverlay, preloadToGet);
-                draw(fieldOverlay, trss.get(0).get(0));
-                draw(fieldOverlay, trss.get(0).get(1));
-                draw(fieldOverlay, trss.get(0).get(2));
-                draw(fieldOverlay, goToPark);
                 p.put("Updated!", 0);
                 dashboard.sendTelemetryPacket(p);
                 P11X = RAI1X;
@@ -690,7 +545,7 @@ public class AutonomousStanga extends LinearOpMode {
     void init_auto() {
         initma(hardwareMap);
         sMCLaw.setPosition(SCC);
-        ihk = new FirmaDinCentru(this);
+        ihk = new Tecton(this);
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         RobotFuncs.drive = drive;
@@ -782,41 +637,28 @@ public class AutonomousStanga extends LinearOpMode {
             wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(0);
             follow_traj(preloadToGet);
-            set_wait_time(WAT);
-            follow_traj(fixHead);
-            getpos();
-            epd.set_target(EMAX, 0);
+            epd.set_target(EM, 0);
             upd_grab_pos();
             getpos();
             wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
-            set_wait_time(0);
-            follow_traj(startGrab);
-            getpos();
             ihk.stage = 1;
             getpos();
             for (int i = 0; i < NUMC - 1; ++i) {
-                set_wait_time(WOT);
-                follow_traj(trss.get(i).get(0)); // Go to stalp
-                getpos();
                 wtfor(RobotFuncs.WAITS.HOISTER, WHO);
-                set_wait_time(WAT);
-                follow_traj(trss.get(i).get(1)); // Retract, Extend and go to get
+                rid(RBOT_POS);
+                ret();
+                epd.set_target(EM, 0);
+                upd_grab_pos();
                 getpos();
                 wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
-                set_wait_time(0);
-                follow_traj(trss.get(i).get(2)); // At get (retract)
-                getpos();
                 ihk.stage = 1;
                 getpos();
             }
 
             if (NUMC >= 1) {
-                set_wait_time(WOT);
-                follow_traj(trss.get(NUMC - 1).get(0)); // Go to stalp
                 wtfor(RobotFuncs.WAITS.HOISTER, WHO);
                 rid(RBOT_POS);
                 ret();
-                //wtfor(RobotFuncs.WAITS.HOISTER_FALL, 0.001);
             }
             getpos();
 
