@@ -31,9 +31,9 @@ public class RobotVars {
     public static double SDIF = 0.076;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
-    public static double SHG = 0.29;     // Grabber Get Heading
-    public static double SHP = 0.29;      // Grabber Put Heading
-    public static double SHAP = 0.35;     // Grabber After Put Heading
+    public static double SHG = 0.03;     // Grabber Get Heading
+    public static double SHP = 0.03;      // Grabber Put Heading
+    public static double SHAP = 0.09;     // Grabber After Put Heading
 
     public static double SCO = 0.0;       // Cone Securing Mini Servo Open Position
     public static double SCM = 0.6;       // Cone Securing Mini Servo Medium Position

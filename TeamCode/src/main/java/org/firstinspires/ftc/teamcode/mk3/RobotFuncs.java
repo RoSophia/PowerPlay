@@ -23,6 +23,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RES;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RIDICARE_LAMPREY;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAD;
@@ -55,6 +56,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rmd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
 import static org.firstinspires.ftc.teamcode.RobotVars.useExt;
 import static org.firstinspires.ftc.teamcode.RobotVars.useRid;
+import static org.firstinspires.ftc.teamcode.mk3.Teotonom.EM;
 import static java.lang.Thread.sleep;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -271,7 +273,7 @@ public class RobotFuncs {
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
-                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
+                while (!lom.isStopRequested() && (RMIU_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
                     leftBack.setPower(0);
                     rightBack.setPower(0);
                     leftFront.setPower(0);
@@ -279,7 +281,7 @@ public class RobotFuncs {
                     drive.updatePoseEstimate();
                     log_state();
                     pa = new TelemetryPacket();
-                    pa.put("WAIT_FOR_T", RTOP_POS - ridA.getCurrentPosition());
+                    pa.put("WAIT_FOR_T", RMIU_POS - ridA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
                     /*
                     telemetry.addLine("WRFOR HOISTER");
@@ -309,7 +311,7 @@ public class RobotFuncs {
                     sleep(2);
                 }
             } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
-                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) > MAX_DIF_EXT && timeout.seconds() < TIMEOUT) {
+                while (!lom.isStopRequested() && (EM - extA.getCurrentPosition()) > MAX_DIF_EXT && timeout.seconds() < TIMEOUT) {
                     leftBack.setPower(0);
                     rightBack.setPower(0);
                     leftFront.setPower(0);
@@ -317,7 +319,7 @@ public class RobotFuncs {
                     drive.updatePoseEstimate();
                     log_state();
                     pa = new TelemetryPacket();
-                    pa.put("WAIT_FOR_T", EMAX - extA.getCurrentPosition());
+                    pa.put("WAIT_FOR_T", EM - extA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
                     /*
                     telemetry.addLine("WRFOR EXTENSION");

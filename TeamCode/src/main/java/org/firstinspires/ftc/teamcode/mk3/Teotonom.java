@@ -107,13 +107,13 @@ public class Teotonom extends LinearOpMode {
 
     public static double P1H = 5.585;
     public static double P1X = -134;
-    public static double P1Y = 16;
+    public static double P1Y = 6;
     public static double P2H = 4.59;
-    public static double P2X = -119;
-    public static double P2Y = 14;
-    public static double P3H = 4.31;
-    public static double P3X = -96;
-    public static double P3Y = 6;
+    public static double P2X = -125;
+    public static double P2Y = -3;
+    public static double P3H = 4.415;
+    public static double P3X = -98;
+    public static double P3Y = 8.5;
 
     public static double P678X = -85;
     public static double P678H = -0;
@@ -159,7 +159,7 @@ public class Teotonom extends LinearOpMode {
     public static double R2X = 30;
     public static double R2Y = -1.2;
 
-    public static int EM = 450;
+    public static int EM = 530;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
