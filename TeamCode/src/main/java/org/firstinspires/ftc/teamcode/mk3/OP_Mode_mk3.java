@@ -122,6 +122,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
     boolean L2Y = false;
     boolean L2U = false;
     boolean L2D = false;
+    boolean L2R = false;
     boolean G2X = false;
     boolean R2RB = false;
     boolean R2LB = false;
@@ -201,7 +202,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
 
     public void runOpMode() {
         preinit();
-        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = R1B = R1X = R1Y = R1A = R1DD = R1DU = coneReady = false;
+        L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = R1B = R1X = R1Y = R1A = R1DD = R1DU = L2R = coneReady = false;
         oldpos = RID_POS;
 
         RobotFuncs.drive = new SampleMecanumDrive(hardwareMap);
@@ -335,6 +336,11 @@ public class OP_Mode_mk3 extends LinearOpMode {
                 clo.toPrepCone = true;
             }
             R1DU = gamepad1.dpad_up;
+
+            if (!L2R && gamepad2.dpad_right) {
+                sMCLaw.setPosition(SCO);
+            }
+            L2R = gamepad2.dpad_right;
 
             if (!R2RB && gamepad2.right_bumper && !coneClaw) {
                 clo.rtg = false;

@@ -46,9 +46,8 @@ public class AutoTest extends LinearOpMode {
     public static double P1X = -134;
     public static double P1Y = 6;
 
-    public static double MVEL = 170;
-    public static double MAL = 140;
-    public static double MDL = 80;
+    public static double MVEL = 60;
+    public static double MAL = 40;
 
     void set_wait_time(double t) {
         drive.follower = new HolonomicPIDVAFollower(SampleMecanumDrive.AXIAL_PID, SampleMecanumDrive.LATERAL_PID, SampleMecanumDrive.HEADING_PID, new Pose2d(2, 2, Math.toRadians(2)), t);
@@ -113,8 +112,6 @@ public class AutoTest extends LinearOpMode {
 
     ElapsedTime SHITTY_WORKAROUND_TIMER = new ElapsedTime(0);
     boolean SHITTY_WORKAROUND_TIMED = false;
-
-    public static double WOT = 0.02;
 
     void init_auto() {
         initma(hardwareMap);
