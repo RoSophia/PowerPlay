@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.mk3;
 
-import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
+import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.UPT;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.rpd;
@@ -44,7 +44,7 @@ class Tecton implements Runnable {
                     }
                     break;
                 case 4:
-                    rpd.set_target(RMID_POS, UPT);
+                    rpd.set_target(RMIU_POS, UPT);
                     stage = 0;
                     break;
                 default:

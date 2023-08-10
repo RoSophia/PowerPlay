@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: ./TeamCode/lib/road-runner-core.jar">
+  <library name="Gradle: C">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/TeamCode/lib/road-runner-core.jar!/" />
     </CLASSES>

@@ -13,7 +13,6 @@ public class RobotVars {
 
     public static int RTOP_POS = 590;     // Maximum Lift Position
     public static int RMIU_POS = 338;     // Medium Lift Position
-    public static int RMID_POS = 100;     // Low Lift Position
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
@@ -31,9 +30,9 @@ public class RobotVars {
     public static double SDIF = 0.076;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
-    public static double SHG = 0.03;     // Grabber Get Heading
-    public static double SHP = 0.03;      // Grabber Put Heading
-    public static double SHAP = 0.09;     // Grabber After Put Heading
+    public static double SHG = 0.06;     // Grabber Get Heading
+    public static double SHP = 0.06;      // Grabber Put Heading
+    public static double SHAP = 0.12;     // Grabber After Put Heading
 
     public static double SCO = 0.0;       // Cone Securing Mini Servo Open Position
     public static double SCM = 0.6;       // Cone Securing Mini Servo Medium Position

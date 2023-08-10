@@ -40,7 +40,6 @@ package org.firstinspires.ftc.teamcode.mk3;
 
 import static org.firstinspires.ftc.teamcode.RobotVars.CU_TESTING;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
-import static org.firstinspires.ftc.teamcode.RobotVars.RMID_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAG;
@@ -117,7 +116,6 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 @TeleOp
 public class OP_Mode_mk3 extends LinearOpMode {
     boolean L2A = false;
-    boolean L2RB = false;
     boolean L2B = false;
     boolean L2Y = false;
     boolean L2U = false;
@@ -290,10 +288,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
             }
             L2A = gamepad2.a;
 
-            if (!L2U && gamepad2.dpad_up) {
+            /*if (!L2U && gamepad2.dpad_up) {
                 rid(RMID_POS);
             }
-            L2U = gamepad2.dpad_up;
+            L2U = gamepad2.dpad_up;*/
 
             if (!L2D && gamepad2.dpad_down) {
                 rid(RMIU_POS);

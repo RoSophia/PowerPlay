@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: org.firstinspires.ftc:Tfod:8.1.1@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/6c7fe6853603a052d72c7d45836484f1/transformed/jetified-Tfod-8.1.1/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/6c7fe6853603a052d72c7d45836484f1/transformed/jetified-Tfod-8.1.1/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/80ef7d6ee4b78fff74bb20afc1e26c29/transformed/jetified-Tfod-8.1.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/80ef7d6ee4b78fff74bb20afc1e26c29/transformed/jetified-Tfod-8.1.1/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.firstinspires.ftc/Tfod/8.1.1/5f610f4ebf4ece0232e27f95ea323c4fef1723cd/Tfod-8.1.1-javadoc.jar!/" />

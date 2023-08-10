@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
+import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAW;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAG;
 import static org.firstinspires.ftc.teamcode.RobotVars.SBAH;
@@ -106,14 +107,14 @@ public class Teotonom extends LinearOpMode {
     public static double SPOSH = 0;
 
     public static double P1H = 5.585;
-    public static double P1X = -134;
-    public static double P1Y = 6;
+    public static double P1X = -131;
+    public static double P1Y = 14;
     public static double P2H = 4.59;
     public static double P2X = -125;
     public static double P2Y = -3;
-    public static double P3H = 4.415;
-    public static double P3X = -98;
-    public static double P3Y = 8.5;
+    public static double P3H = 4.323;
+    public static double P3X = -96;
+    public static double P3Y = 12;
 
     public static double P678X = -85;
     public static double P678H = -0;
@@ -154,9 +155,9 @@ public class Teotonom extends LinearOpMode {
     public static double MDL = 999;  // BREAKING BAD
      */
 
-    public static double R1X = 30;
+    public static double R1X = 22;
     public static double R1Y = -2.4;
-    public static double R2X = 30;
+    public static double R2X = 22;
     public static double R2Y = -1.2;
 
     public static int EM = 530;
@@ -231,6 +232,10 @@ public class Teotonom extends LinearOpMode {
         if (!isStopRequested()) {
             drive.update();
         }
+        leftBack.setPower(0);
+        rightBack.setPower(0);
+        leftFront.setPower(0);
+        rightFront.setPower(0);
         drive.tl.updHeading();
     }
 
@@ -284,7 +289,6 @@ public class Teotonom extends LinearOpMode {
         clo.tppc = false;
         clo.toPrepCone = false;
         clo.timt = 1;
-        openClaw();
         clo.toPut = false;
     }
 
@@ -293,6 +297,7 @@ public class Teotonom extends LinearOpMode {
     }
 
     void upd_grab_pos() {
+        openClaw();
         set_grab_pos(lp);
         ++lp;
     }
@@ -642,6 +647,7 @@ public class Teotonom extends LinearOpMode {
             getpos();
             wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
             ihk.stage = 1;
+            wtfor(RobotFuncs.WAITS.TRANSFER, WEX);
             getpos();
             for (int i = 0; i < NUMC - 1; ++i) {
                 wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
@@ -652,6 +658,7 @@ public class Teotonom extends LinearOpMode {
                 getpos();
                 wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
                 ihk.stage = 1;
+                wtfor(RobotFuncs.WAITS.TRANSFER, WEX);
                 getpos();
             }
 
@@ -674,6 +681,7 @@ public class Teotonom extends LinearOpMode {
             }
 
             //SHOULD_CLOSE_IMU = false;
+            conversiePerverssa(SAP);
             endma();
             ihk.shouldClose = true;
 
