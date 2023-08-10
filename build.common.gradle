@@ -25,6 +25,10 @@ android {
 
     compileSdkVersion 33
 
+    buildFeatures {
+      viewBinding true
+    }
+
     signingConfigs {
         release {
             def apkStoreFile = System.getenv("APK_SIGNING_STORE_FILE")

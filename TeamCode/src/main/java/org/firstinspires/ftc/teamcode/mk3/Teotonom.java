@@ -306,6 +306,7 @@ public class Teotonom extends LinearOpMode {
 
     TrajectorySequence goToPreload;
     TrajectorySequence preloadToGet;
+    TrajectorySequence keepPos;
     TrajectorySequence goToPark;
 
     Tecton ihk;
@@ -336,6 +337,10 @@ public class Teotonom extends LinearOpMode {
                     set_grab_pos(1);
                 })
                 .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H))
+                .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
+                .build();
+
+        keepPos = drive.trajectorySequenceBuilder(new Pose2d(P3X + 0.00001, P3Y, P3H))
                 .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
                 .build();
 
@@ -505,6 +510,7 @@ public class Teotonom extends LinearOpMode {
     boolean SHITTY_WORKAROUND_TIMED = false;
 
     public static double WOT = 0.02;
+    public static double WAT = 0.15;
 
     void runBBBBBBBBBBBBBB() {
         clo.shouldClose = true;
@@ -640,7 +646,7 @@ public class Teotonom extends LinearOpMode {
             follow_traj(goToPreload);
             getpos();
             wtfor(RobotFuncs.WAITS.HOISTERR, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
-            set_wait_time(0);
+            set_wait_time(WAT);
             follow_traj(preloadToGet);
             epd.set_target(EM, 0);
             upd_grab_pos();
@@ -649,11 +655,12 @@ public class Teotonom extends LinearOpMode {
             ihk.stage = 1;
             wtfor(RobotFuncs.WAITS.TRANSFER, WEX);
             getpos();
+            set_wait_time(WOT);
             for (int i = 0; i < NUMC - 1; ++i) {
                 wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
                 rid(RBOT_POS);
                 ret();
-                follow_traj(keep_pos);
+                follow_traj(keepPos);
                 epd.set_target(EM, 0);
                 upd_grab_pos();
                 getpos();
