@@ -47,8 +47,8 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.startma;
  * user to reset the position of the bot in the event that it drifts off the path.
  * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
  */
-@Config
-//@Disabled
+//@Config
+@Disabled
 @Autonomous(group = "drive")
 public class ManualFeedforwardTuner extends LinearOpMode {
     public static double DISTANCE = 250; // in

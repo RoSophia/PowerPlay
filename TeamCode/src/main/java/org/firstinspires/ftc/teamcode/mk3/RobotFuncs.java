@@ -421,9 +421,26 @@ public class RobotFuncs {
             PhotonCore.enable();
             PhotonCore.EXPANSION_HUB.clearBulkCache();
         }
+        DONT_KILL_IMU = false;
     }
 
+    public static boolean DONT_KILL_IMU = false;
+
     public static void initma(HardwareMap ch) { /// Init all hardware info
+        if (!DONT_KILL_IMU) {
+            if (imu != null) {
+                imu.close();
+                imu = null;
+            }
+            if (imuT != null) {
+                try {
+                    imuT.join();
+                } catch (Exception e) {
+
+                }
+                imuT = null;
+            }
+        }
         hardwareMap = ch;
 
         dashboard = FtcDashboard.getInstance();
@@ -504,7 +521,6 @@ public class RobotFuncs {
         frontEncoder.setDirection(FER ? Encoder.Direction.REVERSE : Encoder.Direction.FORWARD);
 
         ridlamp = new Lamprey(hardwareMap.get(AnalogInput.class, RIDICARE_LAMPREY));
-
         if (AUTO_CLOW) {
             sensorRange = hardwareMap.get(DistanceSensor.class, "csensor");
         } else {
@@ -524,6 +540,7 @@ public class RobotFuncs {
     }
 
     public static boolean SHOULD_CLOSE_IMU = false;
+
     public static void startma(LinearOpMode lom, Telemetry tele) { /// Set all values to their starting ones and start the PID threads
         pcoef = 12.0 / batteryVoltageSensor.getVoltage();
         RobotFuncs.lom = lom;
@@ -551,13 +568,13 @@ public class RobotFuncs {
         clo.lom = lom;
         cloT.start();
 
-        if (drive != null) {
-            drive.startTlt(lom);
-        }
-
         SHOULD_CLOSE_IMU = true;
         imu.setLom(lom);
         imuT.start();
+
+        if (drive != null) {
+            drive.startTlt(lom);
+        }
     }
 
     public static void opcl() {

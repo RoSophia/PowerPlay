@@ -69,6 +69,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.rd;
 import static org.firstinspires.ftc.teamcode.RobotVars.rf;
 import static org.firstinspires.ftc.teamcode.RobotVars.ri;
 import static org.firstinspires.ftc.teamcode.RobotVars.rp;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.DONT_KILL_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.SHOULD_CLOSE_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.batteryVoltageSensor;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
@@ -198,10 +199,30 @@ public class OP_Mode_mk3 extends LinearOpMode {
         }
     }
 
+    /*
+       /__\
+       |___|
+       |___|
+       |_I_|
+       |___|
+ _____ _____ _____
+|__I__|_____|__R__|
+       |___|
+       |___|
+       |___|
+       |_N_|
+       |___|
+       |___|
+       |___|
+       |___|
+  Doamne Fereste!
+     */
+
     public void runOpMode() {
         preinit();
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = R1B = R1X = R1Y = R1A = R1DD = R1DU = L2R = coneReady = false;
         oldpos = RID_POS;
+        DONT_KILL_IMU = true;
 
         RobotFuncs.drive = new SampleMecanumDrive(hardwareMap);
         initma(hardwareMap);

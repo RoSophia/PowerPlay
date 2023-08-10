@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.Mutex
 import org.firstinspires.ftc.teamcode.RobotVars.*
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive
 import java.lang.Thread.sleep
+import kotlin.math.abs
 
 class ThreadedLocalization(dr: SampleMecanumDrive) : Runnable {
     lateinit var lom: LinearOpMode
@@ -28,12 +29,23 @@ class ThreadedLocalization(dr: SampleMecanumDrive) : Runnable {
         poseEstimate = drive.poseEstimate
         poseVelocity = drive.poseVelocity
         lastError = drive.lastError
+        val tp = TelemetryPacket()
+        tp.put("EST_PEX", poseEstimate.x)
+        tp.put("EST_PEY", poseEstimate.y)
+        tp.put("EST_PEH", poseEstimate.heading)
+        tp.put("EST_PVX", poseVelocity?.x)
+        tp.put("EST_PVY", poseVelocity?.y)
+        tp.put("EST_PVH", poseVelocity?.heading)
+        tp.put("EST_LEX", lastError?.x)
+        tp.put("EST_LEY", lastError?.y)
+        tp.put("EST_LEH", lastError?.heading)
+        FtcDashboard.getInstance().sendTelemetryPacket(tp)
         new = false
         mtx.unlock()
     }
 
     fun updHeading() {
-        if (USE_UPD_HEAD) {
+        if (USE_UPD_HEAD && abs(RobotFuncs.imu.lastRead) > 0.001) {
             while (!mtx.tryLock()) {
                 sleep(3)
             }
@@ -81,6 +93,9 @@ class ThreadedLocalization(dr: SampleMecanumDrive) : Runnable {
             }
             pe.reset()
             drive.updatePoseEstimate()
+            if (USE_UPD_HEAD_FULL) {
+                updHeading()
+            }
             new = true
             mtx.unlock()
             if (USE_TELE) {

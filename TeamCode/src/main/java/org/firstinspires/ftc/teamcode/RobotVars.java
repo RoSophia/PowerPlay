@@ -12,7 +12,7 @@ public class RobotVars {
     public static int EMAX = 630;         // Maximum Extension
 
     public static int RTOP_POS = 590;     // Maximum Lift Position
-    public static int RMIU_POS = 338;     // Medium Lift Position
+    public static int RMIU_POS = 341;     // Medium Lift Position
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
@@ -38,7 +38,7 @@ public class RobotVars {
     public static double SCM = 0.6;       // Cone Securing Mini Servo Medium Position
     public static double SCC = 0.86;       // Cone Securing Mini Servo Close Position
 
-    public static double SGS = 0.498;  // Cone stack start position
+    public static double SGS = 0.505;  // Cone stack start position
     public static double SGD = 0.021;  // Cone stack diff
     public static double SBAS = 0.60;  // Cone stack balance start position
     public static double SBAD = 0.0;   // Cone stack balance diff
@@ -59,8 +59,8 @@ public class RobotVars {
     public static boolean armHolding = false;
     public static boolean coneReady = false;
 
-    public static double ep = 0.0085;  // Extension pidf and correction term between the motors
-    public static double ed = 0;
+    public static double ep = 0.0023;  // Extension pidf and correction term between the motors
+    public static double ed = 0.00001;
     public static double ei = 0.0;
     public static double ef = 0;
     public static double emd = 10;
@@ -83,12 +83,13 @@ public class RobotVars {
 
     public static String LES = "RF";
     public static String RES = "RB";
-    public static String FES = "LF";
+    public static String FES = "LB";
     public static boolean LER = true;
     public static boolean RER = true;
     public static boolean FER = true;
 
-    public static boolean USE_UPD_HEAD = false;
+    public static boolean USE_UPD_HEAD = true;
+    public static boolean USE_UPD_HEAD_FULL = false;
 
     public static String RIDICARE_LAMPREY = "lamprey2";
 

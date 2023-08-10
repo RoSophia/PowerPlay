@@ -89,10 +89,10 @@ import java.time.chrono.ThaiBuddhistEra;
 import java.util.ArrayList;
 import java.util.Vector;
 
-//@Config
+@Config
 @Autonomous(group = "drive", name = "Autonomous (Firma din centru)")
 @SuppressLint("DefaultLocale")
-@Disabled
+//@Disabled
 public class AutonomousStanga extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;

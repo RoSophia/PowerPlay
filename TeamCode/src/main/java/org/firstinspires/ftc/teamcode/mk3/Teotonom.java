@@ -112,9 +112,9 @@ public class Teotonom extends LinearOpMode {
     public static double P2H = 4.59;
     public static double P2X = -125;
     public static double P2Y = -3;
-    public static double P3H = 4.323;
+    public static double P3H = 4.47;
     public static double P3X = -96;
-    public static double P3Y = 12;
+    public static double P3Y = 6.5;
 
     public static double P678X = -85;
     public static double P678H = -0;
@@ -155,12 +155,12 @@ public class Teotonom extends LinearOpMode {
     public static double MDL = 999;  // BREAKING BAD
      */
 
-    public static double R1X = 22;
+    public static double R1X = 26;
     public static double R1Y = -2.4;
-    public static double R2X = 22;
+    public static double R2X = 26;
     public static double R2Y = -1.2;
 
-    public static int EM = 530;
+    public static int EM = 485;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -180,10 +180,14 @@ public class Teotonom extends LinearOpMode {
     }
 
     void follow_traj(TrajectorySequence traj) {
-        if (traj == null) {
+        if (traj == null || isStopRequested()) {
             return;
         }
+        telemetry.addLine("START FOL!");
+        telemetry.update();
         drive.followTrajectorySequenceAsync(traj);
+        telemetry.addLine("START FOL 2!");
+        telemetry.update();
         ElapsedTime timer = new ElapsedTime(0);
         ElapsedTime FULL_TIMER = new ElapsedTime(0);
         FULL_TIMER.reset();
@@ -192,6 +196,8 @@ public class Teotonom extends LinearOpMode {
         telepack.put("TEMP:MAX_DUR", MAX_DURATION);
         telepack.put("TEMP:FULL_TIMER", FULL_TIMER.seconds());
         dashboard.sendTelemetryPacket(telepack);
+        telemetry.addLine("STARTED TO DRIVE!");
+        telemetry.update();
         while (drive.isBusy() && !isStopRequested() && !gamepad1.right_bumper && FULL_TIMER.seconds() <= MAX_DURATION + CUR_CORRECTION + 0.01) {
             drive.update();
             telemetry.update();
@@ -229,9 +235,9 @@ public class Teotonom extends LinearOpMode {
                 epd.curRet = false;
             }
         }
-        if (!isStopRequested()) {
-            drive.update();
-        }
+        telemetry.addLine("FINISHED TO DRIVE!");
+        telemetry.update();
+        drive.update();
         leftBack.setPower(0);
         rightBack.setPower(0);
         leftFront.setPower(0);
@@ -273,7 +279,7 @@ public class Teotonom extends LinearOpMode {
 
     public static double RD = -1.0;
 
-    public static double WHO = 0.08;
+    public static double WHO = 0.15;
     public static double WEX = 0.0;
 
     int lp = 1;
@@ -416,7 +422,6 @@ public class Teotonom extends LinearOpMode {
         boolean DU = false;
         if (GPOS) {
             while (!isStopRequested() && !gamepad1.right_bumper) {
-                drive.updatePoseEstimate();
                 telemetry.addData("PE", drive.tl.getPoseEstimate());
                 telemetry.addData("PEH", drive.tl.getPoseEstimate().getHeading() / 180 * Math.PI);
                 telemetry.addData("Pe", drive.tl.getLastError());
@@ -442,6 +447,7 @@ public class Teotonom extends LinearOpMode {
                 if (gamepad1.a) {
                     break;
                 }
+
                 if (gamepad1.b && !TA) {
                     epd.set_target(EMIN, RETT);
                     rpd.set_target(RBOT_POS, DOT);
@@ -624,11 +630,15 @@ public class Teotonom extends LinearOpMode {
         }
 
         startma(this, telemetry);
+        telemetry.addLine("START DONE!");
+        telemetry.update();
         sMCLaw.setPosition(SCC);
         ihk.shouldClose = false;
         ihk.lom = this;
         ihkT.start();
         sClose.setPosition(SINCHIS);
+        telemetry.addLine("ASTART DONE!");
+        telemetry.update();
 
         if (!BBBBBBBBBBBBBB) {
             runBBBBBBBBBBBBBB();
@@ -641,32 +651,48 @@ public class Teotonom extends LinearOpMode {
 
             SHITTY_WORKAROUND_TIMER.reset();
             SHITTY_WORKAROUND_TIMED = false;
+            telemetry.addLine("BEFOR GETPOS!");
+            telemetry.update();
             getpos();
+            telemetry.addLine("AFTR GETPOS!");
+            telemetry.update();
             set_wait_time(WOT);
             follow_traj(goToPreload);
+            telemetry.addLine("AFTR FOLLOW!");
+            telemetry.update();
             getpos();
             wtfor(RobotFuncs.WAITS.HOISTERR, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(WAT);
             follow_traj(preloadToGet);
             epd.set_target(EM, 0);
             upd_grab_pos();
-            getpos();
             wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
+            getpos();
             ihk.stage = 1;
             wtfor(RobotFuncs.WAITS.TRANSFER, WEX);
             getpos();
-            set_wait_time(WOT);
+            set_wait_time(WAT);
             for (int i = 0; i < NUMC - 1; ++i) {
+
                 wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
                 rid(RBOT_POS);
                 ret();
                 follow_traj(keepPos);
+                getpos();
+                leftFront.setPower(0.0001);
+                leftBack.setPower(0.0001);
+                rightFront.setPower(0.0001);
+                rightBack.setPower(0.0001);
                 epd.set_target(EM, 0);
                 upd_grab_pos();
-                getpos();
                 wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
+                getpos();
                 ihk.stage = 1;
                 wtfor(RobotFuncs.WAITS.TRANSFER, WEX);
+                leftFront.setPower(0.0);
+                leftBack.setPower(0.0);
+                rightFront.setPower(0.0);
+                rightBack.setPower(0.0);
                 getpos();
             }
 
@@ -690,6 +716,7 @@ public class Teotonom extends LinearOpMode {
 
             //SHOULD_CLOSE_IMU = false;
             conversiePerverssa(SAP);
+            sMCLaw.setPosition(SCC);
             endma();
             ihk.shouldClose = true;
 
