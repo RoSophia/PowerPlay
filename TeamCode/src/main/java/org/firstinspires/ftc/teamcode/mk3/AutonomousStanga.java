@@ -348,8 +348,6 @@ public class AutonomousStanga extends LinearOpMode {
         Vector2d RAI2 = new Vector2d(RAI2X, RAI2Y);
         Vector2d R1 = new Vector2d(R1X, R1Y);
         Vector2d R2 = new Vector2d(R2X, R2Y);
-        Vector2d PTG1 = new Vector2d(PTG1X, PTG1Y);
-        Vector2d PTG2 = new Vector2d(PTG2X, PTG2Y);
         TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);

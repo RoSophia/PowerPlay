@@ -634,29 +634,29 @@ public class Teotonom extends LinearOpMode {
             set_wait_time(WOT);
             follow_traj(goToPreload);
             getpos();
-            wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
+            wtfor(RobotFuncs.WAITS.HOISTERR, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(0);
             follow_traj(preloadToGet);
             epd.set_target(EM, 0);
             upd_grab_pos();
             getpos();
-            wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
+            wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
             ihk.stage = 1;
             getpos();
             for (int i = 0; i < NUMC - 1; ++i) {
-                wtfor(RobotFuncs.WAITS.HOISTER, WHO);
+                wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
                 rid(RBOT_POS);
                 ret();
                 epd.set_target(EM, 0);
                 upd_grab_pos();
                 getpos();
-                wtfor(RobotFuncs.WAITS.EXTENSION, WEX);
+                wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
                 ihk.stage = 1;
                 getpos();
             }
 
             if (NUMC >= 1) {
-                wtfor(RobotFuncs.WAITS.HOISTER, WHO);
+                wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
                 rid(RBOT_POS);
                 ret();
             }

@@ -181,7 +181,7 @@ public class RobotFuncs {
         }
     }
 
-    public static enum WAITS {TRANSFER, HOISTER, HOISTERR, EXTENSION, HOISTER_FALL}
+    public static enum WAITS {TRANSFER, HOISTER, HOISTERR, EXTENSION, EXTENSIONE, HOISTER_FALL}
 
     public static SampleMecanumDrive drive;
     public static Encoder leftEncoder;
@@ -253,97 +253,58 @@ public class RobotFuncs {
         dashboard.sendTelemetryPacket(pa);
         ElapsedTime timeout = new ElapsedTime(0);
         timeout.reset();
+        leftBack.setPower(0);
+        rightBack.setPower(0);
+        leftFront.setPower(0);
+        rightFront.setPower(0);
         try {
             if (p == WAITS.TRANSFER) { /// 0: Wait for transfer to finish
                 while (!lom.isStopRequested() && !coneReady && timeout.seconds() < TIMEOUT) {
-                    leftBack.setPower(0);
-                    rightBack.setPower(0);
-                    leftFront.setPower(0);
-                    rightFront.setPower(0);
-                    drive.updatePoseEstimate();
                     log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", !coneReady);
                     dashboard.sendTelemetryPacket(pa);
-                    /*
-                    telemetry.addLine("WRFOR TRANSFER");
-                    telemetry.update();
-
-                     */
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER) { /// 1: Wait for hoister to the thing
+                while (!lom.isStopRequested() && (RTOP_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
+                    log_state();
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", RTOP_POS - ridA.getCurrentPosition());
+                    dashboard.sendTelemetryPacket(pa);
+                    sleep(2);
+                }
+            } else if (p == WAITS.HOISTERR) { /// 1: Wait for hoister to the thing
                 while (!lom.isStopRequested() && (RMIU_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
-                    leftBack.setPower(0);
-                    rightBack.setPower(0);
-                    leftFront.setPower(0);
-                    rightFront.setPower(0);
-                    drive.updatePoseEstimate();
                     log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", RMIU_POS - ridA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
-                    /*
-                    telemetry.addLine("WRFOR HOISTER");
-                    telemetry.addData("Hoister", RTOP_POS - ridA.getCurrentPosition());
-                    telemetry.update();
-
-                     */
-                    sleep(2);
-                }
-            } else if (p == WAITS.HOISTERR) { /// 1: Wait for hoister to the thing
-                while (!lom.isStopRequested() && (RMID_POS - ridA.getCurrentPosition()) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
-                    leftBack.setPower(0);
-                    rightBack.setPower(0);
-                    leftFront.setPower(0);
-                    rightFront.setPower(0);
-                    drive.updatePoseEstimate();
-                    log_state();
-                    pa = new TelemetryPacket();
-                    pa.put("WAIT_FOR_T", RMID_POS - ridA.getCurrentPosition());
-                    dashboard.sendTelemetryPacket(pa);
-                    /*
-                    telemetry.addLine("WRFOR HOISTER");
-                    telemetry.addData("Hoister", RTOP_POS - ridA.getCurrentPosition());
-                    telemetry.update();
-
-                     */
                     sleep(2);
                 }
             } else if (p == WAITS.EXTENSION) { /// 2: Wait for extension to finish
+                while (!lom.isStopRequested() && (EMAX - extA.getCurrentPosition()) > MAX_DIF_EXT && timeout.seconds() < TIMEOUT) {
+                    log_state();
+                    pa = new TelemetryPacket();
+                    pa.put("WAIT_FOR_T", EMAX - extA.getCurrentPosition());
+                    dashboard.sendTelemetryPacket(pa);
+                    sleep(2);
+                }
+            } else if (p == WAITS.EXTENSIONE) { /// 2: Wait for extension to finish
                 while (!lom.isStopRequested() && (EM - extA.getCurrentPosition()) > MAX_DIF_EXT && timeout.seconds() < TIMEOUT) {
-                    leftBack.setPower(0);
-                    rightBack.setPower(0);
-                    leftFront.setPower(0);
-                    rightFront.setPower(0);
                     drive.updatePoseEstimate();
                     log_state();
                     pa = new TelemetryPacket();
                     pa.put("WAIT_FOR_T", EM - extA.getCurrentPosition());
                     dashboard.sendTelemetryPacket(pa);
-                    /*
-                    telemetry.addLine("WRFOR EXTENSION");
-                    telemetry.addData("Extnesion", EMAX - extA.getCurrentPosition());
-                    telemetry.update();
-
-                     */
                     sleep(2);
                 }
             } else if (p == WAITS.HOISTER_FALL) { /// 2: Wait for hoisster to not the thing
                 while (!lom.isStopRequested() && (ridA.getCurrentPosition() - RBOT_POS) > MAX_DIF_RID && timeout.seconds() < TIMEOUT) {
-                    leftBack.setPower(0);
-                    rightBack.setPower(0);
-                    leftFront.setPower(0);
-                    rightFront.setPower(0);
-                    drive.updatePoseEstimate();
                     log_state();
                     pa = new TelemetryPacket();
-                    /*
                     pa.put("WAIT_FOR_T", ridA.getCurrentPosition() - RBOT_POS);
                     dashboard.sendTelemetryPacket(pa);
-                    telemetry.addLine("WRFOR HOISTER_FALL");
-                    telemetry.update();
-                     */
                     sleep(2);
                 }
             }
@@ -353,20 +314,10 @@ public class RobotFuncs {
             pa.put("WAIT_FOR_WAIT", et.seconds());
             dashboard.sendTelemetryPacket(pa);
             while (et.seconds() < extra && !lom.isStopRequested()) {
-                leftBack.setPower(0);
-                rightBack.setPower(0);
-                leftFront.setPower(0);
-                rightFront.setPower(0);
-                drive.updatePoseEstimate();
                 log_state();
                 pa = new TelemetryPacket();
                 pa.put("WAIT_FOR_WAIT", et.seconds());
                 dashboard.sendTelemetryPacket(pa);
-                /*
-                telemetry.addLine("WRFOR EXTRA");
-                telemetry.addData("Time", et.seconds());
-                telemetry.update();
-                 */
                 sleep(2);
             }
         } catch (Exception e) {
