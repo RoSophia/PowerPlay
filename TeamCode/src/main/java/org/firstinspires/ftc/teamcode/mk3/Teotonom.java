@@ -653,6 +653,7 @@ public class Teotonom extends LinearOpMode {
                 wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
                 rid(RBOT_POS);
                 ret();
+                follow_traj(keep_pos);
                 epd.set_target(EM, 0);
                 upd_grab_pos();
                 getpos();
