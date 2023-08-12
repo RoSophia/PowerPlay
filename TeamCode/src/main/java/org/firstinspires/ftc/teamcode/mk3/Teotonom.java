@@ -14,6 +14,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.SCC;
 import static org.firstinspires.ftc.teamcode.RobotVars.SCO;
 import static org.firstinspires.ftc.teamcode.RobotVars.SDESCHIS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHG;
+import static org.firstinspires.ftc.teamcode.RobotVars.ep;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_POWER;
 import static org.firstinspires.ftc.teamcode.RobotVars.SHITTY_WORKAROUND_TIME;
 import static org.firstinspires.ftc.teamcode.RobotVars.SINCHIS;
@@ -85,7 +86,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive")
+@Autonomous(group = "drive", name = "Auto Mediu S")
 @SuppressLint("DefaultLocale")
 public class Teotonom extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
@@ -112,30 +113,30 @@ public class Teotonom extends LinearOpMode {
     public static double P2H = 4.59;
     public static double P2X = -125;
     public static double P2Y = -3;
-    public static double P3H = 4.47;
-    public static double P3X = -96;
-    public static double P3Y = 6.5;
+    public static double P3H = 4.492;
+    public static double P3X = -95.5;
+    public static double P3Y = 7.1;
 
     public static double P678X = -85;
     public static double P678H = -0;
     public static double P6Y = -65;
     public static double P7Y = 4;
-    public static double P8Y = 55;
+    public static double P8Y = 65;
 
     public static double P71X = 40;
     public static double P71Y = 3.14;
     public static double P72X = 30;
     public static double P72Y = 2.7;
 
-    public static double P81X = 80;
-    public static double P81Y = 3.5;
-    public static double P82X = 80;
-    public static double P82Y = 2;
+    public static double P81X = 50;
+    public static double P81Y = 3.14;
+    public static double P82X = 65;
+    public static double P82Y = 2.5;
 
-    public static double P61X = 1;
-    public static double P61Y = 3;
-    public static double P62X = 20;
-    public static double P62Y = 4;
+    public static double P61X = 60;
+    public static double P61Y = 2.9;
+    public static double P62X = 60;
+    public static double P62Y = 3.1;
 
     public static double RAI1X = 20;
     public static double RAI1Y = -4;
@@ -143,8 +144,8 @@ public class Teotonom extends LinearOpMode {
     public static double RAI2Y = -3.2;
 
     public static boolean BBBBBBBBBBBBBB = true;
-    public static boolean RECURRING_SINGULARITY = true;
-    public static boolean GPOS = true;
+    public static boolean RECURRING_SINGULARITY = false;
+    public static boolean GPOS = false;
 
     public static double MVEL = 170;
     public static double MAL = 140;
@@ -160,7 +161,9 @@ public class Teotonom extends LinearOpMode {
     public static double R2X = 26;
     public static double R2Y = -1.2;
 
-    public static int EM = 485;
+    public static int EM = 470;
+    public static int EMS = 470;
+    public static int EME = 450;
 
     Vector<Double> v = new Vector<>();
     Vector<Pose2d> e = new Vector<>();
@@ -280,7 +283,7 @@ public class Teotonom extends LinearOpMode {
     public static double RD = -1.0;
 
     public static double WHO = 0.15;
-    public static double WEX = 0.0;
+    public static double WEX = 0.05;
 
     int lp = 1;
 
@@ -323,9 +326,14 @@ public class Teotonom extends LinearOpMode {
         clo._clw = false;
     }
 
+    double MV = 60;
+    double MA = 40;
     void mktraj() {
         Vector2d R1 = new Vector2d(R1X, R1Y);
         Vector2d R2 = new Vector2d(R2X, R2Y);
+        TrajectoryVelocityConstraint vvc = SampleMecanumDrive.getVelocityConstraint(MV, MAX_ANG_VEL, TRACK_WIDTH);
+        TrajectoryAccelerationConstraint aac = SampleMecanumDrive.getAccelerationConstraint(MA);
+
         TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
         TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
         TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
@@ -342,12 +350,12 @@ public class Teotonom extends LinearOpMode {
                     ret();
                     set_grab_pos(1);
                 })
-                .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H))
-                .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
+                .lineToLinearHeading(new Pose2d(P2X, P2Y, P2H), vvc, aac)
+                .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H), vvc, aac)
                 .build();
 
         keepPos = drive.trajectorySequenceBuilder(new Pose2d(P3X + 0.00001, P3Y, P3H))
-                .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H))
+                .lineToLinearHeading(new Pose2d(P3X, P3Y, P3H), vvc, aac)
                 .build();
 
         TelemetryPacket tatp = new TelemetryPacket();
@@ -356,9 +364,9 @@ public class Teotonom extends LinearOpMode {
     }
 
     void make_park() {
-        TrajectoryVelocityConstraint vc = SampleMecanumDrive.getVelocityConstraint(MVEL, MAX_ANG_VEL, TRACK_WIDTH);
-        TrajectoryAccelerationConstraint ac = SampleMecanumDrive.getAccelerationConstraint(MAL);
-        TrajectoryAccelerationConstraint dc = SampleMecanumDrive.getAccelerationConstraint(MDL);
+        TrajectoryVelocityConstraint vvc = SampleMecanumDrive.getVelocityConstraint(MV, MAX_ANG_VEL, TRACK_WIDTH);
+        TrajectoryAccelerationConstraint aac = SampleMecanumDrive.getAccelerationConstraint(MA);
+        TrajectoryAccelerationConstraint ddc = SampleMecanumDrive.getAccelerationConstraint(MA);
         switch (LAST_ID) {
             default:
             case 7:
@@ -370,7 +378,7 @@ public class Teotonom extends LinearOpMode {
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
                         })
-                        .funnyRaikuCurveLinear(new Pose2d(P678X, P7Y, P678H), new Vector2d(P71X, P71Y), new Vector2d(P72X, P72Y), vc, ac, dc)
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P7Y, P678H), new Vector2d(P71X, P71Y), new Vector2d(P72X, P72Y), vvc, aac, ddc)
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> ext(EMIN))
                         .waitSeconds(1)
@@ -385,7 +393,7 @@ public class Teotonom extends LinearOpMode {
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
                         })
-                        .funnyRaikuCurveLinear(new Pose2d(P678X, P6Y, P678H), new Vector2d(P61X, P61Y), new Vector2d(P62X, P62Y), vc, ac, dc)
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P6Y, P678H), new Vector2d(P61X, P61Y), new Vector2d(P62X, P62Y), vvc, aac, ddc)
                         .UNSTABLE_addTemporalMarkerOffset(-0.4, () -> ext(EMIN))
                         .addTemporalMarker(this::ltime)
                         .waitSeconds(1)
@@ -400,7 +408,7 @@ public class Teotonom extends LinearOpMode {
                             sBalans.setPosition(SBAG);
                             ext(EMIN);
                         })
-                        .funnyRaikuCurveLinear(new Pose2d(P678X, P8Y, P678H), new Vector2d(P81X, P81Y), new Vector2d(P82X, P82Y), vc, ac, dc)
+                        .funnyRaikuCurveLinear(new Pose2d(P678X, P8Y, P678H), new Vector2d(P81X, P81Y), new Vector2d(P82X, P82Y), vvc, aac, ddc)
                         .addTemporalMarker(this::ltime)
                         .UNSTABLE_addTemporalMarkerOffset(-0.6, () -> ext(EMIN))
                         .waitSeconds(1)
@@ -557,6 +565,7 @@ public class Teotonom extends LinearOpMode {
         }
     }
 
+
     CamGirl qtGirl;
 
     void init_auto() {
@@ -613,6 +622,7 @@ public class Teotonom extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        ep = 0.0023;
         preinit();
         init_auto();
 
@@ -664,6 +674,7 @@ public class Teotonom extends LinearOpMode {
             wtfor(RobotFuncs.WAITS.HOISTERR, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
             set_wait_time(WAT);
             follow_traj(preloadToGet);
+            EM = EMS;
             epd.set_target(EM, 0);
             upd_grab_pos();
             wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);
@@ -673,16 +684,18 @@ public class Teotonom extends LinearOpMode {
             getpos();
             set_wait_time(WAT);
             for (int i = 0; i < NUMC - 1; ++i) {
-
                 wtfor(RobotFuncs.WAITS.HOISTERR, WHO);
                 rid(RBOT_POS);
                 ret();
                 follow_traj(keepPos);
                 getpos();
-                leftFront.setPower(0.0001);
-                leftBack.setPower(0.0001);
-                rightFront.setPower(0.0001);
-                rightBack.setPower(0.0001);
+                leftFront.setPower(0.001);
+                leftBack.setPower(0.001);
+                rightFront.setPower(0.001);
+                rightBack.setPower(0.001);
+                if (i > 2) {
+                    EM = EME;
+                }
                 epd.set_target(EM, 0);
                 upd_grab_pos();
                 wtfor(RobotFuncs.WAITS.EXTENSIONE, WEX);

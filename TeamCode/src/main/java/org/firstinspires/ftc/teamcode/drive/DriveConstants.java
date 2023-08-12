@@ -76,9 +76,9 @@ public class DriveConstants {
     public static double MAX_DECEL = 999;  // BREAKING BAD
      */
 
-    public static double MAX_VEL = 60;// 254
-    public static double MAX_ACCEL = 40;//100;
-    public static double MAX_DECEL = 40;//70;
+    public static double MAX_VEL = 150;// 254
+    public static double MAX_ACCEL = 100;//100;
+    public static double MAX_DECEL = 80;//70;
 
     public static double MAX_ANG_VEL = 4;
     public static double MAX_ANG_ACCEL = 2.5;

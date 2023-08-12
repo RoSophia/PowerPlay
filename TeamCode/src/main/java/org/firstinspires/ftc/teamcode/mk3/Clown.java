@@ -195,6 +195,7 @@ public class Clown implements Runnable {
                 packet.put("SER_SEA", sextA.getPosition());
                 packet.put("SER_SEB", sextB.getPosition());
                 packet.put("SER_SEH", sHeading.getPosition());
+                packet.put("SER_SEC", sClose.getPosition());
                 packet.put("SER_LAM", ridlamp.getPosition());
                 packet.put("csens", cd);
 

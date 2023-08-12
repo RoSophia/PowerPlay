@@ -4,15 +4,15 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class RobotVars {
-    public static double SMDESCHIS = 0.785; // Claw Very Open (After put)
-    public static double SDESCHIS = 0.83; // Claw Open
-    public static double SINCHIS = 0.96;   // Claw Close
+    public static double SMDESCHIS = 0.80; // Claw Very Open (After put)
+    public static double SDESCHIS = 0.80; // Claw Open
+    public static double SINCHIS = 1.00;   // Claw Close
 
     public static int EMIN = 7;          // Minimum Extension
     public static int EMAX = 630;         // Maximum Extension
 
     public static int RTOP_POS = 590;     // Maximum Lift Position
-    public static int RMIU_POS = 341;     // Medium Lift Position
+    public static int RMIU_POS = 345;     // Medium Lift Position
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
@@ -30,9 +30,9 @@ public class RobotVars {
     public static double SDIF = 0.076;      // Grabber Arm Servo Diff Term
     public static double SDIP = 0.0;      // Grabber Arm Servo Proportional Drift Term
 
-    public static double SHG = 0.06;     // Grabber Get Heading
-    public static double SHP = 0.06;      // Grabber Put Heading
-    public static double SHAP = 0.12;     // Grabber After Put Heading
+    public static double SHG = 0.09;     // Grabber Get Heading
+    public static double SHP = 0.09;      // Grabber Put Heading
+    public static double SHAP = 0.15;     // Grabber After Put Heading
 
     public static double SCO = 0.0;       // Cone Securing Mini Servo Open Position
     public static double SCM = 0.6;       // Cone Securing Mini Servo Medium Position
