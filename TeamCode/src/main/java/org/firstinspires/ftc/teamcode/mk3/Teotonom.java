@@ -25,6 +25,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.SHOULD_CLOSE_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.endma;
@@ -727,7 +728,7 @@ public class Teotonom extends LinearOpMode {
                 follow_traj(traj);
             }
 
-            //SHOULD_CLOSE_IMU = false;
+            SHOULD_CLOSE_IMU = false;
             conversiePerverssa(SAP);
             sMCLaw.setPosition(SCC);
             endma();

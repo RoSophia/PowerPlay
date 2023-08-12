@@ -178,7 +178,7 @@ public class OP_Mode_mk3 extends LinearOpMode {
     }
 
     public static double TURNP = 0.5;
-    public static double TURND = 0.09;
+    public static double TURND = 0.1;
     public static double TURNF = 0.15;
     public static double MAX_ERROR = 0.03;
 
@@ -223,8 +223,10 @@ public class OP_Mode_mk3 extends LinearOpMode {
         L2A = L2B = L2Y = L2U = L2D = G2X = R2RB = R2LB = RB = R1B = R1X = R1Y = R1A = R1DD = R1DU = L2R = coneReady = false;
         oldpos = RID_POS;
         DONT_KILL_IMU = true;
+        SDESCHIS = 0.85;
 
         RobotFuncs.drive = new SampleMecanumDrive(hardwareMap);
+        //RobotFuncs.drive = null;
         initma(hardwareMap);
         /*
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

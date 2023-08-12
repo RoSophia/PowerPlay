@@ -28,6 +28,8 @@ import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epd;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.epsEq;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ext;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extA;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.extB;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.opcl;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.ridlamp;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.sClose;
@@ -40,6 +42,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -80,7 +83,7 @@ public class Clown implements Runnable {
     public static double RET_POW = -0.2;
     public static double RLAMP_MPOS = 0.5;
     public static double RLAMP_POS = 1.12;
-    public static boolean USE_TELE = false;
+    public static boolean USE_TELE = true;
     public static double CLWT = 0.08;
 
     public static LinearOpMode lom;
@@ -165,6 +168,12 @@ public class Clown implements Runnable {
     boolean AAAAAAAAAAAAA = false;
     boolean BBBBBBBBBBBBB = false;
 
+
+    public static boolean NOT_USE_LAMP = true;
+    ElapsedTime kmskms = new ElapsedTime(0);
+    public static double KMSKMS1 = 0.2;
+    public static double KMSKMS2 = 0.4;
+
     public void run() {
         while (!shouldClose && !lom.isStopRequested()) {
             double cd = 0;
@@ -246,21 +255,23 @@ public class Clown implements Runnable {
                 _csc = false;
                 _csp = false;
                 _csw = false;
+                kmskms.reset();
             }
 
             if (cput) { // Currently putting
                 epd.curRet = true;
-                spe(false, RET_POW);
+                extA.setPower(RET_POW);
+                extB.setPower(RET_POW);
 
                 if (et.seconds() >= wtim.get(timt) * DT && !_csp) {
                     conversiePerverssa(SAP + poff.get(timt));
                     _csp = true;
                 } else if (_csp) {
-                    if (ridlamp.getPosition() >= RLAMP_MPOS && !_rlamp && !_rrlamp) {
+                    if (((!NOT_USE_LAMP && ridlamp.getPosition() >= RLAMP_MPOS) || (NOT_USE_LAMP && kmskms.seconds() > KMSKMS1)) && !_rlamp && !_rrlamp) {
                         sMCLaw.setPosition(SCM);
                         _rrlamp = true;
                     }
-                    if (ridlamp.getPosition() >= RLAMP_POS && !_rlamp) {
+                    if (((!NOT_USE_LAMP && ridlamp.getPosition() >= RLAMP_POS) || (NOT_USE_LAMP && kmskms.seconds() > KMSKMS2)) && !_rlamp) {
                         _rlamp = true;
                         et.reset();
                     } else if (_rlamp) {
@@ -297,6 +308,10 @@ public class Clown implements Runnable {
                             waiting = true;
                             timt = 0;
                             et.reset();
+                            extA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                            extA.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                            extB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                            extB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                             spe(false, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
                             //spe(true, 0.0); // Te uras adi pt asta "Robotu ar trebui sa traga mereu bratele in spate cand face transferu fuck you"
                             epd.curRet = false;

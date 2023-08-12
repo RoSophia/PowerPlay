@@ -28,6 +28,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.pcoef;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.clo;
+import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.SHOULD_CLOSE_IMU;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.conversiePerverssa;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.dashboard;
 import static org.firstinspires.ftc.teamcode.mk3.RobotFuncs.endma;
@@ -119,20 +120,20 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P22Y = 0;
     public static double P2H = 4.66;
     public static double P2X = -122;
-    public static double P2Y = 29;
+    public static double P2Y = 28.5;
     public static double P3H = 4.38;
-    public static double P3X = -95;
+    public static double P3X = -96.5;
     public static double P3Y = 67;
     public static double P4H = 4.71;
     public static double P4X = -127;
-    public static double P4Y = 30;
+    public static double P4Y = 28.5;
 
     public static double OFFX = 0.0;
     public static double OFFY = 0.0;
     public static double OFFH = 0.0;
 
-    public static double OFFX1 = 0;
-    public static double OFFY1 = 0.0;
+    public static double OFFX1 = -0.15;
+    public static double OFFY1 = 0.1;
     public static double OFFH1 = 0.0;
 
     public static double P678X = -85;
@@ -142,8 +143,8 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P8Y = 65;
 
     public static double P71X = 40;
-    public static double P71Y = 3.14;
-    public static double P72X = 30;
+    public static double P71Y = 3.16;
+    public static double P72X = 40;
     public static double P72Y = 2.7;
 
     public static double P81X = 80;
@@ -348,6 +349,8 @@ public class AutonomousStanga extends LinearOpMode {
 
     public static double WAAAAAAAAAAAAIT = 0.1;
 
+    public static double WOEFF = -0.2;
+
     void mktraj() {
         Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
         Vector2d RAI2 = new Vector2d(RAI2X, RAI2Y);
@@ -435,7 +438,7 @@ public class AutonomousStanga extends LinearOpMode {
                     .funnyRaikuCurveLinear(new Pose2d(P4X + OFFX * i, P4Y + OFFY * i, P4H + OFFH * i), RAI2, RAI1)
                     .UNSTABLE_addTemporalMarkerOffset(0, this::getpos)
                     .waitSeconds(0.05)
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    .UNSTABLE_addTemporalMarkerOffset(WOEFF, () -> {
                         epd.set_target(EMAX, 0);
                         upd_grab_pos();
                     })
@@ -734,6 +737,8 @@ public class AutonomousStanga extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        SDESCHIS = 0.80; // Claw Open
+
         ep = 0.005;
         preinit();
         init_auto();
@@ -842,7 +847,7 @@ public class AutonomousStanga extends LinearOpMode {
                 follow_traj(traj);
             }
 
-            //SHOULD_CLOSE_IMU = false;
+            SHOULD_CLOSE_IMU = false;
             endma();
             ihk.shouldClose = true;
 

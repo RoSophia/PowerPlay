@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class RobotVars {
     public static double SMDESCHIS = 0.80; // Claw Very Open (After put)
     public static double SDESCHIS = 0.80; // Claw Open
-    public static double SINCHIS = 1.00;   // Claw Close
+    public static double SINCHIS = 0.97;   // Claw Close
 
     public static int EMIN = 7;          // Minimum Extension
     public static int EMAX = 630;         // Maximum Extension
@@ -16,7 +16,7 @@ public class RobotVars {
     public static int RBOT_POS = 0;       // Bottom Lift position
     public static int LEEW = 0;           // Leeway For Manual Lift Movement
 
-    public static double SAG = 0.415;     // Grabber Arm Get position
+    public static double SAG = 0.420;     // Grabber Arm Get position
     public static double SAH = 0.610;     // Grabber Arm Hold Position
     public static double SAP = 0.77;      // Grabber Arm Put position
     public static double SAW = 0.680;     // Grabber Arm Wait position
