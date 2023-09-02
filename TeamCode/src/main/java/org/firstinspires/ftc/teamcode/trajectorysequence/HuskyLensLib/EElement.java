@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.HuskyLensLib;
+package org.firstinspires.ftc.teamcode.trajectorysequence.HuskyLensLib;
 
 public class EElement {
     public int x0;

@@ -7,7 +7,7 @@ public class RobotConstants {
     public static double SDESCHIS = 0.73;
     public static double SINCHIS = 0.85;
 
-    public static int TOP_POS = 1140;
+    public static int TOP_POS = 1800;
     public static int MIU_POS = 870;
     public static int MID_POS = 580;
     public static int BOT_POS = 10;
@@ -44,6 +44,6 @@ public class RobotConstants {
     public static double UPT = 0.5;
 
     public static boolean USE_PHOTON = true;
-    public static boolean USE_TELEMETRY = false;
+    public static boolean USE_TELEMETRY = true;
     public static double pcoef = 1.0;
 }

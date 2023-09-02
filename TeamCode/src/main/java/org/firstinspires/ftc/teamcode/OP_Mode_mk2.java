@@ -229,6 +229,8 @@ public class OP_Mode_mk2 extends LinearOpMode {
                 pack.put("CycleTime", timer.milliseconds());
                 timer.reset();
                 dashboard.sendTelemetryPacket(pack);
+                telemetry.addData("Ridicare", ridicareSlide.getCurrentPosition());
+                telemetry.update();
             }
 
             final double speed = Math.hypot(gamepad1.left_stick_x * XOEF, gamepad1.left_stick_y * YOEF);

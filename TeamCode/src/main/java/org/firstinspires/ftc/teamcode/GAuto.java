@@ -232,7 +232,7 @@ public class GAuto extends LinearOpMode {
         }
     }*/
 
-    public static int NCON = 2;
+    public static int NCON = 0;
 
     @SuppressWarnings("ConstantConditions")
     TrajectorySequence mktraj() {
