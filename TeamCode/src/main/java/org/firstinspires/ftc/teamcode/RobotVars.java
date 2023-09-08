@@ -45,6 +45,7 @@ public class RobotVars {
 
     public static double DOT = 0.0;       // Time To Lower The Lift
     public static double UPT = 0.5;       // Time To Hoist Up The Thing
+    public static double MUPT = 0.3;       // Time To Hoist Up The Thing
     public static double EXTT = 0.8;      // Time To Fully Extend
     public static double RETT = 0.0;      // Time To Retract
 
@@ -66,10 +67,10 @@ public class RobotVars {
     public static double emd = 10;
     public static double ebp = 0.0000;
 
-    public static double rp = 0.0075;  // Lift pidf and correction term between the motors
+    public static double rp = 0.005;  // Lift pidf and correction term between the motors
     public static double rd = 0.0;
     public static double ri = 0.0;
-    public static double rf = 0.001;
+    public static double rf = 0.0006;
     public static double rmd = 15;
     public static double rbp = 0.018;
 

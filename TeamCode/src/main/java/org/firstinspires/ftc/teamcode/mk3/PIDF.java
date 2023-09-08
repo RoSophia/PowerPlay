@@ -143,7 +143,7 @@ class PIDF implements Runnable {
         if (motA == null) {
             return;
         }
-        int cp = 0;
+        int cp;
         int cpb = 0;
         ElapsedTime timer2 = new ElapsedTime(0);
         lastTarget = target;

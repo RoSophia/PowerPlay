@@ -15,6 +15,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.LER;
 import static org.firstinspires.ftc.teamcode.RobotVars.LES;
 import static org.firstinspires.ftc.teamcode.RobotVars.MAX_DIF_EXT;
 import static org.firstinspires.ftc.teamcode.RobotVars.MAX_DIF_RID;
+import static org.firstinspires.ftc.teamcode.RobotVars.MUPT;
 import static org.firstinspires.ftc.teamcode.RobotVars.RAP;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBP;
@@ -170,7 +171,7 @@ public class RobotFuncs {
                 if (pos == RTOP_POS) {
                     rpd.set_target(pos, UPT);
                 } else {
-                    rpd.set_target(pos, UPT / 2);
+                    rpd.set_target(pos, MUPT);
                 }
             }
         } else {

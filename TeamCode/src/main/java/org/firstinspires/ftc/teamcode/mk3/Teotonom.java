@@ -116,7 +116,7 @@ public class Teotonom extends LinearOpMode {
     public static double P2Y = -3;
     public static double P3H = 4.492;
     public static double P3X = -95.5;
-    public static double P3Y = 7.1;
+    public static double P3Y = 6.7;
 
     public static double P678X = -85;
     public static double P678H = -0;

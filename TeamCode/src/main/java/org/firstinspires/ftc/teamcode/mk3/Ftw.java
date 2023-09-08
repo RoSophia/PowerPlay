@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.RobotVars.EMAX;
 import static org.firstinspires.ftc.teamcode.RobotVars.EMIN;
 import static org.firstinspires.ftc.teamcode.RobotVars.RBOT_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RETT;
+import static org.firstinspires.ftc.teamcode.RobotVars.RMIU_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.RTOP_POS;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAH;
 import static org.firstinspires.ftc.teamcode.RobotVars.SAP;
@@ -90,10 +91,10 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 @Config
-@Autonomous(group = "drive", name = "Autonomous (Firma din centru)")
+@Autonomous(group = "drive", name = "ULTRA*SAFE")
 @SuppressLint("DefaultLocale")
 //@Disabled
-public class AutonomousStanga extends LinearOpMode {
+public class Ftw extends LinearOpMode {
     AprilTagDetectionPipeline qtPipeline;
     SampleMecanumDrive drive;
 
@@ -112,9 +113,9 @@ public class AutonomousStanga extends LinearOpMode {
     public static double SPOSY = 0;
     public static double SPOSH = 0;
 
-    public static double P1H = 5.585;
-    public static double P1X = -134;
-    public static double P1Y = 16;
+    public static double P1H = 4.782;
+    public static double P1X = -97;
+    public static double P1Y = 4;
     public static double P22H = 4.886;
     public static double P22X = -118;
     public static double P22Y = 0;
@@ -157,10 +158,10 @@ public class AutonomousStanga extends LinearOpMode {
     public static double P62X = 25;
     public static double P62Y = 4.4;
 
-    public static double PTG1X = 15.0;
-    public static double PTG1Y = -1.5;
-    public static double PTG2X = 15.0;
-    public static double PTG2Y = -0.5;
+    public static double PTG1X = 25.0;
+    public static double PTG1Y = -0.9;
+    public static double PTG2X = 25.0;
+    public static double PTG2Y = -1.7;
 
     public static double RAI1X = 20;
     public static double RAI1Y = -4;
@@ -182,9 +183,9 @@ public class AutonomousStanga extends LinearOpMode {
 
      */
 
-    public static double R1X = 30;
+    public static double R1X = 15;
     public static double R1Y = -2.4;
-    public static double R2X = 30;
+    public static double R2X = 15;
     public static double R2Y = -1.2;
 
     Vector<Double> v = new Vector<>();
@@ -336,7 +337,7 @@ public class AutonomousStanga extends LinearOpMode {
     TrajectorySequence ender;
     Vector<Vector<TrajectorySequence>> trss = new Vector<>();
 
-    FirmaDinCentru ihk;
+    FFF ihk;
     Thread ihkT;
 
     void openClaw() {
@@ -350,6 +351,8 @@ public class AutonomousStanga extends LinearOpMode {
     public static double WAAAAAAAAAAAAIT = 0.1;
 
     public static double WOEFF = -0.3;
+
+    public static double CLOWNCLON = 0.4;
 
     void mktraj() {
         Vector2d RAI1 = new Vector2d(RAI1X, RAI1Y);
@@ -365,15 +368,13 @@ public class AutonomousStanga extends LinearOpMode {
 
         goToPreload = drive.trajectorySequenceBuilder(new Pose2d(SPOSX, SPOSY, SPOSH))
                 .funnyRaikuCurveLinear(new Pose2d(P1X, P1Y, P1H), R1, R2, vc, ac, dc)
-                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RTOP_POS))
+                .UNSTABLE_addTemporalMarkerOffset(RD, () -> rid(RMIU_POS))
                 .build();
 
         if (USE_SPLINE_1) {
             preloadToGet = drive.trajectorySequenceBuilder(new Pose2d(P1X + 0.00001, P1Y, P1H))
                     .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                         rid(RBOT_POS);
-                        ret();
-                        set_grab_pos(1);
                     })
                     .funnyRaikuCurveLinear(new Pose2d(P2X, P2Y, P2H), PTG1, PTG2)
                     .waitSeconds(0.044)
@@ -686,7 +687,7 @@ public class AutonomousStanga extends LinearOpMode {
     void init_auto() {
         initma(hardwareMap);
         sMCLaw.setPosition(SCC);
-        ihk = new FirmaDinCentru(this);
+        ihk = new FFF(this);
         ihkT = new Thread(ihk);
         drive = new SampleMecanumDrive(hardwareMap);
         RobotFuncs.drive = drive;
@@ -778,9 +779,11 @@ public class AutonomousStanga extends LinearOpMode {
             set_wait_time(WOT);
             follow_traj(goToPreload);
             getpos();
-            wtfor(RobotFuncs.WAITS.HOISTER, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
-            set_wait_time(0);
+            wtfor(RobotFuncs.WAITS.HOISTERR, WHO); // WAIT FOR BETTER NO EXTRA WAIT IF WAITING IN DRUM
+            set_wait_time(0.4);
             follow_traj(preloadToGet);
+            ret();
+            set_grab_pos(1);
             set_wait_time(WAT);
             follow_traj(fixHead);
             getpos();

@@ -306,6 +306,14 @@ public class OP_Mode_mk3 extends LinearOpMode {
             final double lbPower = mc + turn;
             final double rbPower = ms - turn;
 
+            pcoef = 12.0 / batteryVoltageSensor.getVoltage();
+            final double spcoef = 1 - 0.65 * gamepad1.right_trigger;
+            final double fcoef = pcoef * spcoef;
+            leftFront.setPower(lfPower * fcoef * P1);
+            rightFront.setPower(rfPower * fcoef * P2);
+            leftBack.setPower(lbPower * fcoef * P3);
+            rightBack.setPower(rbPower * fcoef * P4);
+
             if (!L2A && gamepad2.a) {
                 rid(RTOP_POS);
             }
@@ -491,14 +499,6 @@ public class OP_Mode_mk3 extends LinearOpMode {
             if (gamepad2.left_trigger > 0.7 && gamepad2.right_trigger > 0.7) {
                 break;
             }
-
-            pcoef = 12.0 / batteryVoltageSensor.getVoltage();
-            final double spcoef = 1 - 0.65 * gamepad1.right_trigger;
-            final double fcoef = pcoef * spcoef;
-            leftFront.setPower(lfPower * fcoef * P1);
-            rightFront.setPower(rfPower * fcoef * P2);
-            leftBack.setPower(lbPower * fcoef * P3);
-            rightBack.setPower(rbPower * fcoef * P4);
         }
 
         boolean KILL = false;
